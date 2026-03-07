@@ -30,18 +30,29 @@ export const cmsApi = {
     const res = await fetch(`/api/v1/content/${slug}`);
     return res.json();
   },
-  
+
+  getGlobalSettings: async () => {
+    const res = await fetch('/api/v1/global');
+    return res.json();
+  },
+
   // Admin
   getDivisions: async (): Promise<{ divisions: Division[] }> => {
     const res = await fetch('/api/admin/divisions');
     return res.json();
   },
-  
+
   getAllContentBlocks: async (): Promise<{ contentBlocks: ContentBlock[] }> => {
     const res = await fetch('/api/admin/content');
     return res.json();
   },
-  
+
+  // Division-scoped: get all blocks for a specific division
+  getDivisionBlocks: async (slug: string): Promise<{ division: Division; blocks: ContentBlock[] }> => {
+    const res = await fetch(`/api/admin/division/${slug}/blocks`);
+    return res.json();
+  },
+
   createContentBlock: async (data: Partial<ContentBlock>): Promise<ContentBlock> => {
     const res = await fetch('/api/admin/content', {
       method: 'POST',
@@ -50,7 +61,7 @@ export const cmsApi = {
     });
     return res.json();
   },
-  
+
   updateContentBlock: async (id: string, data: Partial<ContentBlock>): Promise<ContentBlock> => {
     const res = await fetch(`/api/admin/content/${id}`, {
       method: 'PUT',
@@ -59,17 +70,43 @@ export const cmsApi = {
     });
     return res.json();
   },
-  
+
+  // Field-level update: merge specific fields into a block's payload
+  updateBlockFields: async (id: string, fields: Record<string, any>): Promise<ContentBlock> => {
+    const res = await fetch(`/api/admin/content/${id}/fields`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields)
+    });
+    return res.json();
+  },
+
   getWeeklyUpdates: async (): Promise<{ updates: WeeklyUpdate[] }> => {
     const res = await fetch('/api/admin/updates');
     return res.json();
   },
-  
+
   publishUpdates: async (updateIds: string[]): Promise<any> => {
     const res = await fetch('/api/admin/publish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ update_ids: updateIds })
+    });
+    return res.json();
+  },
+
+  // --- Global Settings ---
+
+  getAdminGlobalSettings: async () => {
+    const res = await fetch('/api/admin/global');
+    return res.json();
+  },
+
+  updateGlobalSettings: async (section: string, data: Record<string, any>) => {
+    const res = await fetch('/api/admin/global', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section, data })
     });
     return res.json();
   },

@@ -1,7 +1,56 @@
 import React, { useState, useRef } from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
 const ReservationsScreen: React.FC = () => {
-    const [tooltip, setTooltip] = useState<{show: boolean, x: number, y: number, id: string, seats: string, desc: string}>({
+    const { content: cmsData } = useCMS('dining');
+    const reservationsBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'reservations')?.content_payload || {
+        hero: {
+            title1: "Taste the Sunset.",
+            title2: "Reserve Your Moment.",
+            subtitle: "Experience culinary excellence in an atmosphere of warmth and elegance. From intimate balcony seating to grand hall feasts.",
+            btn1: "Pick Your Spot",
+            btn2: "Plan an Event",
+            bgImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuAUe5ZP5MQA7ixW0Da_MfWshoZ0lELmWcPtpCFS_7XhwFeNxobxMNmSqA0iWAsLI1TIvXT2NikxEZIUmLUv1x3sOH5b0GP9zGK9ak3Eq7JdpZjfHixGVVDDtqOyvhen7_eriB3oXUcGRu_9YOlpDpdEX-dZkLfxCML86oAFi2psfygVI9nBjc7COk76SLtG4eCuyKnvQ02nwQZLV5gOy9r5JPEwXVMzd_cSQAaGfgkFkUJY9uGZWSft4gLTZrqyXGfPiL7_oLLlBVfu"
+        },
+        mapInfo: {
+            title: "Select Your Table",
+            desc: "Hover over the map to see table details. Green indicates availability."
+        },
+        occasions: {
+            title: "Special Occasions",
+            subtitle: "Beyond Dining",
+            items: [
+                {
+                    title: "Birthday Packages",
+                    desc: "Turn another year older into a timeless memory. Our birthday packages include a complimentary bottle of vintage champagne, a custom dessert presentation by our pastry chef, and a personalized menu card for the guest of honor.",
+                    features: ["Private booth options", "Custom cake pre-ordering", "Dedicated server"],
+                    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBz4t63zQlqwgNr3V3xWIh6dUAcyR4skNP93N-2mQX8sQoYB5MIv4S8m0siIUlwEDD-Q7KmFJw0JndqVdz0xaUaY22al93QbjmS-EMEb0jZjhloqVYi8rkFYVF_cjl1ULasiSvs7RvbxX8LfGtk_c9uo6tVUW1BNA4hIXGjVpdjKFAtwgdKB0CiSER1Bh-RLwHCFlBB3TgYGnvu_fm-POqKHUxDO3ZcDFmTR8HkaAMv22JMhw9n717aomsL2mwPrc1N8m4Rf1eQPHei",
+                    btnText: "Inquire Now",
+                    reverse: false
+                },
+                {
+                    title: "Corporate Dinners",
+                    desc: "Seal the deal or celebrate the team in our sound-proofed private suites. We offer AV capabilities for presentations and a discreet service style that ensures your meeting flow is never interrupted.",
+                    features: ["12-40 Guests", "AV Enabled"],
+                    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD79xwYBgrkDa55G-uxTYJPYvV5-BgKp-660ClVwGRdAoxn3tNIzlmM2XDM7yRnrX5sEyAdgUuIqX2cHZUT9e5VQ_oVgIyDhQ-sUNJNAEKoSzkSzSNrQVIN1dNqlKMdwmbJMR_KitQ5-RimBcp54wEjUQuhtmY7dtymNi4-NRRe5OoxUK8G8ysxwKXhKEogNg37lZW77yQkjpU62xlUIocOkMW5CmdW4a9hRBIz1TvJ65LEaNKjy6q6gZJF4Ti3oKx48kSy_Wgceu0Q",
+                    btnText: "Corporate Brochure",
+                    reverse: true,
+                    type: "corporate"
+                },
+                {
+                    title: "Private Chef Experiences",
+                    desc: "For the ultimate gastronome. Sit at the exclusive Chef's Table or book a private room for a 7-course tasting menu curated specifically for your palate, paired with rare wines from our cellar.",
+                    features: [],
+                    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuByB2nt681amZpjVAOBAqxaUa0qELYH0n32eZoV_15SEnr0MIAXVSH3wSPUF3s4Yt0Lr_G5gJdCCDKPAUZwkshbLQGOEu2aYr3bWqfzRFEwLrPewdfjngjYqiBM45TGGJaGHWQYltsd0KOBP22Ca93LZXmEjEzywN_FRlAOErJmUEEqrMAmyAp71fykSF3Qq6F5hiMP4t2Cw9h2rt5Sx9lzLGKGjq-nKYanTpbxsRK9mOmeaPP-Mmcjhw88b06DYSk4--Df20YQX6MA",
+                    btnText: "View Sample Menu",
+                    reverse: false,
+                    type: "chef"
+                }
+            ]
+        }
+    };
+
+    const [tooltip, setTooltip] = useState<{ show: boolean, x: number, y: number, id: string, seats: string, desc: string }>({
         show: false, x: 0, y: 0, id: '', seats: '', desc: ''
     });
 
@@ -9,7 +58,7 @@ const ReservationsScreen: React.FC = () => {
 
     const handleMouseEnter = (e: React.MouseEvent, id: string, seats: string, desc: string, isOccupied: boolean) => {
         if (isOccupied) return;
-        
+
         // Calculate position relative to the map container
         const rect = mapRef.current?.getBoundingClientRect();
         if (rect) {
@@ -31,30 +80,30 @@ const ReservationsScreen: React.FC = () => {
             <section className="relative h-[70vh] w-full overflow-hidden flex items-center justify-center">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        alt="Atmospheric dining room at sunset with warm lighting" 
-                        className="w-full h-full object-cover opacity-60 dark:opacity-60" 
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUe5ZP5MQA7ixW0Da_MfWshoZ0lELmWcPtpCFS_7XhwFeNxobxMNmSqA0iWAsLI1TIvXT2NikxEZIUmLUv1x3sOH5b0GP9zGK9ak3Eq7JdpZjfHixGVVDDtqOyvhen7_eriB3oXUcGRu_9YOlpDpdEX-dZkLfxCML86oAFi2psfygVI9nBjc7COk76SLtG4eCuyKnvQ02nwQZLV5gOy9r5JPEwXVMzd_cSQAaGfgkFkUJY9uGZWSft4gLTZrqyXGfPiL7_oLLlBVfu"
+                    <img
+                        alt="Atmospheric dining room at sunset with warm lighting"
+                        className="w-full h-full object-cover opacity-60 dark:opacity-60"
+                        src={reservationsBlock.hero.bgImage}
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-background-light/30 dark:from-background-dark/30 via-background-light/50 dark:via-background-dark/50 to-background-light dark:to-background-dark"></div>
                 </div>
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10 animate-fade-in-up">
                     <span className="text-primary font-medium tracking-widest uppercase mb-3 block text-sm">Welcome to Orient</span>
                     <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
-                        Taste the Sunset.<br/>
-                        <span className="text-gray-600 dark:text-white/80 font-light italic">Reserve Your Moment.</span>
+                        {reservationsBlock.hero.title1}<br />
+                        <span className="text-gray-600 dark:text-white/80 font-light italic">{reservationsBlock.hero.title2}</span>
                     </h1>
                     <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto font-light">
-                        Experience culinary excellence in an atmosphere of warmth and elegance. From intimate balcony seating to grand hall feasts.
+                        {reservationsBlock.hero.subtitle}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <a className="bg-primary text-white px-6 py-3 rounded-lg font-semibold text-base hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20" href="#floor-plan">
                             <span className="material-icons text-lg">table_restaurant</span>
-                            Pick Your Spot
+                            {reservationsBlock.hero.btn1}
                         </a>
                         <a className="bg-white/50 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-white border border-gray-200 dark:border-white/20 px-6 py-3 rounded-lg font-semibold text-base hover:bg-white/60 dark:hover:bg-white/20 transition-all flex items-center justify-center gap-2" href="#occasions">
                             <span className="material-icons text-lg">celebration</span>
-                            Plan an Event
+                            {reservationsBlock.hero.btn2}
                         </a>
                     </div>
                 </div>
@@ -68,8 +117,8 @@ const ReservationsScreen: React.FC = () => {
             <section className="py-16 px-6 relative bg-white dark:bg-background-dark transition-colors" id="floor-plan">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">Select Your Table</h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Hover over the map to see table details. Green indicates availability.</p>
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">{reservationsBlock.mapInfo.title}</h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">{reservationsBlock.mapInfo.desc}</p>
                         {/* Legend */}
                         <div className="flex items-center justify-center gap-6 mt-6 text-xs">
                             <div className="flex items-center gap-2">
@@ -89,11 +138,11 @@ const ReservationsScreen: React.FC = () => {
                     {/* Map Container */}
                     <div ref={mapRef} className="relative bg-gray-100 dark:bg-stone-900 border border-gray-200 dark:border-white/5 rounded-2xl p-8 overflow-hidden shadow-2xl transition-colors">
                         {/* Tooltip */}
-                        <div 
+                        <div
                             className="absolute z-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-lg shadow-xl border border-primary/30 pointer-events-none transform -translate-y-full -mt-2 transition-opacity duration-200"
-                            style={{ 
-                                left: tooltip.x, 
-                                top: tooltip.y, 
+                            style={{
+                                left: tooltip.x,
+                                top: tooltip.y,
                                 opacity: tooltip.show ? 1 : 0,
                                 visibility: tooltip.show ? 'visible' : 'hidden'
                             }}
@@ -102,24 +151,24 @@ const ReservationsScreen: React.FC = () => {
                             <p className="text-xs text-gray-600 dark:text-gray-300">Seats: {tooltip.seats}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-300 italic mt-1">{tooltip.desc}</p>
                         </div>
-                        
+
                         {/* SVG Map */}
                         <svg className="w-full h-auto drop-shadow-lg select-none" viewBox="0 0 800 500">
                             {/* Floor Background */}
                             <rect className="fill-white dark:fill-[#221710]" height="500" rx="10" width="800" x="0" y="0"></rect>
-                            
+
                             {/* Main Hall Area */}
                             <path d="M 50 50 L 550 50 L 550 350 L 50 350 Z" fill="none" className="stroke-gray-300 dark:stroke-[#3d2b20]" strokeWidth="2"></path>
                             <text className="fill-gray-400 dark:fill-[#5c4535]" fontSize="14" fontWeight="bold" letterSpacing="2" x="60" y="80">MAIN HALL</text>
-                            
+
                             {/* Balcony Area */}
                             <path d="M 50 370 L 550 370 L 550 480 L 50 480 Z" className="fill-gray-50 dark:fill-[#2d2018] stroke-gray-300 dark:stroke-[#3d2b20]" strokeWidth="2"></path>
                             <text className="fill-gray-400 dark:fill-[#5c4535]" fontSize="14" fontWeight="bold" letterSpacing="2" x="60" y="400">THE BALCONY</text>
-                            
+
                             {/* Private Rooms Area */}
                             <path d="M 570 50 L 750 50 L 750 480 L 570 480 Z" className="fill-gray-100 dark:fill-[#1a110c] stroke-gray-300 dark:stroke-[#3d2b20]" strokeWidth="2"></path>
                             <text className="fill-gray-400 dark:fill-[#5c4535]" fontSize="14" fontWeight="bold" letterSpacing="2" x="590" y="80">PRIVATE SUITES</text>
-                            
+
                             {/* Tables Main Hall (Round 4-tops) */}
                             <g className="group">
                                 <circle onMouseEnter={(e) => handleMouseEnter(e, "M1", "4", "Near Window", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" cx="150" cy="150" r="25"></circle>
@@ -131,7 +180,7 @@ const ReservationsScreen: React.FC = () => {
                                 <circle onMouseEnter={(e) => handleMouseEnter(e, "M7", "4", "Center Room", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" cx="350" cy="250" r="25"></circle>
                                 <circle className="table-seat occupied fill-gray-400 dark:fill-[#4b3b32]" cx="450" cy="250" r="25"></circle>
                             </g>
-                            
+
                             {/* Tables Balcony (2-tops) */}
                             <g className="group">
                                 <rect onMouseEnter={(e) => handleMouseEnter(e, "B1", "2", "Sunset View", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" height="40" rx="4" width="40" x="100" y="410"></rect>
@@ -139,7 +188,7 @@ const ReservationsScreen: React.FC = () => {
                                 <rect onMouseEnter={(e) => handleMouseEnter(e, "B3", "2", "Sunset View", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" height="40" rx="4" width="40" x="300" y="410"></rect>
                                 <rect onMouseEnter={(e) => handleMouseEnter(e, "B4", "2", "Intimate", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" height="40" rx="4" width="40" x="400" y="410"></rect>
                             </g>
-                            
+
                             {/* Private Rooms (Large Rects) */}
                             <g className="group">
                                 <rect onMouseEnter={(e) => handleMouseEnter(e, "P1", "12", "The Jade Room", false)} onMouseLeave={handleMouseLeave} className="table-seat fill-white dark:fill-surface-dark stroke-gray-300 dark:stroke-white/20 stroke-1" height="80" rx="8" width="120" x="600" y="120"></rect>
@@ -167,7 +216,7 @@ const ReservationsScreen: React.FC = () => {
                         <div className="flex flex-col md:flex-row gap-10 items-center">
                             <div className="w-full md:w-1/2 relative group">
                                 <div className="absolute -inset-2 bg-primary/20 rounded-xl blur-lg group-hover:bg-primary/30 transition-all duration-500"></div>
-                                <img alt="Friends celebrating with cake and champagne" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz4t63zQlqwgNr3V3xWIh6dUAcyR4skNP93N-2mQX8sQoYB5MIv4S8m0siIUlwEDD-Q7KmFJw0JndqVdz0xaUaY22al93QbjmS-EMEb0jZjhloqVYi8rkFYVF_cjl1ULasiSvs7RvbxX8LfGtk_c9uo6tVUW1BNA4hIXGjVpdjKFAtwgdKB0CiSER1Bh-RLwHCFlBB3TgYGnvu_fm-POqKHUxDO3ZcDFmTR8HkaAMv22JMhw9n717aomsL2mwPrc1N8m4Rf1eQPHei"/>
+                                <img alt="Friends celebrating with cake and champagne" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz4t63zQlqwgNr3V3xWIh6dUAcyR4skNP93N-2mQX8sQoYB5MIv4S8m0siIUlwEDD-Q7KmFJw0JndqVdz0xaUaY22al93QbjmS-EMEb0jZjhloqVYi8rkFYVF_cjl1ULasiSvs7RvbxX8LfGtk_c9uo6tVUW1BNA4hIXGjVpdjKFAtwgdKB0CiSER1Bh-RLwHCFlBB3TgYGnvu_fm-POqKHUxDO3ZcDFmTR8HkaAMv22JMhw9n717aomsL2mwPrc1N8m4Rf1eQPHei" />
                             </div>
                             <div className="w-full md:w-1/2 space-y-5">
                                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Birthday Packages</h3>
@@ -188,7 +237,7 @@ const ReservationsScreen: React.FC = () => {
                         <div className="flex flex-col md:flex-row-reverse gap-10 items-center">
                             <div className="w-full md:w-1/2 relative group">
                                 <div className="absolute -inset-2 bg-gray-200 dark:bg-white/5 rounded-xl blur-lg group-hover:bg-gray-300 dark:group-hover:bg-white/10 transition-all duration-500"></div>
-                                <img alt="Formal table setting for business dinner" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD79xwYBgrkDa55G-uxTYJPYvV5-BgKp-660ClVwGRdAoxn3tNIzlmM2XDM7yRnrX5sEyAdgUuIqX2cHZUT9e5VQ_oVgIyDhQ-sUNJNAEKoSzkSzSNrQVIN1dNqlKMdwmbJMR_KitQ5-RimBcp54wEjUQuhtmY7dtymNi4-NRRe5OoxUK8G8ysxwKXhKEogNg37lZW77yQkjpU62xlUIocOkMW5CmdW4a9hRBIz1TvJ65LEaNKjy6q6gZJF4Ti3oKx48kSy_Wgceu0Q"/>
+                                <img alt="Formal table setting for business dinner" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD79xwYBgrkDa55G-uxTYJPYvV5-BgKp-660ClVwGRdAoxn3tNIzlmM2XDM7yRnrX5sEyAdgUuIqX2cHZUT9e5VQ_oVgIyDhQ-sUNJNAEKoSzkSzSNrQVIN1dNqlKMdwmbJMR_KitQ5-RimBcp54wEjUQuhtmY7dtymNi4-NRRe5OoxUK8G8ysxwKXhKEogNg37lZW77yQkjpU62xlUIocOkMW5CmdW4a9hRBIz1TvJ65LEaNKjy6q6gZJF4Ti3oKx48kSy_Wgceu0Q" />
                             </div>
                             <div className="w-full md:w-1/2 space-y-5">
                                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Corporate Dinners</h3>
@@ -211,7 +260,7 @@ const ReservationsScreen: React.FC = () => {
                         <div className="flex flex-col md:flex-row gap-10 items-center">
                             <div className="w-full md:w-1/2 relative group">
                                 <div className="absolute -inset-2 bg-primary/20 rounded-xl blur-lg group-hover:bg-primary/30 transition-all duration-500"></div>
-                                <img alt="Chef plating a gourmet dish up close" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByB2nt681amZpjVAOBAqxaUa0qELYH0n32eZoV_15SEnr0MIAXVSH3wSPUF3s4Yt0Lr_G5gJdCCDKPAUZwkshbLQGOEu2aYr3bWqfzRFEwLrPewdfjngjYqiBM45TGGJaGHWQYltsd0KOBP22Ca93LZXmEjEzywN_FRlAOErJmUEEqrMAmyAp71fykSF3Qq6F5hiMP4t2Cw9h2rt5Sx9lzLGKGjq-nKYanTpbxsRK9mOmeaPP-Mmcjhw88b06DYSk4--Df20YQX6MA"/>
+                                <img alt="Chef plating a gourmet dish up close" className="relative rounded-xl w-full h-[320px] object-cover shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByB2nt681amZpjVAOBAqxaUa0qELYH0n32eZoV_15SEnr0MIAXVSH3wSPUF3s4Yt0Lr_G5gJdCCDKPAUZwkshbLQGOEu2aYr3bWqfzRFEwLrPewdfjngjYqiBM45TGGJaGHWQYltsd0KOBP22Ca93LZXmEjEzywN_FRlAOErJmUEEqrMAmyAp71fykSF3Qq6F5hiMP4t2Cw9h2rt5Sx9lzLGKGjq-nKYanTpbxsRK9mOmeaPP-Mmcjhw88b06DYSk4--Df20YQX6MA" />
                             </div>
                             <div className="w-full md:w-1/2 space-y-5">
                                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Private Chef Experiences</h3>
@@ -229,17 +278,17 @@ const ReservationsScreen: React.FC = () => {
                         <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-l-4 border-primary pl-4">Past Events Gallery</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 h-80">
                             <div className="col-span-2 row-span-2 relative overflow-hidden rounded-lg group">
-                                <img alt="Long banquet table with candles" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJSOEfy1uJQdgDqGWc1IemM3lHFGr3tll1HhiqWazGB5r6R_8Ly1YTGwM-P-_qzbPKcd0VUQjITZk8HJHa65zxtv4Qt4aFoAxXTW6rHhECDNilhSdD19ASth5inMS7osmUlVuuveCBcRc6UXpb9P6qzjz6RD1v1xY60L6s8JlFjgjw69IgJ_z_19vODB1gXIzA9rZfWJ5CvaRZIKQVOKpsUtAqqbV13WsA0Ov0xuXe2wqFFA-aQg918SxgooN4Jo6LYlu2Z6OZ1ady"/>
+                                <img alt="Long banquet table with candles" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJSOEfy1uJQdgDqGWc1IemM3lHFGr3tll1HhiqWazGB5r6R_8Ly1YTGwM-P-_qzbPKcd0VUQjITZk8HJHa65zxtv4Qt4aFoAxXTW6rHhECDNilhSdD19ASth5inMS7osmUlVuuveCBcRc6UXpb9P6qzjz6RD1v1xY60L6s8JlFjgjw69IgJ_z_19vODB1gXIzA9rZfWJ5CvaRZIKQVOKpsUtAqqbV13WsA0Ov0xuXe2wqFFA-aQg918SxgooN4Jo6LYlu2Z6OZ1ady" />
                                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
                             </div>
                             <div className="relative overflow-hidden rounded-lg group">
-                                <img alt="Detailed cocktail shot" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGTun2jiwF4ZlK-9Y5G5NTO4lje8X2bWHEZybGGUxWn_oTRPBR0XXTTM5CN99j31RXivgXd-1JpZjOpD6uowUltWAqMI4JXIzmZSA6ci0aTI3dOGhJcWt0N3NAZ2lu3DARQJT0Qc6B0m-tXwy5SuLiZnaqRl-zuNbpj_-GzkYtxE_xna1SPQ6uIj4SRUzTGbA8vcRwxfWKlz-l3X95BcVKshaS6QBTylxmINcx8ZBfbvRYp0P3Uf9wsTgQHGJ5lky2z-2m0Y5ANnIe"/>
+                                <img alt="Detailed cocktail shot" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGTun2jiwF4ZlK-9Y5G5NTO4lje8X2bWHEZybGGUxWn_oTRPBR0XXTTM5CN99j31RXivgXd-1JpZjOpD6uowUltWAqMI4JXIzmZSA6ci0aTI3dOGhJcWt0N3NAZ2lu3DARQJT0Qc6B0m-tXwy5SuLiZnaqRl-zuNbpj_-GzkYtxE_xna1SPQ6uIj4SRUzTGbA8vcRwxfWKlz-l3X95BcVKshaS6QBTylxmINcx8ZBfbvRYp0P3Uf9wsTgQHGJ5lky2z-2m0Y5ANnIe" />
                             </div>
                             <div className="relative overflow-hidden rounded-lg group">
-                                <img alt="Happy couple dining" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqNwMz6y9xntz3uZ9rTjiHrQsbjTOi4xUXMif1BnL2dJoPm1wNmUzlEGpVNJCKbtnUtBexZ4-xffZ2PPRFaplEqC_BMwUHiqIMfSM1eNtX0rzSptgxtQLtOSURylhh9XYs-dJgQ59wc7yEm9A43UhPZIOKXwtv0tp_5Ypo5HGIGt6zP1AkFepJn8f4hoxJaNSoKd-dkVBzl7is3GfAtRkLCg5wgknWTKB7yHaxOkmUvl_x-G8pm5dQTcd0ZITrPApuB6yf4BijS90l"/>
+                                <img alt="Happy couple dining" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqNwMz6y9xntz3uZ9rTjiHrQsbjTOi4xUXMif1BnL2dJoPm1wNmUzlEGpVNJCKbtnUtBexZ4-xffZ2PPRFaplEqC_BMwUHiqIMfSM1eNtX0rzSptgxtQLtOSURylhh9XYs-dJgQ59wc7yEm9A43UhPZIOKXwtv0tp_5Ypo5HGIGt6zP1AkFepJn8f4hoxJaNSoKd-dkVBzl7is3GfAtRkLCg5wgknWTKB7yHaxOkmUvl_x-G8pm5dQTcd0ZITrPApuB6yf4BijS90l" />
                             </div>
                             <div className="col-span-2 relative overflow-hidden rounded-lg group">
-                                <img alt="Plated gourmet food overhead" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5GtUzp-YVlOJ65tIH6ETdbvCfa_7uK4hYxFiGjRpK9jpeoC5Mvw0RcOaWcQXBIPs8sDSF9PbTqXBXMmeC2GgEI1z3NdAUacFlDYLuuv33qreElmANarbVzlEvBTGDOJsxvqoDxLUtI5SDEIeIXUII9fDmjIlJ-xj9MkeiEDql1XSEiREwRbNDAXhcOssuq0ZtefnNM52uhBidofgBf515jzWqWMyeyT2O09HS8QY4FxdkGZqQc5XZr6vfBorlcNpJtXQaUbACChsn"/>
+                                <img alt="Plated gourmet food overhead" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5GtUzp-YVlOJ65tIH6ETdbvCfa_7uK4hYxFiGjRpK9jpeoC5Mvw0RcOaWcQXBIPs8sDSF9PbTqXBXMmeC2GgEI1z3NdAUacFlDYLuuv33qreElmANarbVzlEvBTGDOJsxvqoDxLUtI5SDEIeIXUII9fDmjIlJ-xj9MkeiEDql1XSEiREwRbNDAXhcOssuq0ZtefnNM52uhBidofgBf515jzWqWMyeyT2O09HS8QY4FxdkGZqQc5XZr6vfBorlcNpJtXQaUbACChsn" />
                             </div>
                         </div>
                     </div>
@@ -281,7 +330,7 @@ const ReservationsScreen: React.FC = () => {
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Select Date</label>
-                                    <input className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent accent-primary" type="date" defaultValue="2023-10-24"/>
+                                    <input className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent accent-primary" type="date" defaultValue="2023-10-24" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Guests</label>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
-const steps = [
+const fallbackSteps = [
   {
     title: 'Pre-Filtration',
     subtitle: 'Sediment Removal',
@@ -53,24 +54,41 @@ const steps = [
 ];
 
 const Process: React.FC = () => {
+  const { content: cmsData } = useCMS('water');
   const [activeStep, setActiveStep] = useState(0);
   const [batchId, setBatchId] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const processBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'process')?.content_payload || {};
+  const steps = processBlock.steps || fallbackSteps;
+  const verifyBlock = processBlock.verify || {
+    title: "TRUST THROUGH DATA.",
+    subtitle: "Our commitment to transparency. Every drop verified. Trace your bottle's journey from source to sip.",
+    placeholder: "ENTER YOUR BOTTLE NECK CODE (e.g., OW-4192)"
+  };
+  const labGallery = processBlock.labGallery || [
+    { title: 'Microbiological Testing', img: 'https://images.unsplash.com/photo-1579165466741-7f35a4755657?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Mineral Analysis Station', img: 'https://images.unsplash.com/photo-1581093588401-fbb0736d9138?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Advanced Filtration', img: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Dr. Yusuf at Work', img: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Quality Control Check', img: 'https://images.unsplash.com/photo-1614935151651-0bea6508db6b?auto=format&fit=crop&w=400&q=80' },
+    { title: 'The Jos Facility', img: 'https://images.unsplash.com/photo-1565514020176-db7102e34568?auto=format&fit=crop&w=400&q=80' },
+  ];
+
   // Handle Scroll Logic for Immersive Section
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
-      
+
       const container = scrollContainerRef.current;
       const { top } = container.getBoundingClientRect();
       const stepHeight = window.innerHeight;
-      
+
       // Calculate which step we are on based on how far we've scrolled into the container
       // Using -top because top becomes negative as we scroll down
       const step = Math.max(0, Math.min(steps.length - 1, Math.floor(-top / stepHeight)));
-      
+
       setActiveStep(step);
     };
 
@@ -81,21 +99,21 @@ const Process: React.FC = () => {
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if(batchId) setIsVerified(true);
+    if (batchId) setIsVerified(true);
   };
 
   return (
     <div className="bg-slate-900 min-h-screen">
-      
+
       {/* 
         IMMERSIVE SCROLL CONTAINER 
         Height = Number of steps * 100vh (approx) to create scroll track
       */}
       <div ref={scrollContainerRef} className="relative" style={{ height: `${steps.length * 100}vh` }}>
-        
+
         {/* STICKY VIEWPORT - Locks content to screen while scrolling "through" time */}
         <div className="sticky top-24 h-[calc(100vh-6rem)] w-full overflow-hidden flex flex-col justify-center">
-          
+
           {/* BACKGROUND IMAGES LAYER */}
           <div className="absolute inset-0 z-0">
             {steps.map((step, index) => (
@@ -109,10 +127,10 @@ const Process: React.FC = () => {
                   zIndex: index === activeStep ? 10 : 0
                 }}
               >
-                <img 
-                  src={step.img} 
-                  alt={step.title} 
-                  className="w-full h-full object-cover" 
+                <img
+                  src={step.img}
+                  alt={step.title}
+                  className="w-full h-full object-cover"
                 />
                 {/* Dark Overlay for Text Readability */}
                 <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
@@ -123,32 +141,30 @@ const Process: React.FC = () => {
 
           {/* CONTENT LAYER */}
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full pointer-events-none">
-            
+
             {/* TIMELINE (Left) */}
-            <div 
+            <div
               className="absolute left-4 md:left-8 transition-all duration-1000 ease-in-out flex flex-col gap-6 border-l-2 border-white/10 pl-6 md:pl-8 pointer-events-auto"
               style={{
                 // Starts at bottom (80%) for first step, moves up to 35% for subsequent steps
-                top: activeStep === 0 ? '75%' : '35%', 
-                transform: 'translateY(-50%)' 
+                top: activeStep === 0 ? '75%' : '35%',
+                transform: 'translateY(-50%)'
               }}
             >
               {steps.map((step, index) => (
-                <div 
+                <div
                   key={`timeline-${index}`}
-                  className={`transition-all duration-500 flex items-center gap-4 ${
-                    index === activeStep 
-                      ? 'opacity-100 scale-100' 
+                  className={`transition-all duration-500 flex items-center gap-4 ${index === activeStep
+                      ? 'opacity-100 scale-100'
                       : 'opacity-30 scale-90'
-                  }`}
+                    }`}
                 >
-                   {/* Step Number Bubble */}
-                  <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold transition-colors duration-500 ${
-                    index === activeStep ? 'bg-primary border-primary text-secondary' : 'border-white text-white'
-                  }`}>
+                  {/* Step Number Bubble */}
+                  <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold transition-colors duration-500 ${index === activeStep ? 'bg-primary border-primary text-secondary' : 'border-white text-white'
+                    }`}>
                     {index + 1}
                   </div>
-                  
+
                   {/* Text Label */}
                   <div className={`${index === activeStep ? 'block' : 'hidden md:block'}`}>
                     <span className="text-white font-bold text-sm tracking-widest uppercase">{step.title}</span>
@@ -176,13 +192,13 @@ const Process: React.FC = () => {
                     <span className="h-px flex-1 bg-white/20"></span>
                     <span className="text-xs font-mono text-white/70">{step.stats.label}: {step.stats.value}</span>
                   </div>
-                  
+
                   <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">{step.title}</h2>
                   <h3 className="text-lg text-primary mb-6 font-medium">{step.subtitle}</h3>
                   <p className="text-slate-200 leading-relaxed text-sm md:text-base">
                     {step.desc}
                   </p>
-                  
+
                   {/* Decorative Elements */}
                   <div className="mt-6 flex gap-2">
                     <div className="w-12 h-1 bg-primary rounded-full animate-pulse"></div>
@@ -211,16 +227,16 @@ const Process: React.FC = () => {
         <div className="bg-secondary text-white py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1920&q=80')] bg-cover mix-blend-overlay opacity-20"></div>
           <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">TRUST THROUGH DATA.</h1>
-            <p className="text-xl text-blue-100 mb-12">Our commitment to transparency. Every drop verified. Trace your bottle's journey from source to sip.</p>
-            
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{verifyBlock.title}</h1>
+            <p className="text-xl text-blue-100 mb-12">{verifyBlock.subtitle}</p>
+
             <form onSubmit={handleVerify} className="max-w-2xl mx-auto relative">
               <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={batchId}
                 onChange={(e) => setBatchId(e.target.value)}
-                placeholder="ENTER YOUR BOTTLE NECK CODE (e.g., OW-4192)" 
+                placeholder={verifyBlock.placeholder}
                 className="w-full h-16 pl-14 pr-4 rounded-full text-slate-900 outline-none focus:ring-4 focus:ring-primary/50 shadow-2xl"
               />
               {isVerified && (
@@ -239,7 +255,7 @@ const Process: React.FC = () => {
               <div className="bg-blue-50 dark:bg-slate-700 p-4 border-b border-blue-100 dark:border-slate-600 text-center">
                 <h2 className="text-xl font-bold text-secondary dark:text-primary uppercase">Batch #{batchId || '4192'} VERIFIED</h2>
               </div>
-              
+
               <div className="p-8 space-y-8">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-slate-700 flex items-center justify-center flex-shrink-0">
@@ -271,7 +287,7 @@ const Process: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-green-50 dark:bg-green-900/30 p-4 flex items-center justify-center gap-2 text-green-700 dark:text-green-400 font-bold">
                 <span className="material-icons">check_circle</span>
                 QUALITY APPROVED
@@ -289,16 +305,9 @@ const Process: React.FC = () => {
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-2">Our Clinical Lab in Jos</h2>
               <div className="w-20 h-1 bg-primary mx-auto"></div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { title: 'Microbiological Testing', img: 'https://images.unsplash.com/photo-1579165466741-7f35a4755657?auto=format&fit=crop&w=400&q=80' },
-                { title: 'Mineral Analysis Station', img: 'https://images.unsplash.com/photo-1581093588401-fbb0736d9138?auto=format&fit=crop&w=400&q=80' },
-                { title: 'Advanced Filtration', img: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80' },
-                { title: 'Dr. Yusuf at Work', img: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=400&q=80' },
-                { title: 'Quality Control Check', img: 'https://images.unsplash.com/photo-1614935151651-0bea6508db6b?auto=format&fit=crop&w=400&q=80' },
-                { title: 'The Jos Facility', img: 'https://images.unsplash.com/photo-1565514020176-db7102e34568?auto=format&fit=crop&w=400&q=80' },
-              ].map((item, i) => (
+              {labGallery.map((item: any, i: number) => (
                 <div key={i} className="group">
                   <div className="overflow-hidden rounded-lg mb-4 shadow-md">
                     <img src={item.img} alt={item.title} className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500" />

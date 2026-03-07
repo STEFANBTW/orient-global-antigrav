@@ -1,38 +1,73 @@
-
 import React from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
 const Booking: React.FC = () => {
+  const { content: cmsData } = useCMS('lounge');
+  const bookingBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'booking')?.content_payload || {
+    hero: {
+      title1: "Sanctuary",
+      title2: "Awaits",
+      subtitle: "Reserve your private corner of the night. Where shadows meet gold.",
+      btnText: "Select Your Sanctuary",
+      bgImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDT9A6yls7951yfoo6ClqY2nrNQtN9LOisNkfxzieJ3LrAzX3q5yNQZLeYJiVL6BNIy6w0QlRlDI4kI0XoMohG4az0pvyT7nYVsnB6GjuzMcd4o2DUiSV7PNO_tDnzHX3Ng-yQyWTd8azbBENmEWvJqCUsaMFoi2H_0jNTZPemJ4NWYkU6KUbi4eY9WAaM47nJonhd72QXMBszAkg-kvtJOP30_-llKyT8c1du3jKDjxF7-XjGNPjCO-NjuKG_HNLXGC03-VF7sgQ0F"
+    },
+    map: {
+      title: "The Floor Plan",
+      desc: "Navigate the lounge. Click a zone to verify availability.",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCwjtlH3vG2sTOF8NREdcUCTEaHhG1d2lZfpCDDR20MyMZSBpcrPHCBuSFTb3T30XSDmDNyhEfWV6SYDX63j3m_tfpQS-4r9n4blHzA8_336GBomd-u_V7o5AmYp-clTdVqFRJcFFF8tGn3yLh5P8E4JCYz2H9MstPdZDmaWPU-ORv4yLbNVIPi8bPeJlL8NHBU1QNcVWarIldyyEEwTIL-H-10esRw4gXZjSUDzJbo41KixlMDUHivj3jiodFzsKaI8LnLaVvRY6Vf"
+    },
+    packages: {
+      title: "Exclusivity Packages",
+      items: [
+        {
+          title: "The Gold Standard",
+          desc: "The essential VIP experience. Reserved booth, bottle service, personal server.",
+          price: "₦1,500,000",
+          img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_9UOaJq303dsKv8MpWkaQ8YAc3TE8wuyFTUCTNdttd-Zq_-cn8eLzdj1o6W4ox__8zoInN237h-kpGhUHfHGXCexBG8LppFDw-kdKkUXMSPW-pwsM-MykL59Edr3EvT7cAirrWXGgmkQh1viMwTfr_-EtFZHyMvTuJ5YY1xN8QZ5-Wp5gR2yXZsjj9MKjvcQRGJvPoI-QmXp66NHe47qlQ98RKc71gr1fiFlz2-syVRmWHDRDu5GLJnxspSevQNvE3OAWz47zBhxx",
+          style: "gold"
+        },
+        {
+          title: "Noir Elite",
+          desc: "Uncompromised privacy. Access to The Private Vault via secret entrance.",
+          price: "₦5,000,000",
+          img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDM8sZEAxN_ymrTCB4T2y64ICZiLGqxx_hwiPzDsOAk_l7wqQ7E5gR2uEsRdE6Uf4Oc4ccbL0KqDl0KM2-V7oVZQlOvhuQ0Oa0cW7HC_QvySEr322dZ55CF20WiNXk6IAjLx6HXCf4voFdbkaebOUQ-hMsgZxKsvIvsXMGopf2lQ9dcXHUdg8wyucFmv1co5LiJfnpJsZv1dMibQLUhQo7ky4PIwWpfxiXmN9yF4Z5lq5cW4U2aDlp89WVrVpbyEPwFEdcD88-Tw0t1",
+          style: "noir"
+        }
+      ]
+    }
+  };
+
   return (
     <div className="bg-background-dark font-display text-white min-h-screen overflow-x-hidden">
       {/* Hero */}
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img className="w-full h-full object-cover animate-[hero-pan_30s_infinite_alternate]" alt="Lounge" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT9A6yls7951yfoo6ClqY2nrNQtN9LOisNkfxzieJ3LrAzX3q5yNQZLeYJiVL6BNIy6w0QlRlDI4kI0XoMohG4az0pvyT7nYVsnB6GjuzMcd4o2DUiSV7PNO_tDnzHX3Ng-yQyWTd8azbBENmEWvJqCUsaMFoi2H_0jNTZPemJ4NWYkU6KUbi4eY9WAaM47nJonhd72QXMBszAkg-kvtJOP30_-llKyT8c1du3jKDjxF7-XjGNPjCO-NjuKG_HNLXGC03-VF7sgQ0F" />
+          <img className="w-full h-full object-cover animate-[hero-pan_30s_infinite_alternate]" alt="Lounge" src={bookingBlock.hero.bgImage} />
           <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
         </div>
         <div className="relative z-10 text-center px-6">
           <span className="text-primary text-xs font-bold tracking-widest uppercase mb-4 block">Private Access Only</span>
-          <h1 className="text-6xl md:text-8xl font-bold mb-6">Sanctuary <br/><span className="text-primary">Awaits</span></h1>
-          <p className="text-gray-300 max-w-xl mx-auto mb-8 font-light">Reserve your private corner of the night. Where shadows meet gold.</p>
-          <button className="bg-primary text-black px-10 py-4 rounded font-bold uppercase tracking-widest hover:bg-white transition-all">Select Your Sanctuary</button>
+          <h1 className="text-6xl md:text-8xl font-bold mb-6">{bookingBlock.hero.title1} <br /><span className="text-primary">{bookingBlock.hero.title2}</span></h1>
+          <p className="text-gray-300 max-w-xl mx-auto mb-8 font-light">{bookingBlock.hero.subtitle}</p>
+          <button className="bg-primary text-black px-10 py-4 rounded font-bold uppercase tracking-widest hover:bg-white transition-all">{bookingBlock.hero.btnText}</button>
         </div>
       </section>
 
       {/* Map Section */}
       <section className="py-24 bg-gradient-noir">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">The Floor Plan</h2>
-          <p className="text-gray-400">Navigate the lounge. Click a zone to verify availability.</p>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">{bookingBlock.map.title}</h2>
+          <p className="text-gray-400">{bookingBlock.map.desc}</p>
         </div>
         <div className="perspective-container max-w-5xl mx-auto h-[600px] bg-neutral-900/50 rounded-2xl border border-white/5 relative overflow-hidden group">
-          <img className="w-full h-full object-cover opacity-20 transition-all group-hover:opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwjtlH3vG2sTOF8NREdcUCTEaHhG1d2lZfpCDDR20MyMZSBpcrPHCBuSFTb3T30XSDmDNyhEfWV6SYDX63j3m_tfpQS-4r9n4blHzA8_336GBomd-u_V7o5AmYp-clTdVqFRJcFFF8tGn3yLh5P8E4JCYz2H9MstPdZDmaWPU-ORv4yLbNVIPi8bPeJlL8NHBU1QNcVWarIldyyEEwTIL-H-10esRw4gXZjSUDzJbo41KixlMDUHivj3jiodFzsKaI8LnLaVvRY6Vf" alt="Blueprint" />
+          <img className="w-full h-full object-cover opacity-20 transition-all group-hover:opacity-40" src={bookingBlock.map.img} alt="Blueprint" />
           <div className="absolute top-[20%] left-[20%]">
-             <button className="w-6 h-6 rounded-full bg-primary animate-pulse-gold"></button>
+            <button className="w-6 h-6 rounded-full bg-primary animate-pulse-gold"></button>
           </div>
           <div className="absolute top-[30%] right-[25%]">
-             <button className="w-8 h-8 rounded-full bg-primary flex items-center justify-center animate-pulse-gold">
-               <span className="material-icons text-black text-xs">lock</span>
-             </button>
+            <button className="w-8 h-8 rounded-full bg-primary flex items-center justify-center animate-pulse-gold">
+              <span className="material-icons text-black text-xs">lock</span>
+            </button>
           </div>
           <div className="absolute bottom-6 right-6 border border-white/10 px-4 py-2 rounded bg-black/40 text-[10px] uppercase tracking-widest text-gray-400 flex items-center gap-2">
             <span className="material-icons text-sm">explore</span> Interactive Map
@@ -43,45 +78,29 @@ const Booking: React.FC = () => {
       {/* Packages */}
       <section className="py-24 px-6 bg-background-dark">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12">Exclusivity Packages</h2>
+          <h2 className="text-4xl font-bold mb-12">{bookingBlock.packages.title}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-[#121214] rounded-xl border border-white/5 overflow-hidden flex flex-col md:flex-row h-auto md:h-80 hover:border-primary transition-all">
-               <div className="w-full md:w-1/3 relative">
-                 <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_9UOaJq303dsKv8MpWkaQ8YAc3TE8wuyFTUCTNdttd-Zq_-cn8eLzdj1o6W4ox__8zoInN237h-kpGhUHfHGXCexBG8LppFDw-kdKkUXMSPW-pwsM-MykL59Edr3EvT7cAirrWXGgmkQh1viMwTfr_-EtFZHyMvTuJ5YY1xN8QZ5-Wp5gR2yXZsjj9MKjvcQRGJvPoI-QmXp66NHe47qlQ98RKc71gr1fiFlz2-syVRmWHDRDu5GLJnxspSevQNvE3OAWz47zBhxx" alt="Gold Standard" />
-                 <div className="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
-               </div>
-               <div className="flex-1 p-8 flex flex-col justify-between">
-                 <div>
-                   <h3 className="text-2xl font-bold mb-4">The Gold Standard</h3>
-                   <p className="text-gray-400 text-sm mb-4">The essential VIP experience. Reserved booth, bottle service, personal server.</p>
-                 </div>
-                 <div className="flex justify-between items-end border-t border-white/5 pt-4">
+            {bookingBlock.packages.items.map((pkg: any, i: number) => (
+              <div key={i} className={`rounded-xl overflow-hidden flex flex-col md:flex-row h-auto md:h-80 transition-all hover:border-primary border ${pkg.style === 'gold' ? 'bg-[#121214] border-white/5' : 'bg-gradient-to-br from-blue-900/20 to-black border-primary/20'}`}>
+                <div className="w-full md:w-1/3 relative">
+                  <img className={`w-full h-full object-cover ${pkg.style === 'noir' ? 'grayscale' : ''}`} src={pkg.img} alt={pkg.title} />
+                  {pkg.style === 'gold' && <div className="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>}
+                </div>
+                <div className="flex-1 p-8 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-4">{pkg.title}</h3>
+                    <p className="text-gray-400 text-sm mb-4">{pkg.desc}</p>
+                  </div>
+                  <div className="flex justify-between items-end border-t border-white/5 pt-4">
                     <div>
                       <span className="text-[10px] text-gray-500 uppercase">Starting At</span>
-                      <div className="text-xl font-bold">₦1,500,000</div>
+                      <div className="text-xl font-bold">{pkg.price}</div>
                     </div>
                     <button className="text-primary text-xs uppercase font-bold">Select</button>
-                 </div>
-               </div>
-            </div>
-            <div className="bg-gradient-to-br from-blue-900/20 to-black rounded-xl border border-primary/20 overflow-hidden flex flex-col md:flex-row h-auto md:h-80 hover:border-primary transition-all">
-               <div className="w-full md:w-1/3 relative">
-                 <img className="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM8sZEAxN_ymrTCB4T2y64ICZiLGqxx_hwiPzDsOAk_l7wqQ7E5gR2uEsRdE6Uf4Oc4ccbL0KqDl0KM2-V7oVZQlOvhuQ0Oa0cW7HC_QvySEr322dZ55CF20WiNXk6IAjLx6HXCf4voFdbkaebOUQ-hMsgZxKsvIvsXMGopf2lQ9dcXHUdg8wyucFmv1co5LiJfnpJsZv1dMibQLUhQo7ky4PIwWpfxiXmN9yF4Z5lq5cW4U2aDlp89WVrVpbyEPwFEdcD88-Tw0t1" alt="Noir Elite" />
-               </div>
-               <div className="flex-1 p-8 flex flex-col justify-between">
-                 <div>
-                   <h3 className="text-2xl font-bold mb-4">Noir Elite</h3>
-                   <p className="text-gray-400 text-sm mb-4">Uncompromised privacy. Access to The Private Vault via secret entrance.</p>
-                 </div>
-                 <div className="flex justify-between items-end border-t border-white/5 pt-4">
-                    <div>
-                      <span className="text-[10px] text-gray-500 uppercase">Starting At</span>
-                      <div className="text-xl font-bold">₦5,000,000</div>
-                    </div>
-                    <button className="text-primary text-xs uppercase font-bold">Select</button>
-                 </div>
-               </div>
-            </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

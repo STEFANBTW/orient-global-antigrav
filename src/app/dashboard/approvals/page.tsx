@@ -1,10 +1,6 @@
-"use client";
-
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRoles } from "@/context/role-context";
 import { useCMS, CMSRequest } from "@/context/cms-context";
-import { useCollection, useFirestore } from "@/firebase";
-import { doc, updateDoc, collection, query, where } from "firebase/firestore";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,32 +21,23 @@ const fadeInUp = {
 export default function ApprovalsPage() {
   const { currentUser, requests: roleRequests, updateRequestStatus } = useRoles();
   const { requests: cmsRequests, approveRequest: approveCMS, rejectRequest: rejectCMS } = useCMS();
-  const firestore = useFirestore();
+  
+  // Mock enrollment requests state
+  const [enrollmentRequests, setEnrollmentRequests] = useState<any[]>([]);
 
   const role = currentUser?.role;
   const division = currentUser?.division;
 
   const isBoss = role === 'admin_boss';
   
-  const enrollmentQuery = useMemo(() => {
-    if (!firestore || !isBoss) return null;
-    return query(collection(firestore, 'enrollmentRequests'), where('status', '==', 'pending'));
-  }, [firestore, isBoss]);
-  
-  const { data: enrollmentRequests } = useCollection(enrollmentQuery);
-
   const handleApproveEnrollment = async (reqId: string, uid: string) => {
-    if (!firestore) return;
-    updateDoc(doc(firestore, "enrollmentRequests", reqId), { status: "approved" });
-    updateDoc(doc(firestore, "users", uid), { status: "active" });
-    toast({ title: "Access Granted", description: "User has been activated." });
+    setEnrollmentRequests(prev => prev.filter(r => r.id !== reqId));
+    toast({ title: "Access Granted", description: "User has been activated. (Mock Mode)" });
   };
 
   const handleDeclineEnrollment = async (reqId: string, uid: string) => {
-    if (!firestore) return;
-    updateDoc(doc(firestore, "enrollmentRequests", reqId), { status: "rejected" });
-    updateDoc(doc(firestore, "users", uid), { status: "rejected" });
-    toast({ title: "Access Denied", description: "Enrollment request rejected." });
+    setEnrollmentRequests(prev => prev.filter(r => r.id !== reqId));
+    toast({ title: "Access Denied", description: "Enrollment request rejected. (Mock Mode)" });
   };
 
   const handleApproveCMS = (id: string) => {

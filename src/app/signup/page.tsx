@@ -1,19 +1,23 @@
-"use client";
-
 import { useState } from "react";
-import { useAuth, useFirestore } from "@/firebase";
-import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, setDoc, addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Loader2, ShieldCheck, LogIn, Info, ArrowLeft } from "lucide-react";
+import { UserPlus, Loader2, ShieldCheck, Info, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { DIVISIONS } from "@/app/lib/mock-data";
+
+// Mock divisions
+const DIVISIONS = [
+  { id: 'bakery', name: 'Bakery' },
+  { id: 'market', name: 'Market' },
+  { id: 'dining', name: 'Dining' },
+  { id: 'games', name: 'Games' },
+  { id: 'water', name: 'Water' },
+  { id: 'lounge', name: 'Lounge' },
+];
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -23,76 +27,37 @@ export default function SignupPage() {
   const [role, setRole] = useState("admin_staff");
   const [loading, setLoading] = useState(false);
   
-  const auth = useAuth();
-  const firestore = useFirestore();
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!auth || !firestore) {
-      toast({ 
-        variant: "destructive", 
-        title: "System Error", 
-        description: "Identity services are currently offline. Please refresh." 
-      });
-      return;
-    }
-    
     setLoading(true);
     
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
     try {
-      // 1. Authenticate with Identity Node
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
       const isBoss = role === 'admin_boss';
-      const status = isBoss ? 'active' : 'pending';
-
-      // 2. Provision Core User Profile
-      await setDoc(doc(firestore, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        name: name,
-        role: role,
-        division: isBoss ? 'global' : division,
-        status: status,
-        createdAt: serverTimestamp()
-      });
-
-      // 3. Log Clearance Request if not automatic
+      
       if (!isBoss) {
-        await addDoc(collection(firestore, "enrollmentRequests"), {
-          uid: user.uid,
-          email: user.email,
-          name: name,
-          requestedDivision: division,
-          requestedRole: role,
-          timestamp: serverTimestamp(),
-          status: "pending"
-        });
-        
-        // Force sign-out to prevent session conflict before approval
-        await signOut(auth);
-        
         toast({ 
           title: "Enrollment Logged", 
-          description: "Your request has been routed for executive clearance." 
+          description: "Your request has been routed for executive clearance. (Mock Mode)" 
         });
       } else {
         toast({ 
           title: "Executive Active", 
-          description: "Boss account provisioned. You may now enter mission control." 
+          description: "Boss account provisioned. You may now enter mission control. (Mock Mode)" 
         });
       }
       
-      // Atomic navigation
       navigate("/login", { replace: true });
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
         title: "Provisioning Failed", 
-        description: error.message || "Credential integrity check failed."
+        description: "Credentials failed integrity check."
       });
     } finally {
       setLoading(false);

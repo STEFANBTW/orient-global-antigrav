@@ -1,3 +1,8 @@
+/**
+ * @deprecated — REPLACED by `BlockEditor.tsx` (Visual Block Editor Factory).
+ * This file is kept for reference only and is no longer mounted anywhere.
+ * Do NOT import or use this component. See `/components/dashboard/cms/BlockEditor.tsx`.
+ */
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,7 +54,7 @@ export default function AdvancedCMSEditor() {
 
   const handleSaveBlock = async () => {
     if (!editingBlock) return;
-    
+
     try {
       const payload = JSON.parse(payloadStr);
       await cmsApi.updateContentBlock(editingBlock.id, {
@@ -134,8 +139,8 @@ export default function AdvancedCMSEditor() {
                   </div>
                   <div className="space-y-2">
                     {filteredBlocks.map(block => (
-                      <div 
-                        key={block.id} 
+                      <div
+                        key={block.id}
                         className={`p-3 border rounded-md cursor-pointer flex justify-between items-center transition-colors ${editingBlock?.id === block.id ? 'border-primary bg-primary/5' : 'hover:bg-muted'}`}
                         onClick={() => handleEditBlock(block)}
                       >
@@ -173,7 +178,7 @@ export default function AdvancedCMSEditor() {
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
                           <Label>JSON Payload</Label>
-                          <Textarea 
+                          <Textarea
                             className="font-mono text-sm min-h-[300px] bg-muted/50"
                             value={payloadStr}
                             onChange={(e) => setPayloadStr(e.target.value)}

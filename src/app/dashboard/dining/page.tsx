@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { LivePreview } from "@/components/dashboard/live-preview";
-import DivisionCMSEditor from "@/components/dashboard/cms/DivisionEditor";
-import { 
-  ChefHat, 
-  Search, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  ChefHat,
+  Search,
   Eye,
   Calendar,
   LayoutGrid,
@@ -31,7 +31,7 @@ export default function DiningCommandCenter() {
   const isHOD = role === 'admin_head' || role === 'admin_boss';
 
   const filteredMenu = useMemo(() => {
-    return diningMenu.filter(item => 
+    return diningMenu.filter(item =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [diningMenu, searchQuery]);
@@ -52,7 +52,7 @@ export default function DiningCommandCenter() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <ActionGuard sensitivity="high" actionLabel="Stop Service" variant="destructive" className="flex-1 md:flex-none" />
           <ActionGuard sensitivity="low" actionLabel="Sync Menu" className="flex-1 md:flex-none" />
-          <button 
+          <button
             onClick={() => setShowPreviewMobile(!showPreviewMobile)}
             className="lg:hidden h-10 w-10 border border-slate-200 rounded-md flex items-center justify-center bg-white"
           >
@@ -75,8 +75,8 @@ export default function DiningCommandCenter() {
                   </div>
                   <div className="relative w-full sm:max-w-[200px] shrink-0">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                    <Input 
-                      placeholder="Search..." 
+                    <Input
+                      placeholder="Search..."
                       className="pl-9 h-8 text-[10px] border-slate-200 w-full"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -95,8 +95,8 @@ export default function DiningCommandCenter() {
                       </TableHeader>
                       <TableBody>
                         {filteredMenu.map((item) => (
-                          <TableRow 
-                            key={item.id} 
+                          <TableRow
+                            key={item.id}
                             className={`border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer ${selectedItem?.id === item.id ? 'bg-primary/5' : ''}`}
                             onClick={() => setSelectedItem(item)}
                           >
@@ -149,8 +149,20 @@ export default function DiningCommandCenter() {
               </Card>
             </TabsContent>
 
+            <TabsContent value="sommelier" className="m-0 flex-1">
+              <Card className="border-slate-200 h-full flex flex-col items-center justify-center p-6 md:p-12 text-center gap-6 md:gap-8 bg-white overflow-y-auto">
+                <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center border border-primary/10 shrink-0">
+                  <Globe className="w-8 h-8 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tighter italic font-headline">Wine Vault</h3>
+                  <p className="text-[10px] text-slate-400 max-w-sm mx-auto uppercase tracking-widest font-bold">Manage your curations here.</p>
+                </div>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="cms" className="m-0 flex-1">
-              <DivisionCMSEditor division="dining" />
+              <BlockEditor division="dining" />
             </TabsContent>
           </Tabs>
         </div>
@@ -166,13 +178,13 @@ export default function DiningCommandCenter() {
               <Badge className="bg-emerald-500 text-white text-[8px] uppercase tracking-widest px-2 font-bold shrink-0">Live</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedItem || diningMenu[0]} 
-                division="dining" 
+              <LivePreview
+                item={selectedItem || diningMenu[0]}
+                division="dining"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "Updated", description: "Menu saved." })}
                 onReject={() => toast({ variant: "destructive", title: "Rejected", description: "Returned to staff." })}
-               />
+              />
             </div>
           </Card>
         </div>

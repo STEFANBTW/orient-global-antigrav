@@ -1,12 +1,29 @@
 import React, { useState } from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
 const Quality: React.FC = () => {
+  const { content: cmsData } = useCMS('water');
   const [batchId, setBatchId] = useState('');
   const [isVerified, setIsVerified] = useState(false);
 
+  const processBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'process')?.content_payload || {};
+  const verifyBlock = processBlock.verify || {
+    title: "TRUST THROUGH DATA.",
+    subtitle: "Our commitment to transparency. Every drop verified. Trace your bottle's journey from source to sip.",
+    placeholder: "ENTER YOUR BOTTLE NECK CODE (e.g., OW-4192)"
+  };
+  const labGallery = processBlock.labGallery || [
+    { title: 'Microbiological Testing', img: 'https://images.unsplash.com/photo-1579165466741-7f35a4755657?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Mineral Analysis Station', img: 'https://images.unsplash.com/photo-1581093588401-fbb0736d9138?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Advanced Filtration', img: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Dr. Yusuf at Work', img: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=400&q=80' },
+    { title: 'Quality Control Check', img: 'https://images.unsplash.com/photo-1614935151651-0bea6508db6b?auto=format&fit=crop&w=400&q=80' },
+    { title: 'The Jos Facility', img: 'https://images.unsplash.com/photo-1565514020176-db7102e34568?auto=format&fit=crop&w=400&q=80' },
+  ];
+
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if(batchId) setIsVerified(true);
+    if (batchId) setIsVerified(true);
   };
 
   return (
@@ -15,16 +32,16 @@ const Quality: React.FC = () => {
       <div className="bg-secondary text-white py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1920&q=80')] bg-cover mix-blend-overlay opacity-20"></div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">TRUST THROUGH DATA.</h1>
-          <p className="text-xl text-blue-100 mb-12">Our commitment to transparency. Every drop verified. Trace your bottle's journey from source to sip.</p>
-          
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">{verifyBlock.title}</h1>
+          <p className="text-xl text-blue-100 mb-12">{verifyBlock.subtitle}</p>
+
           <form onSubmit={handleVerify} className="max-w-2xl mx-auto relative">
             <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={batchId}
               onChange={(e) => setBatchId(e.target.value)}
-              placeholder="ENTER YOUR BOTTLE NECK CODE (e.g., OW-4192)" 
+              placeholder={verifyBlock.placeholder}
               className="w-full h-16 pl-14 pr-4 rounded-full text-slate-900 outline-none focus:ring-4 focus:ring-primary/50 shadow-2xl"
             />
             {isVerified && (
@@ -43,7 +60,7 @@ const Quality: React.FC = () => {
             <div className="bg-blue-50 p-4 border-b border-blue-100 text-center">
               <h2 className="text-xl font-bold text-secondary uppercase">Batch #{batchId || '4192'} VERIFIED</h2>
             </div>
-            
+
             <div className="p-8 space-y-8">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -75,7 +92,7 @@ const Quality: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-green-50 p-4 flex items-center justify-center gap-2 text-green-700 font-bold">
               <span className="material-icons">check_circle</span>
               QUALITY APPROVED
@@ -93,16 +110,9 @@ const Quality: React.FC = () => {
             <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-widest mb-2">Our Clinical Lab in Jos</h2>
             <div className="w-20 h-1 bg-primary mx-auto"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: 'Microbiological Testing', img: 'https://images.unsplash.com/photo-1579165466741-7f35a4755657?auto=format&fit=crop&w=400&q=80' },
-              { title: 'Mineral Analysis Station', img: 'https://images.unsplash.com/photo-1581093588401-fbb0736d9138?auto=format&fit=crop&w=400&q=80' },
-              { title: 'Advanced Filtration', img: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=400&q=80' },
-              { title: 'Dr. Yusuf at Work', img: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=400&q=80' },
-              { title: 'Quality Control Check', img: 'https://images.unsplash.com/photo-1614935151651-0bea6508db6b?auto=format&fit=crop&w=400&q=80' },
-              { title: 'The Jos Facility', img: 'https://images.unsplash.com/photo-1565514020176-db7102e34568?auto=format&fit=crop&w=400&q=80' },
-            ].map((item, i) => (
+            {labGallery.map((item: any, i: number) => (
               <div key={i} className="group">
                 <div className="overflow-hidden rounded-lg mb-4 shadow-md">
                   <img src={item.img} alt={item.title} className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500" />

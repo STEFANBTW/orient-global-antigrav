@@ -11,13 +11,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { LivePreview } from "@/components/dashboard/live-preview";
 import MarketInventoryEditor from "@/components/dashboard/market/MarketInventoryEditor";
-import MarketCMSEditor from "@/components/dashboard/market/MarketCMSEditor";
-import { 
-  Box, 
-  Search, 
-  Filter, 
-  Eye, 
-  Tag, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  Box,
+  Search,
+  Filter,
+  Eye,
+  Tag,
   ArrowUpRight,
   Cpu
 } from "lucide-react";
@@ -68,7 +68,7 @@ export default function MarketCommandCenter() {
             </TabsContent>
 
             <TabsContent value="cms" className="m-0 flex-1">
-              <MarketCMSEditor />
+              <BlockEditor division="market" />
             </TabsContent>
 
             <TabsContent value="ai" className="m-0 flex-1">
@@ -97,10 +97,10 @@ export default function MarketCommandCenter() {
 
             <TabsContent value="wholesale" className="m-0 flex-1">
               <Card className="border-slate-200 shadow-sm p-8 text-center space-y-6 bg-white rounded-xl h-full flex flex-col justify-center">
-                 <Box className="w-10 h-10 text-slate-300 mx-auto" />
-                 <h3 className="text-xl font-bold uppercase tracking-tighter">Wholesale Kanban</h3>
-                 <p className="text-xs text-slate-500 max-w-sm mx-auto">Manage corporate bulk orders and high-volume requests.</p>
-                 <ActionGuard sensitivity="high" actionLabel="Audit Contracts" className="mx-auto" />
+                <Box className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-xl font-bold uppercase tracking-tighter">Wholesale Kanban</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">Manage corporate bulk orders and high-volume requests.</p>
+                <ActionGuard sensitivity="high" actionLabel="Audit Contracts" className="mx-auto" />
               </Card>
             </TabsContent>
           </Tabs>
@@ -117,13 +117,13 @@ export default function MarketCommandCenter() {
               <Badge className="bg-emerald-500 text-white text-[8px] uppercase tracking-widest px-2 font-bold">Live</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedSKU} 
-                division="market" 
+              <LivePreview
+                item={selectedSKU}
+                division="market"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "POS Synced", description: "Global pricing has been updated." })}
                 onReject={() => toast({ variant: "destructive", title: "Flagged", description: "Price adjustment rejected for margin error." })}
-               />
+              />
             </div>
           </Card>
         </div>

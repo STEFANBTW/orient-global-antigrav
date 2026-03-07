@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Product } from '../types';
-import { cmsApi } from '@/services/cmsApi';
+import { useCMS } from '@/hooks/useCMS';
+import { WaterNarrativeArc } from './NarrativeArc';
+
 
 const steps = [
   { id: '01', title: 'Sediment', desc: 'Removes large particles.', icon: 'filter_alt', note: '5-micron polypropylene filter catches rust, dust, and sand.' },
@@ -16,23 +18,8 @@ const steps = [
 const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
   const [guests, setGuests] = useState(50);
   const [hours, setHours] = useState(4);
-  const [subscriptionType, setSubscriptionType] = useState<'weekly'|'monthly'>('weekly');
-  const [cmsData, setCmsData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await cmsApi.getDivisionContent('water');
-        setCmsData(data);
-      } catch (error) {
-        console.error("Failed to fetch CMS data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const [subscriptionType, setSubscriptionType] = useState<'weekly' | 'monthly'>('weekly');
+  const { content: cmsData, loading } = useCMS('water');
 
   const recommendedLiters = Math.round(guests * hours * 0.5);
 
@@ -62,26 +49,29 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
 
   return (
     <div className="w-full font-sans">
+      {/* Narrative Arc — Anatomy of Purity */}
+      <WaterNarrativeArc />
+
       {/* Hero Section */}
       <header className="relative h-[80vh] w-full flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950">
-        
+
         {/* Soft Radial Gradients for Atmosphere */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-           <motion.div 
-             animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-             className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-blue-200/40 dark:bg-blue-900/20 blur-[120px]"
-           />
-           <motion.div 
-             animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-             className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-sky-200/40 dark:bg-sky-900/20 blur-[100px]"
-           />
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-blue-200/40 dark:bg-blue-900/20 blur-[120px]"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-sky-200/40 dark:bg-sky-900/20 blur-[100px]"
+          />
         </div>
 
         {/* Hero Content */}
         <div className="relative z-20 text-center px-6 max-w-5xl mx-auto mt-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
@@ -90,8 +80,8 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
             <span className="w-2 h-2 rounded-full bg-blue-500 mr-3 animate-pulse"></span>
             <span className="text-[9px] font-medium tracking-[0.3em] uppercase text-slate-600 dark:text-slate-300">Medical Grade Purification</span>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
@@ -100,8 +90,8 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
             {heroBlock.title.split(' ').slice(0, -2).join(' ')} <br />
             <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-400">{heroBlock.title.split(' ').slice(-2).join(' ')}</span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.4 }}
@@ -109,21 +99,21 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
           >
             {heroBlock.subtitle}
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-6"
           >
-            <button 
+            <button
               onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-8 py-3.5 bg-blue-600 text-white rounded-full font-medium text-xs tracking-wide hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
             >
               Shop Collection
             </button>
-            <button 
-              onClick={() => onNavigate?.('process')} 
+            <button
+              onClick={() => onNavigate?.('process')}
               className="group flex items-center gap-2 px-8 py-3.5 bg-transparent text-slate-900 dark:text-white rounded-full font-medium text-xs tracking-wide hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
               Explore Process
@@ -143,10 +133,10 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
             <h2 className="text-3xl md:text-4xl font-light text-slate-900 dark:text-white mb-4 tracking-tight">7 Steps to Purity</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-base font-light">Our proprietary filtration process removes 99.99% of impurities while retaining essential minerals.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-12 gap-y-24">
             {steps.map((step, idx) => (
-              <motion.div 
+              <motion.div
                 key={step.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -167,7 +157,7 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
       {/* CATALOG SECTION - Glassmorphism & Airy */}
       <section id="catalog" className="py-12 bg-white dark:bg-[#050b1a] relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-24">
-          
+
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-light text-slate-900 dark:text-white mb-4 tracking-tight">The Collection</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-base font-light">Reliable hydration for home, office, and events.</p>
@@ -175,7 +165,7 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
             {products.map((product, idx) => (
-              <motion.div 
+              <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -203,12 +193,12 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
               <h2 className="text-2xl font-light text-slate-900 dark:text-white mb-3">Hydration Calculator</h2>
               <p className="text-slate-500 dark:text-slate-400 font-light text-sm">Ensure your team or guests stay perfectly hydrated.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
               <div>
                 <label className="block text-xs font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">Number of Guests</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={guests}
                   onChange={(e) => setGuests(parseInt(e.target.value) || 0)}
                   className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 pb-4 text-3xl font-light text-slate-900 dark:text-white focus:border-blue-500 outline-none transition-colors"
@@ -216,8 +206,8 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
               </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">Duration (Hours)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={hours}
                   onChange={(e) => setHours(parseInt(e.target.value) || 0)}
                   className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 pb-4 text-3xl font-light text-slate-900 dark:text-white focus:border-blue-500 outline-none transition-colors"
@@ -228,7 +218,7 @@ const Home: React.FC<{ onNavigate?: (p: any) => void }> = ({ onNavigate }) => {
             <div className="p-8 bg-white dark:bg-slate-950 rounded-3xl border border-slate-100 dark:border-slate-800 text-center">
               <p className="text-slate-500 dark:text-slate-400 font-light mb-4">Recommended Bundle</p>
               <div className="text-4xl font-light text-slate-900 dark:text-white mb-6">
-                ₦{((Math.ceil(recommendedLiters / 19) * 1200) + (Math.ceil(guests/12) * 1800)).toLocaleString()}
+                ₦{((Math.ceil(recommendedLiters / 19) * 1200) + (Math.ceil(guests / 12) * 1800)).toLocaleString()}
               </div>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-light">
                 {Math.ceil(recommendedLiters / 19)}x 19L Refills & {Math.ceil(guests / 12)}x 50cl Cases

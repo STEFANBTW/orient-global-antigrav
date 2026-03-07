@@ -6,12 +6,13 @@ import AboutScreen from './components/AboutScreen';
 import SommelierScreen from './components/SommelierScreen';
 import DeliveryScreen from './components/DeliveryScreen';
 import ReservationsScreen from './components/ReservationsScreen';
+import { DiningNarrativeArc } from './NarrativeArc';
 
 export type DiningView = 'dashboard' | 'menu' | 'about' | 'sommelier' | 'delivery' | 'reservations';
 
-export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, setView: (v: DiningView) => void, localTheme?: 'dark'|'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
+export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, setView: (v: DiningView) => void, localTheme?: 'dark' | 'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
@@ -36,11 +37,10 @@ export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, 
                 setView(view);
                 document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap px-3 py-1.5 rounded-full ${
-                currentView === view 
-                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+              className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap px-3 py-1.5 rounded-full ${currentView === view
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
                   : 'text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
+                }`}
             >
               {view}
             </button>
@@ -73,6 +73,7 @@ export const DiningApp: React.FC<{ currentView: DiningView }> = ({ currentView }
 
   return (
     <div className="bg-black min-h-screen">
+      {currentView === 'dashboard' && <DiningNarrativeArc />}
       {renderView()}
     </div>
   );

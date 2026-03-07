@@ -4,6 +4,9 @@ import { ScrollContext } from './ScrollContext';
 import { Architect } from './BakeryArchitect';
 import { Wholesale } from './BakeryWholesale';
 import { Story } from './BakeryStory';
+import { useCMS } from './hooks/useCMS';
+import { BakeryNarrativeArc } from './BakeryNarrativeArc';
+import { BakeryMenu } from './BakeryMenu';
 
 const menuItems = [
   { title: "Butter Croissant", category: "Pastries", price: "₦4,500", desc: "27 layers of pure bliss. Baked fresh every 2 hours to ensure maximum flake.", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzuTGeynABEZq_RNMW_0DWnpySiwUdY708i6ZVWjZ7aIl0DpPLMJq1VQVEwuiE3nMamKg_bwuczTqbcV6ecYVDUXjY9SZK519_nntwfz9HAhku_iqDi_Ef3RUdWrVu9jrh-MWAyUVc-FKp3_XCiyFx_P2OM-jDXRGULnYJqVqUqqx6jyHp_XoHc7SCS-NUZMRZsCvKWvMaSW8Dsah1KUa05a9i3V7cPWokidQYzWZ7hkP9T04I1yuxLjt0g6HhgWkppOALuJnR6wrU", ingredients: "High-fat French Butter, Organic Wheat Flour, Sea Salt, Fresh Yeast" },
@@ -90,6 +93,20 @@ const BakeryPairingCard: React.FC<{ title: string; desc: string; image: string }
 );
 
 export const BakeryHome: React.FC = () => {
+  const { content, loading } = useCMS('bakery');
+
+  if (loading) {
+    return (
+      <div className="bg-slate-50 dark:bg-background-dark min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-primary font-serif italic text-2xl">Warming the ovens...</div>
+      </div>
+    );
+  }
+
+  return <BakeryHomeContent content={content} />;
+};
+
+const BakeryHomeContent: React.FC<{ content: any }> = ({ content }) => {
   const ref = useRef(null);
   const { scrollContainerRef } = React.useContext(ScrollContext);
   const { scrollYProgress } = useScroll({
@@ -98,32 +115,35 @@ export const BakeryHome: React.FC = () => {
     offset: ["start start", "end start"]
   });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const categories = ['All', 'Bread', 'Pastries', 'Savory'];
 
-  const displayedItems = activeCategory === 'All' ? menuItems : menuItems.filter(item => item.category === activeCategory);
+  const customCakes = content?.products?.items?.filter((i: any) => i.category === 'Cakes' || i.name?.includes('Cake')) || [];
+  const heroData = {
+    title: content?.hero?.title || "Jos’s Morning <span className=\"text-primary italic\">Ritual</span>.",
+    subtitle: content?.hero?.subtitle || "Hot, fresh, and ready by 7:00 AM. Hand-kneaded dough, patience, and the warmth of a real fire.",
+    cta: content?.hero?.cta || "Order Pickup",
+    image: content?.hero?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuD6SG_V94G3jAOPP14HMgaAc2y6fE1y54l-T9C_E8xI1lee7tUiF_qJrO8kXpExWPXmuyi8aqoigi93IDoakFe7g9F7qjyPpIDuf5zvLq-T9HQck89ar2rvOtJOWbapiebrimVajx_o7xAq0UfknDkv0sjaGWYqUmPn7GOzTdfsSZqTNiJPRV2YdCQ87VO5yahIhmngNShbsfl5AgO4_w5JoN1TT8lQmCaRisnMIBX9YW4YySXwnKh-Uwv2ioOH1i39jT1EUr1eVcIX"
+  };
 
   return (
     <div ref={ref} className="bg-slate-50 dark:bg-background-dark overflow-x-hidden pt-0">
       {/* Cinematic Hero Section */}
       <header className="relative w-full h-[85vh] overflow-hidden flex items-center justify-center bg-background-dark">
         <div className="absolute inset-0 z-0">
-          <motion.img style={{ y: yParallax }} alt="Baker dusting flour on dough in slow motion" className="w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6SG_V94G3jAOPP14HMgaAc2y6fE1y54l-T9C_E8xI1lee7tUiF_qJrO8kXpExWPXmuyi8aqoigi93IDoakFe7g9F7qjyPpIDuf5zvLq-T9HQck89ar2rvOtJOWbapiebrimVajx_o7xAq0UfknDkv0sjaGWYqUmPn7GOzTdfsSZqTNiJPRV2YdCQ87VO5yahIhmngNShbsfl5AgO4_w5JoN1TT8lQmCaRisnMIBX9YW4YySXwnKh-Uwv2ioOH1i39jT1EUr1eVcIX" />
+          <motion.img style={{ y: yParallax }} alt="Bakery Hero" className="w-full h-full object-cover opacity-60" src={heroData.image} />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent"></div>
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-block py-1 px-3 border border-white/30 rounded-full text-white/80 text-xs font-serif italic mb-6 backdrop-blur-sm">
             Est. 2024
           </motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-xl">
-            Jos’s Morning <span className="text-primary italic">Ritual</span>.
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-xl" dangerouslySetInnerHTML={{ __html: String(heroData.title || "") }}>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="font-display text-base sm:text-lg md:text-xl text-stone-200 font-light tracking-wide mb-10 max-w-xl mx-auto">
-            Hot, fresh, and ready by 7:00 AM. Hand-kneaded dough, patience, and the warmth of a real fire.
+            {heroData.subtitle}
           </motion.p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-white text-stone-900 hover:bg-stone-100 font-medium py-3 px-8 rounded-full transition-colors transform active:scale-95">
-              Order Pickup
+              {heroData.cta || "Order Pickup"}
             </button>
             <button className="border border-white/40 text-white hover:bg-white/10 backdrop-blur-sm font-medium py-3 px-8 rounded-full transition-colors flex items-center justify-center gap-2 transform active:scale-95">
               <span className="material-icons text-sm">play_circle</span> Watch the Process
@@ -158,7 +178,7 @@ export const BakeryHome: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-6 md:space-y-8">
             <span className="text-primary font-bold uppercase tracking-widest text-xs border-b border-primary/30 pb-1">The Essence</span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white leading-tight">Grown in Jos, <br/> Perfected in <span className="text-primary italic">Fire.</span></h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white leading-tight">Grown in Jos, <br /> Perfected in <span className="text-primary italic">Fire.</span></h2>
             <p className="text-stone-400 text-base md:text-lg font-light leading-relaxed">
               Our flour isn't just an ingredient; it's a legacy. Sourced directly from family-run farms in the Plateau, we use 100% organic heritage grains that carry the mineral-rich essence of our soil.
             </p>
@@ -182,30 +202,6 @@ export const BakeryHome: React.FC = () => {
         </div>
       </section>
 
-      {/* Daily Menu Section */}
-      <section className="py-24 bg-[#F9F8F6] dark:bg-background-dark relative" id="menu">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div>
-              <h2 className="font-serif text-5xl text-stone-800 dark:text-white font-medium mb-4 italic">Daily Selection</h2>
-              <p className="text-stone-500 dark:text-stone-400 max-w-md font-sans leading-relaxed">Our menu changes daily based on seasonal ingredients and our baker's inspiration.</p>
-            </div>
-            <div className="bg-white dark:bg-stone-900 p-2 rounded-full shadow-sm border border-stone-100 dark:border-stone-800 flex">
-              {categories.map((cat) => (
-                <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${ activeCategory === cat ? 'bg-stone-800 text-white shadow-md' : 'text-stone-500 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800' }`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-            {displayedItems.map((item, index) => (
-              <BakeryMenuItem key={index} title={item.title} price={item.price} desc={item.desc} image={item.image} ingredients={item.ingredients} />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Sensory Journey */}
       <section className="relative min-h-screen flex items-center bg-background-dark py-20 sm:py-32 overflow-hidden">
         <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full opacity-20 lg:opacity-30">
@@ -213,7 +209,7 @@ export const BakeryHome: React.FC = () => {
         </div>
         <div className="max-w-7xl mx-auto px-4 relative z-10 w-full">
           <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-2xl bg-background-dark/80 backdrop-blur-xl p-8 sm:p-12 rounded-[2rem] sm:rounded-[3rem] border border-white/5 shadow-2xl">
-            <h3 className="font-serif text-3xl sm:text-5xl text-white mb-6">A Sensory <br/> <span className="text-primary italic">Journey.</span></h3>
+            <h3 className="font-serif text-3xl sm:text-5xl text-white mb-6">A Sensory <br /> <span className="text-primary italic">Journey.</span></h3>
             <p className="text-stone-300 text-base sm:text-lg font-light leading-relaxed mb-8">
               Close your eyes. Hear the crackle of the crust as it cools. Inhale the deep, toasted aroma of 48-hour fermented dough. Feel the warmth radiating from a loaf that was an hour ago just flour, water, and fire.
             </p>
@@ -307,7 +303,7 @@ export const BakeryHome: React.FC = () => {
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 lg:order-2 space-y-6 md:space-y-8">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl dark:text-white leading-tight">Grown in Jos, <br/> Fed by <span className="text-primary italic">Community.</span></h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl dark:text-white leading-tight">Grown in Jos, <br /> Fed by <span className="text-primary italic">Community.</span></h2>
             <p className="text-stone-500 text-base md:text-lg leading-relaxed">
               We aren't just a bakery; we are a hub for local agriculture. By partnering directly with Plateau farmers, we ensure our wheat travels less and tastes like home. Every loaf purchased supports the growth of our beautiful state.
             </p>
@@ -322,9 +318,9 @@ export const BakeryHome: React.FC = () => {
   );
 };
 
-export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setView: (v: 'home' | 'architect' | 'wholesale' | 'story') => void, localTheme?: 'dark'|'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
+export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setView: (v: 'home' | 'menu' | 'architect' | 'wholesale' | 'story') => void, localTheme?: 'dark' | 'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
@@ -345,6 +341,7 @@ export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setV
           <div className="flex items-center justify-center space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar px-4">
             {[
               { id: 'home', label: 'Bakery' },
+              { id: 'menu', label: 'Menu' },
               { id: 'architect', label: 'The Architect' },
               { id: 'wholesale', label: 'Wholesale' },
               { id: 'story', label: 'Our Story' }
@@ -355,9 +352,8 @@ export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setV
                   setView(item.id as any);
                   document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${
-                  currentView === item.id ? 'text-primary' : 'text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white'
-                }`}
+                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${currentView === item.id ? 'text-primary' : 'text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white'
+                  }`}
               >
                 {item.label}
               </button>
@@ -376,10 +372,11 @@ export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setV
   );
 };
 
-export const BakeryApp: React.FC<{ currentView: 'home' | 'architect' | 'wholesale' | 'story' }> = ({ currentView }) => {
+export const BakeryApp: React.FC<{ currentView: 'home' | 'menu' | 'architect' | 'wholesale' | 'story' }> = ({ currentView }) => {
   return (
     <div>
-      {currentView === 'home' && <BakeryHome />}
+      {currentView === 'home' && <><BakeryNarrativeArc /><BakeryHome /></>}
+      {currentView === 'menu' && <BakeryMenu />}
       {currentView === 'architect' && <Architect />}
       {currentView === 'wholesale' && <Wholesale />}
       {currentView === 'story' && <Story />}

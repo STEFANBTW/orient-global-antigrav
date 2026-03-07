@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { HardwareMap } from "@/components/dashboard/hardware-map";
-import DivisionCMSEditor from "@/components/dashboard/cms/DivisionEditor";
-import { 
-  Trophy, 
-  Monitor, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  Trophy,
+  Monitor,
   Eye,
   Plus
 } from "lucide-react";
@@ -61,8 +61,8 @@ export default function GamesCommandCenter() {
                   </div>
                 </CardHeader>
                 <div className="flex-1 p-8">
-                  <HardwareMap 
-                    rigs={hardwareRigs} 
+                  <HardwareMap
+                    rigs={hardwareRigs}
                     onSelectRig={(rig) => setSelectedRig(rig)}
                     selectedRigId={selectedRig?.id}
                   />
@@ -108,8 +108,8 @@ export default function GamesCommandCenter() {
                     </TableHeader>
                     <TableBody>
                       {tournaments.map((tour) => (
-                        <TableRow 
-                          key={tour.id} 
+                        <TableRow
+                          key={tour.id}
                           className={`border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer ${selectedTournament?.id === tour.id ? 'bg-primary/5' : ''}`}
                           onClick={() => setSelectedTournament(tour)}
                         >
@@ -136,7 +136,7 @@ export default function GamesCommandCenter() {
             </TabsContent>
 
             <TabsContent value="cms" className="m-0 flex-1">
-              <DivisionCMSEditor division="games" />
+              <BlockEditor division="games" />
             </TabsContent>
           </Tabs>
         </div>
@@ -152,13 +152,13 @@ export default function GamesCommandCenter() {
               <Badge className="bg-emerald-500 text-white text-[8px] uppercase tracking-widest px-2 font-bold shrink-0 animate-pulse">Synced</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedTournament || tournaments[0]} 
-                division="games" 
+              <LivePreview
+                item={selectedTournament || tournaments[0]}
+                division="games"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "Authorized", description: "Tournament sanctioned." })}
                 onReject={() => toast({ variant: "destructive", title: "Flagged", description: "Draft rejected." })}
-               />
+              />
             </div>
           </Card>
         </div>

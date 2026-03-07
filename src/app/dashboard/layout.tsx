@@ -2,30 +2,30 @@
 'use client';
 
 import React, { useEffect, useMemo } from "react";
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarContent, 
-  SidebarHeader, 
-  SidebarMenu, 
-  SidebarMenuItem, 
-  SidebarMenuButton, 
-  SidebarGroup, 
-  SidebarGroupLabel, 
-  SidebarTrigger, 
-  SidebarInset 
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarTrigger,
+  SidebarInset
 } from "@/components/ui/sidebar";
-import { 
-  LayoutDashboard, 
-  Inbox, 
-  ChefHat, 
-  Store, 
-  Utensils, 
-  Gamepad2, 
-  Wine as WineIcon, 
-  Droplets, 
-  ShieldCheck, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Inbox,
+  ChefHat,
+  Store,
+  Utensils,
+  Gamepad2,
+  Wine as WineIcon,
+  Droplets,
+  ShieldCheck,
+  LogOut,
   ChevronRight,
   Globe,
   Users,
@@ -41,21 +41,23 @@ import {
   Box,
   Cpu,
   ShoppingCart,
-  History
+  History,
+  ChevronsUpDown
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useRoles } from "@/context/role-context";
 import { Toaster } from "@/components/ui/toaster";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { OmnisearchPalette } from "@/components/admin/OmnisearchPalette";
 
 const divisionIcons: Record<string, any> = {
   bakery: ChefHat,
@@ -122,16 +124,12 @@ export default function DashboardLayout() {
     if (!currentUser) return null;
     const parts = pathname.split('/');
     const urlDivision = parts[2];
-    
+
     if (urlDivision && divisionModules[urlDivision]) {
       return urlDivision;
     }
-    
-    if (currentUser.role !== 'admin_boss') {
-      return currentUser.division;
-    }
-    
-    return null;
+
+    return 'global';
   }, [pathname, currentUser]);
 
   useEffect(() => {
@@ -144,13 +142,7 @@ export default function DashboardLayout() {
 
   if (!currentUser) return null;
 
-  const isBoss = currentUser.role === 'admin_boss';
-
-  const pendingCount = requests.filter(r => {
-    if (isBoss) return r.status === 'pending';
-    if (currentUser.role === 'admin_head') return r.division === currentUser.division && r.status === 'pending';
-    return false;
-  }).length;
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -159,18 +151,45 @@ export default function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50 font-body text-slate-900">
-        <Sidebar className="border-r border-slate-200 bg-white" collapsible="icon">
+      <OmnisearchPalette />
+      <div className="admin-theme flex min-h-screen w-full bg-background font-body text-foreground">
+        <Sidebar className="border-r border-border bg-sidebar" collapsible="icon">
           <SidebarHeader className="p-4 md:p-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary p-2 rounded-lg shadow-md shadow-primary/20 shrink-0">
-                <ShieldCheck className="w-5 h-5 text-white" />
-              </div>
-              <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-                <h1 className="text-lg font-bold tracking-tight text-slate-900 leading-none uppercase italic">ORIENT</h1>
-                <p className="text-[9px] text-primary font-bold uppercase tracking-[0.2em] mt-1">Management Portal</p>
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className={`flex items-center gap-3 group p-2 -m-2 rounded-xl transition-colors cursor-pointer hover:bg-black/5`}>
+                  <div className="bg-primary p-2 rounded-lg shadow-md shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+                    <h1 className="text-lg font-bold tracking-tight leading-none uppercase italic text-foreground">ORIENT</h1>
+                    <p className="text-[9px] text-primary font-bold uppercase tracking-[0.2em] mt-1 truncate">
+                      {activeDivisionContext && activeDivisionContext !== 'global' ? `${activeDivisionContext} Node` : 'Global Management'}
+                    </p>
+                  </div>
+                  <ChevronsUpDown className="w-4 h-4 text-muted-foreground shrink-0 group-data-[collapsible=icon]:hidden" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 mt-2">
+                <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Workspace Switcher</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" className="w-full cursor-pointer font-bold text-xs flex items-center gap-2">
+                    <Globe className="w-4 h-4" /> Global Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                {['bakery', 'dining', 'games', 'lounge', 'market', 'water'].map(div => {
+                  const Icon = divisionIcons[div];
+                  return (
+                    <DropdownMenuItem key={div} asChild>
+                      <Link to={`/dashboard/${div}`} className="w-full cursor-pointer font-bold text-xs flex items-center gap-2 capitalize">
+                        <Icon className="w-4 h-4" /> {div} Node
+                      </Link>
+                    </DropdownMenuItem>
+                  )
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarHeader>
 
           <SidebarContent className="px-2 md:px-4">
@@ -184,27 +203,25 @@ export default function DashboardLayout() {
                     <Link to="/dashboard" className="flex items-center gap-3 px-3">
                       <LayoutDashboard className="w-4 h-4" />
                       <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">
-                        {isBoss ? "Global Dashboard" : "My Workspace"}
+                        Global Dashboard
                       </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                {(isBoss || currentUser.role === 'admin_head') && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/inbox'} className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white">
-                      <Link to="/dashboard/inbox" className="flex items-center gap-3 px-3">
-                        <Inbox className="w-4 h-4" />
-                        <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">Authorizations</span>
-                        {pendingCount > 0 && (
-                          <Badge className="ml-auto bg-primary-foreground text-primary text-[8px] h-4 min-w-[1rem] px-1 border-none font-bold group-data-[collapsible=icon]:hidden">
-                            {pendingCount}
-                          </Badge>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === '/dashboard/inbox'} className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white">
+                    <Link to="/dashboard/inbox" className="flex items-center gap-3 px-3">
+                      <Inbox className="w-4 h-4" />
+                      <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">Authorizations</span>
+                      {pendingCount > 0 && (
+                        <Badge className="ml-auto bg-primary-foreground text-primary text-[8px] h-4 min-w-[1rem] px-1 border-none font-bold group-data-[collapsible=icon]:hidden">
+                          {pendingCount}
+                        </Badge>
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/dashboard/logs'} className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white">
@@ -215,16 +232,14 @@ export default function DashboardLayout() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                {isBoss && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/cms'} className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white">
-                      <Link to="/dashboard/cms" className="flex items-center gap-3 px-3">
-                        <Palette className="w-4 h-4" />
-                        <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">Site Editor</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === '/dashboard/cms'} className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white">
+                    <Link to="/dashboard/cms" className="flex items-center gap-3 px-3">
+                      <Palette className="w-4 h-4" />
+                      <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">Site Editor</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
 
@@ -236,10 +251,10 @@ export default function DashboardLayout() {
                 <SidebarMenu>
                   {divisionModules[activeDivisionContext].map((module) => (
                     <SidebarMenuItem key={module.id}>
-                      <SidebarMenuButton 
+                      <SidebarMenuButton
                         isActive={activeModule === module.id}
                         onClick={() => setActiveModule(module.id)}
-                        className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-white"
+                        className="h-11 rounded-lg mb-1 data-[active=true]:bg-primary data-[active=true]:text-primary-foreground text-muted-foreground hover:bg-black/5 hover:text-foreground"
                       >
                         <div className="flex items-center gap-3 px-3 w-full">
                           <module.icon className="w-4 h-4" />
@@ -253,56 +268,30 @@ export default function DashboardLayout() {
               </SidebarGroup>
             )}
 
-            {isBoss && (
-              <SidebarGroup className="mt-4">
-                <SidebarGroupLabel className="px-4 text-[9px] font-bold uppercase tracking-[0.3em] text-slate-400 mb-2 group-data-[collapsible=icon]:hidden">
-                  Node Inspection
-                </SidebarGroupLabel>
-                <SidebarMenu>
-                  {['bakery', 'dining', 'games', 'lounge', 'market', 'water'].map((div) => {
-                    const Icon = divisionIcons[div];
-                    const href = `/dashboard/${div}`;
-                    return (
-                      <SidebarMenuItem key={div}>
-                        <SidebarMenuButton 
-                          asChild
-                          isActive={pathname === href}
-                          className="h-11 rounded-lg mb-1 data-[active=true]:bg-slate-200 data-[active=true]:text-slate-900"
-                        >
-                          <Link to={href} className="flex items-center gap-3 px-3 w-full">
-                            <Icon className="w-4 h-4" />
-                            <span className="font-bold text-[10px] uppercase tracking-widest truncate group-data-[collapsible=icon]:hidden">{div}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroup>
-            )}
           </SidebarContent>
 
-          <div className="mt-auto p-4 md:p-6 border-t border-slate-200">
+          <div className="mt-auto p-4 md:p-6 border-t border-border">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-3 cursor-pointer group hover:bg-slate-100 p-2 rounded-xl transition-colors">
-                  <Avatar className="h-9 w-9 border border-slate-200">
-                    <AvatarFallback className="bg-primary text-white font-bold text-[10px]">{currentUser.avatar}</AvatarFallback>
+                <div className="flex items-center gap-3 cursor-pointer group hover:bg-black/5 p-2 -m-2 rounded-xl transition-colors">
+                  <Avatar className="h-9 w-9 border border-border">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold text-[10px]">{currentUser.avatar}</AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
-                    <span className="text-[10px] font-bold text-slate-900 truncate uppercase tracking-tight">{currentUser.name}</span>
-                    <span className="text-[8px] text-slate-500 uppercase font-bold tracking-widest truncate">
-                      {currentUser.role === 'admin_boss' ? 'Director' : currentUser.role === 'admin_head' ? 'Manager' : 'Staff'}
+                  <div className="flex flex-col min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+                    <span className="text-[10px] font-bold text-foreground truncate uppercase tracking-tight">{currentUser.name}</span>
+                    <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest truncate">
+                      Administrator
                     </span>
                   </div>
+                  <ChevronsUpDown className="w-4 h-4 text-muted-foreground shrink-0 group-data-[collapsible=icon]:hidden" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-widest">Personnel Profile</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56 mb-2">
+                <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Personnel Profile</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
-                  className="text-red-600 focus:bg-red-50 cursor-pointer text-xs uppercase tracking-widest font-bold py-2"
+                  className="text-red-500 hover:text-red-600 focus:bg-red-500/10 focus:text-red-600 cursor-pointer text-xs uppercase tracking-widest font-bold py-2"
                 >
                   <LogOut className="mr-2 h-3.5 w-3.5" /> Log Out
                 </DropdownMenuItem>
@@ -311,8 +300,8 @@ export default function DashboardLayout() {
           </div>
         </Sidebar>
 
-        <SidebarInset className="flex-1 flex flex-col bg-slate-50 max-w-full overflow-hidden">
-          <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-slate-200 bg-white sticky top-0 z-50">
+        <SidebarInset className="flex-1 flex flex-col bg-background max-w-full overflow-hidden">
+          <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-border bg-sidebar sticky top-0 z-50">
             <div className="flex items-center gap-3 md:gap-6">
               <SidebarTrigger className="text-slate-400 hover:text-primary h-9 w-9 border border-slate-200 rounded-lg shrink-0" />
               <div className="h-5 w-px bg-slate-200 hidden sm:block" />
@@ -320,7 +309,7 @@ export default function DashboardLayout() {
                 <h2 className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] leading-none mb-1 hidden xs:block">Personnel Status</h2>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold text-slate-900 tracking-widest uppercase italic truncate max-w-[120px] xs:max-w-none">
-                    {isBoss ? "Global System Online" : `Division Node: ${currentUser.division.toUpperCase()}`}
+                    {activeDivisionContext === 'global' ? "Global System Online" : `Division Node: ${activeDivisionContext?.toUpperCase()}`}
                   </span>
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 </div>
@@ -329,7 +318,7 @@ export default function DashboardLayout() {
 
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="border-slate-200 text-[8px] tracking-widest uppercase bg-slate-50 px-3 py-1 text-slate-500 font-bold hidden sm:flex shrink-0">
-                Clearance Tier 0{isBoss ? '1' : currentUser.role === 'admin_head' ? '2' : '3'}
+                Clearance Tier 01
               </Badge>
             </div>
           </header>

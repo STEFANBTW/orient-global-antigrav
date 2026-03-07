@@ -21,6 +21,7 @@ import Loyalty from './pages/Loyalty';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { MarketNarrativeArc } from './NarrativeArc';
 
 export type SupermarketPage = 'Home' | 'Wholesale' | 'Deals' | 'Dashboard' | 'Cart' | 'Produce' | 'Aisles' | 'PreviouslyBought' | 'BOGOF' | 'Under5' | 'Bundles' | 'Bakery' | 'Receipts' | 'Favorites' | 'Loyalty' | 'Settings' | 'Login' | 'Register';
 
@@ -135,7 +136,7 @@ export const SupermarketApp: React.FC<{ activePage: SupermarketPage, setActivePa
               transition={{ duration: 0.35, ease: "easeOut" }}
               className="min-h-full"
             >
-              {activePage === 'Home' && <Home onNavigate={setActivePage} onOpenSmartPaste={() => setIsSmartPasteOpen(true)} />}
+              {activePage === 'Home' && <><MarketNarrativeArc /><Home onNavigate={setActivePage} onOpenSmartPaste={() => setIsSmartPasteOpen(true)} /></>}
               {activePage === 'Wholesale' && <Wholesale />}
               {activePage === 'Deals' && <Deals onNavigate={setActivePage} />}
               {activePage === 'Dashboard' && <Dashboard onNavigate={setActivePage} />}

@@ -16,11 +16,7 @@ export function ApprovalInbox() {
 
   if (!currentUser) return null;
 
-  const filteredRequests = requests.filter(req => {
-    if (currentUser.role === 'admin_boss') return req.targetRoleId === 'admin_boss' && req.status === 'pending';
-    if (currentUser.role === 'admin_head') return req.targetRoleId === 'admin_head' && req.division === currentUser.division && req.status === 'pending';
-    return false;
-  });
+  const filteredRequests = requests.filter(req => req.status === 'pending');
 
   const handleDeclineClick = (req: ApprovalRequest) => {
     setSelectedRequest(req);

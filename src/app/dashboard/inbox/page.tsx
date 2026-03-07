@@ -12,13 +12,7 @@ export default function InboxPage() {
 
   if (!currentUser) return null;
 
-  const isBoss = currentUser.role === 'admin_boss';
-  
-  const pendingCount = requests.filter(r => {
-    if (currentUser.role === 'admin_boss') return r.targetRoleId === 'admin_boss' && r.status === 'pending';
-    if (currentUser.role === 'admin_head') return r.targetRoleId === 'admin_head' && r.division === currentUser.division && r.status === 'pending';
-    return false;
-  }).length;
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   return (
     <div className="space-y-10 max-w-[1200px] mx-auto pb-20">
@@ -41,7 +35,7 @@ export default function InboxPage() {
           </h1>
           <p className="text-slate-500 font-medium italic">
             Awaiting executive clearance for <span className="text-primary font-bold not-italic underline decoration-primary/30">
-              {isBoss ? "Global Operations" : `${currentUser.division} Node`}
+              Global Operations
             </span>
           </p>
         </div>

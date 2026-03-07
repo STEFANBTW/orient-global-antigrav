@@ -6,10 +6,10 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { LivePreview } from "@/components/dashboard/live-preview";
-import DivisionCMSEditor from "@/components/dashboard/cms/DivisionEditor";
-import { 
-  Activity, 
-  Timer, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  Activity,
+  Timer,
   Palette,
   Eye,
   Settings
@@ -99,7 +99,7 @@ export default function BakeryCommandCenter() {
             </TabsContent>
 
             <TabsContent value="cms" className="m-0 flex-1">
-              <DivisionCMSEditor division="bakery" />
+              <BlockEditor division="bakery" />
             </TabsContent>
           </Tabs>
         </div>
@@ -115,13 +115,13 @@ export default function BakeryCommandCenter() {
               <Badge className="bg-amber-600 text-white text-[8px] uppercase tracking-widest px-2 font-bold">Staged</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedItem} 
-                division="bakery" 
+              <LivePreview
+                item={selectedItem}
+                division="bakery"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "Bake Published", description: "Item is now live on the catalog." })}
                 onReject={() => toast({ variant: "destructive", title: "Recalled", description: "Item draft returned to Staff." })}
-               />
+              />
             </div>
           </Card>
         </div>

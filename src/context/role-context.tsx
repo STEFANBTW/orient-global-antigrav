@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-export type UserRole = 'admin_boss' | 'admin_head' | 'admin_staff';
+export type UserRole = 'admin' | 'admin_staff' | 'admin_head' | 'admin_boss';
 export type DivisionId = 'bakery' | 'dining' | 'games' | 'lounge' | 'market' | 'water' | 'global';
 
 export interface UserProfile {
@@ -19,7 +19,7 @@ export interface ApprovalRequest {
   id: string;
   requesterId: string;
   requesterName: string;
-  targetRoleId: 'admin_head' | 'admin_boss';
+  targetRoleId: 'admin';
   division: DivisionId;
   actionLabel: string;
   description: string;
@@ -128,7 +128,7 @@ export interface RoleContextType {
   activeModule: string;
   setActiveModule: (module: string) => void;
   canExecuteLocally: (sensitivity: 'low' | 'high') => boolean;
-  
+
   // Division States
   diningMenu: MenuItem[];
   loungeMenu: MenuItem[];
@@ -136,7 +136,7 @@ export interface RoleContextType {
   vipBookings: VIPBooking[];
   waterLogs: WaterLog[];
   skus: SKUItem[];
-  
+
   tournaments: Tournament[];
   hardwareRigs: HardwareRig[];
   sommelierList: any[];
@@ -145,20 +145,7 @@ export interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const MOCK_PERSONAS: UserProfile[] = [
-  { id: 'BOSS-001', name: 'Aliko Dangote', email: 'boss1@orient.com', role: 'admin_boss', division: 'global', avatar: 'AD' },
-  { id: 'BOSS-002', name: 'Tony Elumelu', email: 'boss2@orient.com', role: 'admin_boss', division: 'global', avatar: 'TE' },
-  { id: 'HOD-B', name: 'Chef Tunde', email: 'hod.bakery@orient.com', role: 'admin_head', division: 'bakery', avatar: 'CT' },
-  { id: 'HOD-D', name: 'Sade Adu', email: 'hod.dining@orient.com', role: 'admin_head', division: 'dining', avatar: 'SA' },
-  { id: 'HOD-G', name: 'Obi Okoro', email: 'hod.games@orient.com', role: 'admin_head', division: 'games', avatar: 'OO' },
-  { id: 'HOD-L', name: 'Femi Kuti', email: 'hod.lounge@orient.com', role: 'admin_head', division: 'lounge', avatar: 'FK' },
-  { id: 'HOD-M', name: 'Ngozi Iweala', email: 'hod.market@orient.com', role: 'admin_head', division: 'market', avatar: 'NI' },
-  { id: 'HOD-W', name: 'Amina Mohammed', email: 'hod.water@orient.com', role: 'admin_head', division: 'water', avatar: 'AM' },
-  { id: 'STAFF-B', name: 'Ahmed Lawal', email: 'staff.bakery@orient.com', role: 'admin_staff', division: 'bakery', avatar: 'AL' },
-  { id: 'STAFF-D', name: 'Michael Obi', email: 'staff.dining@orient.com', role: 'admin_staff', division: 'dining', avatar: 'MO' },
-  { id: 'STAFF-G', name: 'Liam O\'Connor', email: 'staff.games@orient.com', role: 'admin_staff', division: 'games', avatar: 'LO' },
-  { id: 'STAFF-L', name: 'Elena Rossi', email: 'staff.lounge@orient.com', role: 'admin_staff', division: 'lounge', avatar: 'ER' },
-  { id: 'STAFF-M', name: 'Sarah Jenkins', email: 'staff.market@orient.com', role: 'admin_staff', division: 'market', avatar: 'SJ' },
-  { id: 'STAFF-W', name: 'David K.', email: 'staff.water@orient.com', role: 'admin_staff', division: 'water', avatar: 'DK' },
+  { id: 'admin', name: 'Admin', email: 'admin@orient.com', role: 'admin', division: 'global', avatar: 'A' },
 ];
 
 export function RoleProvider({ children }: { children: ReactNode }) {
@@ -177,10 +164,10 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         itemName: 'Raspberry Velvet Cake',
         oldValue: '₦40,000',
         newValue: '₦45,000',
-        staffName: 'Ahmed Lawal',
-        staffRole: 'Staff',
-        approverName: 'Chef Tunde',
-        approverRole: 'Manager',
+        staffName: 'Admin',
+        staffRole: 'Admin',
+        approverName: 'Admin',
+        approverRole: 'Admin',
         reason: 'Increased ingredient costs',
         division: 'bakery'
       },
@@ -190,10 +177,10 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         itemName: 'Dom Perignon',
         oldValue: '₦220,000',
         newValue: '₦250,000',
-        staffName: 'Elena Rossi',
-        staffRole: 'Staff',
-        approverName: 'Femi Kuti',
-        approverRole: 'Manager',
+        staffName: 'Admin',
+        staffRole: 'Admin',
+        approverName: 'Admin',
+        approverRole: 'Admin',
         reason: 'Vintage scarcity adjustment',
         division: 'lounge'
       }
@@ -222,8 +209,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   ]);
 
   // Market
-  const [skus] = useState<SKUItem[]>([
-    { id: 'SKU-001', sku: 'MKT-IMP-902', name: 'Swiss Dark Chocolate', brand: 'Lindt', category: 'Imported', price: 8500, stock: 45, isBOGOF: false, isUnder5: false }
+  const [skus, setSkus] = useState<SKUItem[]>([
+    { id: 'SKU-001', sku: 'MKT-IMP-902', name: 'Swiss Dark Chocolate', brand: 'Lindt', category: 'Imported', price: 8500, stock: 45, isBOGOF: false, isUnder5: false },
+    { id: 'p2', sku: 'PRO-002', name: 'Red Tomatoes', brand: 'Jos Farms', category: 'Produce', price: 1200, stock: 120, isBOGOF: false, isUnder5: false }
   ]);
 
   const [tournaments] = useState([
@@ -238,6 +226,22 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (currentUser) setActiveDivisionView(currentUser.division);
   }, [currentUser]);
+
+  // Global SSE Listener for Zero-Touch Updates
+  useEffect(() => {
+    const sse = new EventSource('/api/admin/sse');
+    sse.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type === 'stock_update') {
+          setSkus(prev => prev.map(s => s.id === payload.sku ? { ...s, stock: payload.new_stock } : s));
+        }
+      } catch (err) {
+        console.error("SSE parse error", err);
+      }
+    };
+    return () => sse.close();
+  }, []);
 
   const createRequest = (req: Omit<ApprovalRequest, 'id' | 'timestamp' | 'status'>) => {
     const newRequest: ApprovalRequest = {
@@ -266,9 +270,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         oldValue: request.oldValue,
         newValue: request.newValue,
         staffName: request.requesterName,
-        staffRole: 'Staff',
-        approverName: currentUser?.name || 'Manager',
-        approverRole: currentUser?.role === 'admin_boss' ? 'Director' : 'Manager',
+        staffRole: 'Admin',
+        approverName: currentUser?.name || 'Admin',
+        approverRole: 'Admin',
         reason: request.description,
         division: request.division
       });
@@ -278,13 +282,11 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   const canExecuteLocally = (sensitivity: 'low' | 'high') => {
     if (!currentUser) return false;
-    if (currentUser.role === 'admin_boss') return true;
-    if (currentUser.role === 'admin_head') return sensitivity === 'low';
-    return false;
+    return currentUser.role === 'admin';
   };
 
   return (
-    <RoleContext.Provider value={{ 
+    <RoleContext.Provider value={{
       currentUser, setCurrentUser, requests, auditLogs, createRequest, addAuditLog, updateRequestStatus,
       activeDivisionView, setActiveDivisionView, activeModule, setActiveModule, canExecuteLocally,
       diningMenu, loungeMenu, labDrinks, vipBookings, waterLogs, skus,

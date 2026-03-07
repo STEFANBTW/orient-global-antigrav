@@ -1,13 +1,38 @@
-
 import React from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
 const Lab: React.FC = () => {
+  const { content: cmsData } = useCMS('lounge');
+  const labBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'lab')?.content_payload || {
+    hero: {
+      title1: "The Art of",
+      title2: "The Draw.",
+      subtitle: "Discover the perfect alchemy between spirit and smoke. Enter the Orient Lounge pairing lab.",
+      bgImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuCa7JuvXQNp2lTMLEOllsid_J3ttz_2QGFpL4Roq-OQ6TfYiH2gQjrwf8IdmtCMbYX46-HMbf5F9oROl_osce0l8l7v_gl2YgOsvFEC56Htk67UF_deHy9rAW7rfAcRj8WBunSqAjUeAtiV8b7FRcGZlWTjJKKpRz0tmopgY76IOLKoOA53bjBYBCLLu9Slce22zcOfiI5kd2J6wOOCdDFbSb2B6SBZK_CGO6nGcBvRPzbTjmOOSZ8o0eSl8VhUg9JVKvIzqosfpqJ6",
+    },
+    match: {
+      score: "98% Match Score",
+      title: "Cohiba Behike 52",
+      desc: "A legendary Cuban cigar known for its rare medio tiempo leaves. Creamy, earthy, sublime.",
+      stats: [
+        { label: "Body", value: "Full" },
+        { label: "Duration", value: "45m" },
+        { label: "Origin", value: "Cuba" }
+      ],
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA4qgfvQRf4kKImHbqpS4a2JdOhIBrb534G6yJ8NnblGiZsTskQw35B-UfOA5DIJpqH6R5o8tLpocuaflfLgBaw9t5E1qTFcHDriDtKqtZ9z55DWc1QewBXUZGIQIkHf8NipYGp7XOqx1of-rzgHJM_cZhMVshvrmpeQWMLMiDu0qthF2TLiliABjgX30Ltl37mgEsg1eju6vwCD1Ac8Q76eWvy6a1BLwMR-RcjNCiJ_JQvQwH46MXjw8R9kS1_HYT3LRoscYh0Mr3e"
+    },
+    dynamics: [
+      { title: "Oak & Earth", desc: "Interaction between charred oak barrels and soil-rich tobacco.", icon: "forest" },
+      { title: "Spice & Leather", desc: "Notes of black pepper and worn leather emerging in the final third.", icon: "grain" }
+    ]
+  };
+
   return (
     <div className="bg-background-dark font-display text-white overflow-x-hidden min-h-screen">
       {/* Hero */}
       <section className="relative h-screen min-h-[800px] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full">
-          <img className="w-full h-full object-cover animate-[hero-pan_30s_infinite_alternate]" alt="Lit cigar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa7JuvXQNp2lTMLEOllsid_J3ttz_2QGFpL4Roq-OQ6TfYiH2gQjrwf8IdmtCMbYX46-HMbf5F9oROl_osce0l8l7v_gl2YgOsvFEC56Htk67UF_deHy9rAW7rfAcRj8WBunSqAjUeAtiV8b7FRcGZlWTjJKKpRz0tmopgY76IOLKoOA53bjBYBCLLu9Slce22zcOfiI5kd2J6wOOCdDFbSb2B6SBZK_CGO6nGcBvRPzbTjmOOSZ8o0eSl8VhUg9JVKvIzqosfpqJ6" />
+          <img className="w-full h-full object-cover animate-[hero-pan_30s_infinite_alternate]" alt="Lit cigar" src={labBlock.hero.bgImage} />
           <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -17,11 +42,11 @@ const Lab: React.FC = () => {
               <span className="text-xs font-medium text-primary uppercase tracking-widest">Digital Sommelier v4.0</span>
             </div>
             <h1 className="text-6xl md:text-8xl font-bold leading-tight text-white tracking-tighter">
-              The Art of <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">The Draw.</span>
+              {labBlock.hero.title1} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">{labBlock.hero.title2}</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-lg leading-relaxed border-l-2 border-primary pl-6">
-              Discover the perfect alchemy between spirit and smoke. Enter the Orient Lounge pairing lab.
+              {labBlock.hero.subtitle}
             </p>
           </div>
         </div>
@@ -45,26 +70,20 @@ const Lab: React.FC = () => {
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-white/5 pt-10">
               <div className="md:col-span-7 space-y-6">
-                <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-bold uppercase rounded-full">98% Match Score</span>
-                <h3 className="text-3xl font-bold">Cohiba Behike 52</h3>
-                <p className="text-gray-300 leading-relaxed">A legendary Cuban cigar known for its rare medio tiempo leaves. Creamy, earthy, sublime.</p>
+                <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-bold uppercase rounded-full">{labBlock.match.score}</span>
+                <h3 className="text-3xl font-bold">{labBlock.match.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{labBlock.match.desc}</p>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-black p-4 rounded-lg text-center border border-white/5">
-                    <div className="text-primary font-bold">Full</div>
-                    <div className="text-[10px] uppercase text-gray-500">Body</div>
-                  </div>
-                  <div className="bg-black p-4 rounded-lg text-center border border-white/5">
-                    <div className="text-primary font-bold">45m</div>
-                    <div className="text-[10px] uppercase text-gray-500">Duration</div>
-                  </div>
-                  <div className="bg-black p-4 rounded-lg text-center border border-white/5">
-                    <div className="text-primary font-bold">Cuba</div>
-                    <div className="text-[10px] uppercase text-gray-500">Origin</div>
-                  </div>
+                  {labBlock.match.stats.map((stat: any, i: number) => (
+                    <div key={i} className="bg-black p-4 rounded-lg text-center border border-white/5">
+                      <div className="text-primary font-bold">{stat.value}</div>
+                      <div className="text-[10px] uppercase text-gray-500">{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="md:col-span-5 h-64 rounded-xl overflow-hidden border border-white/5">
-                <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4qgfvQRf4kKImHbqpS4a2JdOhIBrb534G6yJ8NnblGiZsTskQw35B-UfOA5DIJpqH6R5o8tLpocuaflfLgBaw9t5E1qTFcHDriDtKqtZ9z55DWc1QewBXUZGIQIkHf8NipYGp7XOqx1of-rzgHJM_cZhMVshvrmpeQWMLMiDu0qthF2TLiliABjgX30Ltl37mgEsg1eju6vwCD1Ac8Q76eWvy6a1BLwMR-RcjNCiJ_JQvQwH46MXjw8R9kS1_HYT3LRoscYh0Mr3e" alt="Cigar Match" />
+                <img className="w-full h-full object-cover" src={labBlock.match.img} alt="Cigar Match" />
               </div>
             </div>
           </div>
@@ -77,33 +96,26 @@ const Lab: React.FC = () => {
           <div>
             <h2 className="text-4xl font-bold mb-12">Flavor Dynamics</h2>
             <div className="space-y-8">
-              <div className="flex gap-4 group">
-                 <div className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all">
-                   <span className="material-icons">forest</span>
-                 </div>
-                 <div>
-                   <h4 className="text-xl font-bold">Oak & Earth</h4>
-                   <p className="text-gray-400 text-sm">Interaction between charred oak barrels and soil-rich tobacco.</p>
-                 </div>
-              </div>
-              <div className="flex gap-4 group">
-                 <div className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all">
-                   <span className="material-icons">grain</span>
-                 </div>
-                 <div>
-                   <h4 className="text-xl font-bold">Spice & Leather</h4>
-                   <p className="text-gray-400 text-sm">Notes of black pepper and worn leather emerging in the final third.</p>
-                 </div>
-              </div>
+              {labBlock.dynamics.map((d: any, i: number) => (
+                <div key={i} className="flex gap-4 group">
+                  <div className="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all">
+                    <span className="material-icons">{d.icon}</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold">{d.title}</h4>
+                    <p className="text-gray-400 text-sm">{d.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           <div className="flex justify-center">
             <div className="w-80 h-80 rounded-full border-4 border-white/5 relative flex items-center justify-center">
-               <div className="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
-               <div className="text-center">
-                 <div className="text-5xl font-bold">98%</div>
-                 <div className="text-[10px] uppercase tracking-widest text-primary">Synergy</div>
-               </div>
+              <div className="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
+              <div className="text-center">
+                <div className="text-5xl font-bold">98%</div>
+                <div className="text-[10px] uppercase tracking-widest text-primary">Synergy</div>
+              </div>
             </div>
           </div>
         </div>

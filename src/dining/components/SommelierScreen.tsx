@@ -1,45 +1,86 @@
 import React from 'react';
+import { useCMS } from '@/hooks/useCMS';
 
 const SommelierScreen: React.FC = () => {
+    const { content: cmsData } = useCMS('dining');
+    const sommelierBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'sommelier')?.content_payload || {
+        hero: {
+            title1: "The Sommelier’s",
+            title2: "Corner",
+            est: "Est. 2024",
+            bgImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAEX8X-_HRWxmVc2-Z6pfn0TqOjI8iUquyrs1BsoSUpdm_ExMYSJFEHamOGsya8lrHlVSQZ-tCXMeGq0U6eAvTEDRFDHBO4pkSydQYnufA5enCEJq-ENuSiJWcszPtG9SssMKu2OoINhim4KQ3zofM66VzLJgwdXLJF7kLSciyszrlyfrYeFjqmhIn6n1i_6P9QU4GHBmQiUKmlcYrUTGwCo8AaCOeFQf-CY8tmarvaneSgtwx5boUIzV4htpsQFIXGEb8DV12UOmB"
+        },
+        ai: {
+            title1: "Ask the",
+            title2: "Sommelier",
+            desc: "Unsure what complements your meal? Our digital sommelier analyzes the flavor profile of your chosen dish and recommends the perfect bottle.",
+            tag1: "AI-Powered",
+            tag2: "Curated by taste algorithms"
+        },
+        heritage: {
+            title: "Science of the Soil",
+            subtitle: "Heritage Series",
+            zobo: {
+                title: "The Zobo Infusion",
+                subtitle: "Hibiscus Sabdariffa",
+                desc1: "Beyond its vibrant ruby hue, Zobo is a masterclass in natural extraction. Our process begins with sun-dried roselle calyces, steeped at precisely 85°C to preserve the delicate anthocyanins responsible for its antioxidant properties.",
+                desc2: "We introduce a proprietary blend of cloves and ginger during the cooling phase, creating a spicy undercurrent that awakens the palate before the main course.",
+                img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBssD_LUthXyTrwE5u26YoXMuQz_4PwGCza5PZSPuQRrv0ZR7m2-1PjHLbKQ_ruFIJyaIiP8jUDyoExceYap7PfPT7kNUKFer0B4-7avuqf-bWlBpwWxyFDtcWP_0IvWFTmfScv6EDeL_6TykrDUjFFdS_10BGP24cACWN64T3etH-OwlqE1cmF8NIPeFim7LiLTbi_eSN38XnFVf8cFBBlfVNk2TGKBg4ukOZJ0zQeywW1fSQTXid-wljZccGPdLNgIYDUkS2JPS3i",
+                stats: [
+                    { value: "48h", label: "Steeping Time" },
+                    { value: "3.2", label: "pH Level" },
+                    { value: "0%", label: "Alcohol" }
+                ]
+            },
+            kunu: {
+                title: "The Kunu Fermentation",
+                subtitle: "Millet & Sorghum",
+                desc1: "Kunu represents the ancient biotechnology of fermentation. By malting millet grains for 24 hours, we activate amylase enzymes that break down starches into fermentable sugars.",
+                desc2: "The result is a probiotic-rich, creamy elixir with a nutty profile. At Orient, we serve it chilled in clay vessels to maintain its earthy integrity, pairing exceptionally well with our spicy grilled meats.",
+                img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4rfde4PpTNNJHM0qi0WfOqJg34lmjrq0fySzokqhndYjbcgKaU63ta0gMHIIJeB7y5wIZ1Bu17p3XShfC2X5c5cQXAU3K4diQ-a_zqbb11T8ebLZEavhyU554oV3H-VbJ9YhKYFUz__C-K0WUJEPJBVauq7eA5I96igQK-ysTRmJVOzc6Xhhyms4nf_Ezs_fA-h6-F0SVZQIioU0I9x0FoKdByWjv0Q0Ot5HbLtPDUlgs_k1z732PVTfvcGaOqI4s39obgytqnaZA"
+            }
+        }
+    };
+
     return (
         <div className="bg-slate-50 dark:bg-background-dark text-gray-800 dark:text-gray-200 font-sans">
-             {/* Hero */}
-             <section className="relative h-[60vh] w-full flex items-center justify-center overflow-hidden">
+            {/* Hero */}
+            <section className="relative h-[60vh] w-full flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAEX8X-_HRWxmVc2-Z6pfn0TqOjI8iUquyrs1BsoSUpdm_ExMYSJFEHamOGsya8lrHlVSQZ-tCXMeGq0U6eAvTEDRFDHBO4pkSydQYnufA5enCEJq-ENuSiJWcszPtG9SssMKu2OoINhim4KQ3zofM66VzLJgwdXLJF7kLSciyszrlyfrYeFjqmhIn6n1i_6P9QU4GHBmQiUKmlcYrUTGwCo8AaCOeFQf-CY8tmarvaneSgtwx5boUIzV4htpsQFIXGEb8DV12UOmB" 
-                        className="w-full h-full object-cover opacity-60" 
-                        alt="Crystal Glass" 
+                    <img
+                        src={sommelierBlock.hero.bgImage}
+                        className="w-full h-full object-cover opacity-60"
+                        alt="Crystal Glass"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent"></div>
                 </div>
                 <div className="relative z-10 max-w-4xl mx-auto text-center px-6 mt-16">
                     <div className="inline-block mb-6 px-4 py-1 border border-primary/30 rounded-full bg-primary/10 backdrop-blur-sm">
-                        <span className="text-primary text-xs font-bold uppercase tracking-[0.2em]">Est. 2024</span>
+                        <span className="text-primary text-xs font-bold uppercase tracking-[0.2em]">{sommelierBlock.hero.est}</span>
                     </div>
                     <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 leading-tight">
-                        The Sommelier’s <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-300">Corner</span>
+                        {sommelierBlock.hero.title1} <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-300">{sommelierBlock.hero.title2}</span>
                     </h1>
                 </div>
-             </section>
+            </section>
 
-             {/* AI Section */}
-             <section className="py-16 px-6 relative bg-slate-50 dark:bg-background-dark">
+            {/* AI Section */}
+            <section className="py-16 px-6 relative bg-slate-50 dark:bg-background-dark">
                 <div className="max-w-5xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                         <div className="lg:col-span-5 space-y-5">
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Ask the <span className="text-primary">Sommelier</span></h2>
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{sommelierBlock.ai.title1} <span className="text-primary">{sommelierBlock.ai.title2}</span></h2>
                             <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed text-sm">
-                                Unsure what complements your meal? Our digital sommelier analyzes the flavor profile of your chosen dish and recommends the perfect bottle.
+                                {sommelierBlock.ai.desc}
                             </p>
                             <div className="flex items-center gap-3 pt-3">
                                 <div className="h-10 w-10 rounded-full bg-neutral-dark flex items-center justify-center border border-primary/20">
                                     <span className="material-icons text-primary text-lg">auto_awesome</span>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-white">AI-Powered</p>
-                                    <p className="text-[10px] text-gray-500">Curated by taste algorithms</p>
+                                    <p className="text-xs font-bold text-white">{sommelierBlock.ai.tag1}</p>
+                                    <p className="text-[10px] text-gray-500">{sommelierBlock.ai.tag2}</p>
                                 </div>
                             </div>
                         </div>
@@ -49,7 +90,7 @@ const SommelierScreen: React.FC = () => {
                                 <div className="relative z-10 space-y-5">
                                     <label className="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Describe your dish</label>
                                     <div className="relative">
-                                        <input className="w-full bg-neutral-dark/50 border border-neutral-mid text-white placeholder-gray-500 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="I'm having the Spicy Prawn Curry..." type="text"/>
+                                        <input className="w-full bg-neutral-dark/50 border border-neutral-mid text-white placeholder-gray-500 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="I'm having the Spicy Prawn Curry..." type="text" />
                                         <span className="material-icons absolute right-4 top-3 text-gray-500 text-lg">search</span>
                                     </div>
                                     <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 text-sm">
@@ -61,66 +102,60 @@ const SommelierScreen: React.FC = () => {
                         </div>
                     </div>
                 </div>
-             </section>
+            </section>
 
-             {/* Heritage Series */}
-             <section className="py-20 bg-neutral-dark relative" id="heritage">
-                 <div className="max-w-7xl mx-auto px-6">
-                     <div className="text-center mb-16">
-                        <span className="text-primary text-xs font-bold uppercase tracking-widest">Heritage Series</span>
-                        <h2 className="text-4xl font-sans font-bold text-white mt-3 mb-4">Science of the Soil</h2>
+            {/* Heritage Series */}
+            <section className="py-20 bg-neutral-dark relative" id="heritage">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <span className="text-primary text-xs font-bold uppercase tracking-widest">{sommelierBlock.heritage.subtitle}</span>
+                        <h2 className="text-4xl font-sans font-bold text-white mt-3 mb-4">{sommelierBlock.heritage.title}</h2>
                         <div className="w-16 h-1 bg-primary mx-auto rounded-full"></div>
-                     </div>
+                    </div>
 
-                     {/* Zobo Block */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center">
-                         <div className="relative group">
-                             <div className="absolute inset-0 bg-primary/20 rounded-xl transform rotate-2 group-hover:rotate-4 transition-transform duration-500"></div>
-                             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBssD_LUthXyTrwE5u26YoXMuQz_4PwGCza5PZSPuQRrv0ZR7m2-1PjHLbKQ_ruFIJyaIiP8jUDyoExceYap7PfPT7kNUKFer0B4-7avuqf-bWlBpwWxyFDtcWP_0IvWFTmfScv6EDeL_6TykrDUjFFdS_10BGP24cACWN64T3etH-OwlqE1cmF8NIPeFim7LiLTbi_eSN38XnFVf8cFBBlfVNk2TGKBg4ukOZJ0zQeywW1fSQTXid-wljZccGPdLNgIYDUkS2JPS3i" className="relative rounded-xl shadow-2xl z-10 w-full h-[400px] object-cover filter brightness-90 contrast-110" alt="Zobo" />
-                         </div>
-                         <div className="space-y-6">
-                             <div>
-                                 <h3 className="text-2xl font-bold text-white mb-1">The Zobo Infusion</h3>
-                                 <p className="text-primary text-sm font-medium">Hibiscus Sabdariffa</p>
-                             </div>
-                             <div className="prose prose-invert prose-sm text-gray-400 font-light">
-                                <p className="mb-3">
-                                    Beyond its vibrant ruby hue, Zobo is a masterclass in natural extraction. Our process begins with sun-dried roselle calyces, steeped at precisely 85°C to preserve the delicate anthocyanins responsible for its antioxidant properties.
-                                </p>
-                                <p>
-                                    We introduce a proprietary blend of cloves and ginger during the cooling phase, creating a spicy undercurrent that awakens the palate before the main course.
-                                </p>
-                             </div>
-                             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
-                                <div>
-                                    <span className="block text-xl font-bold text-white">48h</span>
-                                    <span className="text-[10px] text-gray-500 uppercase">Steeping Time</span>
-                                </div>
-                                <div>
-                                    <span className="block text-xl font-bold text-white">3.2</span>
-                                    <span className="text-[10px] text-gray-500 uppercase">pH Level</span>
-                                </div>
-                                <div>
-                                    <span className="block text-xl font-bold text-white">0%</span>
-                                    <span className="text-[10px] text-gray-500 uppercase">Alcohol</span>
-                                </div>
-                             </div>
-                         </div>
-                     </div>
-
-                     {/* Kunu Block */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <div className="order-2 md:order-1 space-y-6">
+                    {/* Zobo Block */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center">
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-primary/20 rounded-xl transform rotate-2 group-hover:rotate-4 transition-transform duration-500"></div>
+                            <img src={sommelierBlock.heritage.zobo.img} className="relative rounded-xl shadow-2xl z-10 w-full h-[400px] object-cover filter brightness-90 contrast-110" alt={sommelierBlock.heritage.zobo.title} />
+                        </div>
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-2xl font-bold text-white mb-1">The Kunu Fermentation</h3>
-                                <p className="text-primary text-sm font-medium">Millet & Sorghum</p>
+                                <h3 className="text-2xl font-bold text-white mb-1">{sommelierBlock.heritage.zobo.title}</h3>
+                                <p className="text-primary text-sm font-medium">{sommelierBlock.heritage.zobo.subtitle}</p>
                             </div>
                             <div className="prose prose-invert prose-sm text-gray-400 font-light">
                                 <p className="mb-3">
-                                    Kunu represents the ancient biotechnology of fermentation. By malting millet grains for 24 hours, we activate amylase enzymes that break down starches into fermentable sugars.
+                                    {sommelierBlock.heritage.zobo.desc1}
                                 </p>
                                 <p>
-                                    The result is a probiotic-rich, creamy elixir with a nutty profile. At Orient, we serve it chilled in clay vessels to maintain its earthy integrity, pairing exceptionally well with our spicy grilled meats.
+                                    {sommelierBlock.heritage.zobo.desc2}
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+                                {sommelierBlock.heritage.zobo.stats.map((stat: any, i: number) => (
+                                    <div key={i}>
+                                        <span className="block text-xl font-bold text-white">{stat.value}</span>
+                                        <span className="text-[10px] text-gray-500 uppercase">{stat.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Kunu Block */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                        <div className="order-2 md:order-1 space-y-6">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white mb-1">{sommelierBlock.heritage.kunu.title}</h3>
+                                <p className="text-primary text-sm font-medium">{sommelierBlock.heritage.kunu.subtitle}</p>
+                            </div>
+                            <div className="prose prose-invert prose-sm text-gray-400 font-light">
+                                <p className="mb-3">
+                                    {sommelierBlock.heritage.kunu.desc1}
+                                </p>
+                                <p>
+                                    {sommelierBlock.heritage.kunu.desc2}
                                 </p>
                             </div>
                             <button className="text-primary hover:text-white transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
@@ -129,13 +164,13 @@ const SommelierScreen: React.FC = () => {
                         </div>
                         <div className="order-1 md:order-2 relative group">
                             <div className="absolute inset-0 bg-neutral-mid rounded-xl transform -rotate-2 group-hover:-rotate-4 transition-transform duration-500"></div>
-                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4rfde4PpTNNJHM0qi0WfOqJg34lmjrq0fySzokqhndYjbcgKaU63ta0gMHIIJeB7y5wIZ1Bu17p3XShfC2X5c5cQXAU3K4diQ-a_zqbb11T8ebLZEavhyU554oV3H-VbJ9YhKYFUz__C-K0WUJEPJBVauq7eA5I96igQK-ysTRmJVOzc6Xhhyms4nf_Ezs_fA-h6-F0SVZQIioU0I9x0FoKdByWjv0Q0Ot5HbLtPDUlgs_k1z732PVTfvcGaOqI4s39obgytqnaZA" className="relative rounded-xl shadow-2xl z-10 w-full h-[400px] object-cover filter brightness-90 contrast-110" alt="Kunu" />
+                            <img src={sommelierBlock.heritage.kunu.img} className="relative rounded-xl shadow-2xl z-10 w-full h-[400px] object-cover filter brightness-90 contrast-110" alt={sommelierBlock.heritage.kunu.title} />
                         </div>
                     </div>
-                 </div>
-             </section>
+                </div>
+            </section>
 
-             {/* Wine & Malt List */}
+            {/* Wine & Malt List */}
             <section className="py-16 bg-slate-50 dark:bg-background-dark overflow-hidden" id="wines">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-primary/20 pb-5">
@@ -151,35 +186,35 @@ const SommelierScreen: React.FC = () => {
                     </div>
                     {/* List Container */}
                     <div className="space-y-3">
-                        <ReserveItem 
-                            title="Château Margaux" 
-                            subtitle="Cabernet Sauvignon Blend" 
-                            region="Bordeaux, France" 
-                            year="2015" 
+                        <ReserveItem
+                            title="Château Margaux"
+                            subtitle="Cabernet Sauvignon Blend"
+                            region="Bordeaux, France"
+                            year="2015"
                             price="$850"
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuDaBwIML2tau-0SXWpx41WOlLu0hjdvMX3sJrC7zTqU_b_SgTeTQyqIDEgz6CDNkBcz1cQJKp42XvN82LWAVFIwX_jE7ooqbf2m9QeMwBrJKaGs3Q-2YBYJ4xsYmIUAueylFYd5Nmc0Buk5ecvxG8W5osccY11lKkc8rT03viGPhDNlxGkGM0uiuZjYP6mEF2IDwRvU_yJZAMemI7lsdY-Hd3ooaabvJBFvm_HBovTv8aAqgxEFzbX8TKZN_l1Hudgfeutt6Y1H6i6m"
                         />
-                        <ReserveItem 
-                            title="Penfolds Grange" 
-                            subtitle="Shiraz" 
-                            region="South Australia" 
-                            year="2017" 
+                        <ReserveItem
+                            title="Penfolds Grange"
+                            subtitle="Shiraz"
+                            region="South Australia"
+                            year="2017"
                             price="$620"
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuAiNuuTDNAxRCTD73ydQAKjkIyOj1MEAhR-GbCzswSkMKFbd5ZEAYlGVABDa0e8GZ39Wg3vOZV2r82EIBWeQtuV_2gD9wZKXmYA2atbrbMEPQ7MI9CNSpT7kFADm4ZbSR0ALE5WX6gv80SVN1BkxgWhp0qx71jX0_6HOyc98d3bpqTiVRBWaP9h-vZtvw9h04JmqSOxvLps3A1aaH1JXZCw2fnbtdNBbDf0f89cpQ76GDHEHzIjru6Ktc8il6YQhbny-HSjjWAa3Ygq"
                         />
-                        <ReserveItem 
-                            title="Yamazaki 18 Year" 
-                            subtitle="Single Malt Whisky" 
-                            region="Osaka, Japan" 
-                            year="NV" 
+                        <ReserveItem
+                            title="Yamazaki 18 Year"
+                            subtitle="Single Malt Whisky"
+                            region="Osaka, Japan"
+                            year="NV"
                             price="$1,200"
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuAh2tZQ9wYSflZbvouZN9oxQCOuB5otHEL72d-tkKXuSSyBu3pBG_jcfUe8Xcq8o0f3R5lXux7E-moju0LpOGTZf-QmZwwLEC1Foy1j-8ZR2goDd49G54VCTUpF7eLbs2M1K-FkD0MsrHluiftbv56Dqs7jJYry-g_jncU-DrOUdxIyM3O87SyCgEoTIswRv5ld3-8m3CArCbyIS47oLKUZukkenMX1N4MKf3N30OFHCiRyaGYslnqngtYh4HBV0IJ7JOTKSCGu3Ilt"
                         />
-                        <ReserveItem 
-                            title="Cloudy Bay" 
-                            subtitle="Sauvignon Blanc" 
-                            region="Marlborough, NZ" 
-                            year="2022" 
+                        <ReserveItem
+                            title="Cloudy Bay"
+                            subtitle="Sauvignon Blanc"
+                            region="Marlborough, NZ"
+                            year="2022"
                             price="$85"
                         />
                     </div>
@@ -197,19 +232,19 @@ const SommelierScreen: React.FC = () => {
                         The Cocktail Lab
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <CocktailCard 
+                        <CocktailCard
                             title="The Orient Express"
                             desc="A bold fusion of Asian spices and western spirits. Ginger-infused vodka meets lychee liqueur."
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuDMRCxkfP9GdWqkX5QzFfyXQrWB7RbnqV0xlYGKbpFAjYXdXdRdGHEpvxp1HpdX6NIBxCGyGuAJIt4KysXNDFsB65PqqZRUH6P8ojM3wx3HWeHIXtzbcn1gAHsu0lWv7hP1jpOSbUXgiGRr--BRvkiBzYPgtZmId23D_67ppc5vYhqFw-hFO73h8lSetzo72mbPfyzWjHXy5PE2uOOd9fsYEsEdX9LT--6ff2lFyjGLU85FCizp0IOmob4tJXGjaDcRSXFIDZW5473N"
                             ingredients={[["Ginger Vodka", "50ml"], ["Lychee Juice", "30ml"], ["Lime", "15ml"]]}
                         />
-                         <CocktailCard 
+                        <CocktailCard
                             title="Smoked Date Old Fashioned"
                             desc="Bourbon washed with Medjool dates, finished with hickory smoke and orange bitters."
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuC4RJ9h5SD1cA5h3Yx_HJIi3bmZlDdBLpSjpa6EE2o1KGixMBoLC6Ylo9QRyc_5u9wjUtCnerScjwO8y-wi3YRSZxFVVJjhn9oYfYvsYxzfO9wDYW5j4YYodUTEm_0bP7X1JyYbS0rzqWom-vmHXP58W55JrgOHCuMpNBZFCI9V2pHxy6NOf8nafOMwNFkQR4m5AloEUuAZ-MWpRL1Hidl5kNtrutTafocZIu4wc3n_3tH8vYr2HcAA0a-JjIwndqAffvJl4xTOb4cy"
                             ingredients={[["Date Bourbon", "60ml"], ["Demerara Syrup", "5ml"]]}
                         />
-                         <CocktailCard 
+                        <CocktailCard
                             title="The Jade Garden"
                             desc="A refreshing palate cleanser. Japanese gin, cucumber, matcha dusting, and tonic."
                             image="https://lh3.googleusercontent.com/aida-public/AB6AXuANCYyvBxCSNKRIO-T6whp6XU36fAanuZElt4KBJHUr52tX48724-mr5ikWjMiDwgDyL2D4CbDPtLiDPhK448tbos0Mx4TR3kfZL_dJ6Dx2o5Wu3VrnbQsa38vFhMQYk3Uy52IwQ5jjq76DIBRuMJxqP7zJlwbw6WKFgV9Ij-Q6UY0xzpf0tQhFG65DrV71NyTyCsIsYJLy0GAavA4Hf0MAtqH3X0eKSw4SOG6NSi1REgDWaMp5IBWoJLB_A6on11aWJS0xSUgWH5Vn"

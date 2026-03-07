@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { LivePreview } from "@/components/dashboard/live-preview";
-import DivisionCMSEditor from "@/components/dashboard/cms/DivisionEditor";
-import { 
-  Zap, 
-  Plus, 
-  Eye, 
-  Sparkles, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  Zap,
+  Plus,
+  Eye,
+  Sparkles,
   Calendar,
   Wine
 } from "lucide-react";
@@ -69,8 +69,8 @@ export default function LoungeCommandCenter() {
                 <ScrollArea className="flex-1">
                   <div className="p-6 grid grid-cols-1 gap-4">
                     {labDrinks.map(drink => (
-                      <div 
-                        key={drink.id} 
+                      <div
+                        key={drink.id}
                         onClick={() => setSelectedItem(drink)}
                         className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedItem?.id === drink.id ? 'bg-amber-500/5 border-amber-500/30' : 'bg-white border-slate-100 hover:border-slate-300'}`}
                       >
@@ -138,7 +138,7 @@ export default function LoungeCommandCenter() {
             </TabsContent>
 
             <TabsContent value="cms" className="m-0 flex-1">
-              <DivisionCMSEditor division="lounge" />
+              <BlockEditor division="lounge" />
             </TabsContent>
           </Tabs>
         </div>
@@ -154,13 +154,13 @@ export default function LoungeCommandCenter() {
               <Badge className="bg-emerald-500 text-white text-[8px] uppercase tracking-widest px-2 font-bold animate-pulse">Synced</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedItem} 
-                division="lounge" 
+              <LivePreview
+                item={selectedItem}
+                division="lounge"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "Authorized", description: "Lounge atmosphere has been updated." })}
                 onReject={() => toast({ variant: "destructive", title: "Refused", description: "Experiment remains in staged status." })}
-               />
+              />
             </div>
           </Card>
         </div>

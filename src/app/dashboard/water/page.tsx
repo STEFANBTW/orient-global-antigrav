@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ActionGuard } from "@/components/dashboard/action-guard";
 import { LivePreview } from "@/components/dashboard/live-preview";
-import DivisionCMSEditor from "@/components/dashboard/cms/DivisionEditor";
-import { 
-  Droplets, 
-  Truck, 
-  ShieldCheck, 
-  Eye, 
+import BlockEditor from "@/components/dashboard/cms/BlockEditor";
+import {
+  Droplets,
+  Truck,
+  ShieldCheck,
+  Eye,
   FileText,
   BarChart3
 } from "lucide-react";
@@ -66,8 +66,8 @@ export default function WaterCommandCenter() {
                 <ScrollArea className="flex-1">
                   <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {waterLogs.map(log => (
-                      <div 
-                        key={log.id} 
+                      <div
+                        key={log.id}
                         onClick={() => setSelectedLog(log)}
                         className={`p-6 rounded-2xl border transition-all cursor-pointer ${selectedLog?.id === log.id ? 'bg-sky-500/5 border-sky-500/30' : 'bg-white border-slate-100 hover:border-slate-300'}`}
                       >
@@ -111,7 +111,7 @@ export default function WaterCommandCenter() {
             </TabsContent>
 
             <TabsContent value="cms" className="m-0 flex-1">
-              <DivisionCMSEditor division="water" />
+              <BlockEditor division="water" />
             </TabsContent>
           </Tabs>
         </div>
@@ -127,13 +127,13 @@ export default function WaterCommandCenter() {
               <Badge className="bg-emerald-500 text-white text-[8px] uppercase tracking-widest px-2 font-bold">Verified</Badge>
             </CardHeader>
             <div className="flex-1 overflow-auto p-0">
-               <LivePreview 
-                item={selectedLog} 
-                division="water" 
+              <LivePreview
+                item={selectedLog}
+                division="water"
                 isHOD={isHOD}
                 onApprove={() => toast({ title: "Report Published", description: "Water purity data is now live." })}
                 onReject={() => toast({ variant: "destructive", title: "Flagged", description: "Log report rejected." })}
-               />
+              />
             </div>
           </Card>
         </div>
