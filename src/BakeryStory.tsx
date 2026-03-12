@@ -1,58 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { cmsApi } from './services/cmsApi';
+import { useBakeryCms } from './lib/bakeryCmsData';
 
 export const Story: React.FC = () => {
-  const [cmsData, setCmsData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: bakeryData } = useBakeryCms();
+  const story = bakeryData.story;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await cmsApi.getDivisionContent('bakery');
-        setCmsData(data);
-      } catch (error) {
-        console.error("Failed to fetch CMS data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) {
+  if (!bakeryData) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center font-sans text-slate-500">
+      <div className="bakery-theme min-h-screen bg-[var(--bakery-bg)] flex items-center justify-center font-sans text-[var(--bakery-text-muted)]">
         <div className="animate-pulse tracking-[0.2em] uppercase text-sm">Loading Bakery Story...</div>
       </div>
     );
   }
 
-  const heroBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'hero')?.content_payload || {
-    title: "Jos’s Morning Ritual",
-    subtitle: "Hot, fresh, and ready by 7:00 AM."
-  };
-
-  const rollsBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'rolls')?.content_payload || {
-    items: [
-      { title: "Sticky Cinnamon Roll", price: "$12.00", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCd_TmNBtFRIqwh5bh7iSlOdqRDJSGJVKP1T-3YCFoq-WnNanHo6WbBuRXRvvs8tGQSZK1dZn6I3a6iJHL4byM9r5DC26JFjA7U9s_o2o2ia367BS2gVpc2LHYMwm5e_UPo_r_GPIZKyQHnoR8vXlbdPWdS5z5SZxXQd68-5uWq1QMGTj01wNIGMZG1jB4PPdc9XAUU0ZRvEHw44Sdxiw4c5TdmJpuXivg3eodT1I-xcIyM6u9Br9l8Z00zpX_O4pUx_7yGlsf2Knwr" },
-      { title: "Cinnamon Rolls (Fresh)", price: "$12.00", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDYvf77WkTzo48ZPbJwUbQetCY5GnPm0VNmBHX0NT52ceOmSMsQZHiYsq9NcCufvHkW87mOr6Z7DTgftYf8q1h6AHQM8XNZeZnPrLJoJNhWZvwsRgqxS8vOeeR2JCDpJoMJqdY6l7G-xynMPgrNZX3i-mBcBfzq3YlV640wg5x5BjcnS_G_UbOryxsD1iSmAv08WogejIlucFklzxkv2CI0kfa_ilSMPwqWo6-tr1Z6Wd7aoOqW5gpClZIalrlkkyU4U9a7i9ViNPEd" },
-      { title: "Sticky Cinnamon Roll", price: "$15.00", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzuTGeynABEZq_RNMW_0DWnpySiwUdY708i6ZVWjZ7aIl0DpPLMJq1VQVEwuiE3nMamKg_bwuczTqbcV6ecYVDUXjY9SZK519_nntwfz9HAhku_iqDi_Ef3RUdWrVu9jrh-MWAyUVc-FKp3_XCiyFx_P2OM-jDXRGULnYJqVqUqqx6jyHp_XoHc7SCS-NUZMRZsCvKWvMaSW8Dsah1KUa05a9i3V7cPWokidQYzWZ7hkP9T04I1yuxLjt0g6HhgWkppOALuJnR6wrU" },
-      { title: "Cinnamon Rolls", price: "$18.50", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCye9YH_o_PRcnhP-s4c_Ay_E9zoNz1oReHKAlsEWfNNc7YuV1Ha_6yYsqEUNMItX38C0VGq1fAUZNac96Mv6pe6yEH50CBl63aS0HNTNeWMPszVliMAlJsLceV2USAOc-QqVgcYwFhNWDkWc-U21cu4YBhsJY4vLKePO8OOJu4Ob-3FXxKeGeeC0ntOXjwSXivoh7nmf_8bN0KAJXnAI1QrUdSzNf-eKfwDlmUyKwpzDVdMYGPCLtqb1ExbXZnDi5J0HvGIlco5PcP" }
-    ]
-  };
+  const rollsItems = [
+    { title: "Sticky Cinnamon Roll", price: "₦5,000", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCd_TmNBtFRIqwh5bh7iSlOdqRDJSGJVKP1T-3YCFoq-WnNanHo6WbBuRXRvvs8tGQSZK1dZn6I3a6iJHL4byM9r5DC26JFjA7U9s_o2o2ia367BS2gVpc2LHYMwm5e_UPo_r_GPIZKyQHnoR8vXlbdPWdS5z5SZxXQd68-5uWq1QMGTj01wNIGMZG1jB4PPdc9XAUU0ZRvEHw44Sdxiw4c5TdmJpuXivg3eodT1I-xcIyM6u9Br9l8Z00zpX_O4pUx_7yGlsf2Knwr" },
+    { title: "Cinnamon Rolls (Fresh)", price: "₦5,000", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDYvf77WkTzo48ZPbJwUbQetCY5GnPm0VNmBHX0NT52ceOmSMsQZHiYsq9NcCufvHkW87mOr6Z7DTgftYf8q1h6AHQM8XNZeZnPrLJoJNhWZvwsRgqxS8vOeeR2JCDpJoMJqdY6l7G-xynMPgrNZX3i-mBcBfzq3YlV640wg5x5BjcnS_G_UbOryxsD1iSmAv08WogejIlucFklzxkv2CI0kfa_ilSMPwqWo6-tr1Z6Wd7aoOqW5gpClZIalrlkkyU4U9a7i9ViNPEd" },
+  ];
 
   return (
-    <div className="bg-slate-50 dark:bg-background-dark overflow-x-hidden pt-0">
+    <div className="bakery-theme bg-[var(--bakery-bg)] text-[var(--bakery-text)] overflow-x-hidden pt-0">
       {/* 1. Hero Header - Jos's Morning Ritual */}
-      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-950">
+      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-[var(--bakery-bg)]">
         <div className="absolute inset-0 z-0">
           <img
             alt="Baker dusting flour on dough"
             className="w-full h-full object-cover opacity-60 grayscale-[30%]"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6SG_V94G3jAOPP14HMgaAc2y6fE1y54l-T9C_E8xI1lee7tUiF_qJrO8kXpExWPXmuyi8aqoigi93IDoakFe7g9F7qjyPpIDuf5zvLq-T9HQck89ar2rvOtJOWbapiebrimVajx_o7xAq0UfknDkv0sjaGWYqUmPn7GOzTdfsSZqTNiJPRV2YdCQ87VO5yahIhmngNShbsfl5AgO4_w5JoN1TT8lQmCaRisnMIBX9YW4YySXwnKh-Uwv2ioOH1i39jT1EUr1eVcIX"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-slate-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bakery-bg)]/20 to-[var(--bakery-bg)]"></div>
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <motion.h1
@@ -61,15 +38,15 @@ export const Story: React.FC = () => {
             transition={{ duration: 1 }}
             className="font-sans text-5xl md:text-7xl lg:text-8xl text-white font-bold mb-4 tracking-tighter"
           >
-            {heroBlock.title}
+            {bakeryData.home.heroTitle.replace(/<[^>]*>?/gm, '')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="text-slate-300 text-lg md:text-xl font-light tracking-[0.2em] uppercase"
+            className="text-[var(--bakery-text-muted)] text-lg md:text-xl font-light tracking-[0.2em] uppercase"
           >
-            {heroBlock.subtitle}
+            {bakeryData.home.heroSubtext}
           </motion.p>
         </div>
       </section>
@@ -77,8 +54,8 @@ export const Story: React.FC = () => {
       {/* 2. The Artisanal Process - Staggered Organic Sections */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-sans text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">The Artisanal Process</h2>
-          <div className="w-16 h-1 bg-primary mx-auto"></div>
+          <h2 className="font-sans text-4xl md:text-5xl font-bold text-[var(--bakery-heading)] mb-4 tracking-tight">The Artisanal Process</h2>
+          <div className="w-16 h-1 bg-[var(--bakery-primary)] mx-auto"></div>
         </div>
         <div className="space-y-24 md:space-y-32">
           {/* Step 1 */}
@@ -115,21 +92,21 @@ export const Story: React.FC = () => {
       </section>
 
       {/* 3. Interactive Items Grid */}
-      <section className="py-16 bg-slate-50 dark:bg-slate-900/50">
+      <section className="py-16 bg-[var(--bakery-bg-soft)]">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h2 className="font-sans text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">Interactive Items</h2>
-            <p className="text-base text-slate-500 leading-relaxed max-w-lg">
+            <h2 className="font-sans text-4xl font-bold text-[var(--bakery-heading)] leading-tight tracking-tight">Interactive Items</h2>
+            <p className="text-base text-[var(--bakery-text-muted)] leading-relaxed max-w-lg">
               Great products start with great ingredients. Every component of our pastries is selected for its origin and quality, from Madagascar vanilla beans to local farm-fresh eggs.
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <div className="aspect-square bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm flex flex-col justify-end group hover:bg-primary transition-all duration-500 cursor-pointer border border-slate-100 dark:border-slate-800">
-                <span className="material-icons text-primary group-hover:text-white mb-4 text-3xl">local_florist</span>
-                <p className="font-bold dark:text-white group-hover:text-white text-sm">Organic Flour</p>
+              <div className="aspect-square bg-[var(--bakery-card-bg)] rounded-2xl p-6 shadow-sm flex flex-col justify-end group hover:bg-[var(--bakery-primary)] transition-all duration-500 cursor-pointer border border-[var(--bakery-card-border)]">
+                <span className="material-icons text-[var(--bakery-primary)] group-hover:text-white mb-4 text-3xl">local_florist</span>
+                <p className="font-bold text-[var(--bakery-text)] group-hover:text-white text-sm">Organic Flour</p>
               </div>
-              <div className="aspect-square bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm flex flex-col justify-end group hover:bg-primary transition-all duration-500 cursor-pointer border border-slate-100 dark:border-slate-800">
-                <span className="material-icons text-primary group-hover:text-white mb-4 text-3xl">water_drop</span>
-                <p className="font-bold dark:text-white group-hover:text-white text-sm">Filtered Water</p>
+              <div className="aspect-square bg-[var(--bakery-card-bg)] rounded-2xl p-6 shadow-sm flex flex-col justify-end group hover:bg-[var(--bakery-primary)] transition-all duration-500 cursor-pointer border border-[var(--bakery-card-border)]">
+                <span className="material-icons text-[var(--bakery-primary)] group-hover:text-white mb-4 text-3xl">water_drop</span>
+                <p className="font-bold text-[var(--bakery-text)] group-hover:text-white text-sm">Filtered Water</p>
               </div>
             </div>
           </div>
@@ -151,12 +128,12 @@ export const Story: React.FC = () => {
       {/* 4. Interactive Daily Selection - The Cinnamon Rolls Grid */}
       <section className="py-16 max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="font-sans text-4xl font-bold dark:text-white mb-6 tracking-tight">Interactive Daily Selection</h2>
+          <h2 className="font-sans text-4xl font-bold text-[var(--bakery-heading)] mb-6 tracking-tight">Interactive Daily Selection</h2>
           <div className="flex justify-center gap-3">
             {['All', 'Bread', 'Pastries', 'Savory'].map((cat, i) => (
               <button
                 key={cat}
-                className={`px-5 py-1.5 rounded-full text-xs font-bold ${i === 0 ? 'bg-primary text-white' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}
+                className={`px-5 py-1.5 rounded-full text-xs font-bold ${i === 0 ? 'bg-[var(--bakery-primary)] text-white' : 'bg-[var(--bakery-bg-soft)] text-[var(--bakery-text-muted)] border border-[var(--bakery-card-border)]'}`}
               >
                 {cat}
               </button>
@@ -164,7 +141,7 @@ export const Story: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {rollsBlock.items.map((item: any, idx: number) => (
+          {rollsItems.map((item: any, idx: number) => (
             <RollCard
               key={idx}
               title={item.title}
@@ -176,9 +153,9 @@ export const Story: React.FC = () => {
       </section>
 
       {/* 5. Signature 3D Showcase */}
-      <section className="py-16 bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      <section className="py-16 bg-[var(--bakery-bg)]">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="font-sans text-4xl md:text-5xl font-bold dark:text-white mb-12 tracking-tight">Signature 3D Showcase</h2>
+          <h2 className="font-sans text-4xl md:text-5xl font-bold text-[var(--bakery-heading)] mb-12 tracking-tight">Signature 3D Showcase</h2>
           <div className="relative inline-block group">
             <motion.div
               animate={{ y: [0, -20, 0] }}
@@ -193,17 +170,17 @@ export const Story: React.FC = () => {
             </motion.div>
             {/* Floaties */}
             <div className="absolute inset-0 pointer-events-none">
-              <span className="material-icons text-primary absolute top-0 left-0 animate-bounce">local_florist</span>
-              <span className="material-icons text-primary absolute top-10 right-0 animate-pulse">grain</span>
-              <span className="material-icons text-primary absolute bottom-0 left-10 animate-pulse">spa</span>
+              <span className="material-icons text-[var(--bakery-primary)] absolute top-0 left-0 animate-bounce">local_florist</span>
+              <span className="material-icons text-[var(--bakery-primary)] absolute top-10 right-0 animate-pulse">grain</span>
+              <span className="material-icons text-[var(--bakery-primary)] absolute bottom-0 left-10 animate-pulse">spa</span>
             </div>
           </div>
           <div className="mt-12 flex justify-center items-center gap-8">
             <div className="flex gap-4">
-              <button className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span className="material-icons">chevron_left</span></button>
-              <button className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center hover:bg-primary hover:text-white transition-all"><span className="material-icons">chevron_right</span></button>
+              <button className="w-10 h-10 rounded-full border border-[var(--bakery-card-border)] flex items-center justify-center hover:bg-[var(--bakery-primary)] hover:text-white transition-all text-[var(--bakery-text)]"><span className="material-icons">chevron_left</span></button>
+              <button className="w-10 h-10 rounded-full border border-[var(--bakery-card-border)] flex items-center justify-center hover:bg-[var(--bakery-primary)] hover:text-white transition-all text-[var(--bakery-text)]"><span className="material-icons">chevron_right</span></button>
             </div>
-            <button className="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/30 hover:bg-orange-600 transform hover:scale-105 active:scale-95 transition-all">
+            <button className="bg-[var(--bakery-primary)] text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-[var(--bakery-primary)]/30 hover:opacity-90 transform hover:scale-105 active:scale-95 transition-all">
               Customize & Order $85.00
             </button>
           </div>
@@ -211,9 +188,9 @@ export const Story: React.FC = () => {
       </section>
 
       {/* 6. Catering & Bulk */}
-      <section className="py-16 bg-slate-950 text-white relative">
+      <section className="py-16 bg-[var(--bakery-bg-soft)] text-[var(--bakery-text)] relative border-y border-[var(--bakery-card-border)]">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="font-sans text-4xl md:text-5xl font-bold text-center mb-16 tracking-tight">Catering & Bulk</h2>
+          <h2 className="font-sans text-4xl md:text-5xl font-bold text-center mb-16 tracking-tight text-[var(--bakery-heading)]">Catering & Bulk</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <CateringCard
               title="Corporate"
@@ -240,40 +217,40 @@ export const Story: React.FC = () => {
 
       {/* 7. The Baker's Story (Editorial) */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <h2 className="font-sans text-4xl md:text-5xl font-bold text-center mb-12 dark:text-white tracking-tight">The Baker’s Story</h2>
+        <h2 className="font-sans text-4xl md:text-5xl font-bold text-center mb-12 text-[var(--bakery-heading)] tracking-tight">The Baker’s Story</h2>
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-8">
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl group cursor-pointer">
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6SG_V94G3jAOPP14HMgaAc2y6fE1y54l-T9C_E8xI1lee7tUiF_qJrO8kXpExWPXmuyi8aqoigi93IDoakFe7g9F7qjyPpIDuf5zvLq-T9HQck89ar2rvOtJOWbapiebrimVajx_o7xAq0UfknDkv0sjaGWYqUmPn7GOzTdfsSZqTNiJPRV2YdCQ87VO5yahIhmngNShbsfl5AgO4_w5JoN1TT8lQmCaRisnMIBX9YW4YySXwnKh-Uwv2ioOH1i39jT1EUr1eVcIX"
+                src={story.showcaseGif}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 alt="Baker in kitchen"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 bg-primary/90 text-white rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-[var(--bakery-primary)]/90 text-white rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
                   <span className="material-icons text-3xl">play_arrow</span>
                 </div>
               </div>
             </div>
-            <div className="p-6 border-l-4 border-primary bg-slate-50 dark:bg-slate-900 rounded-r-3xl">
-              <h3 className="font-sans text-2xl font-bold mb-3 dark:text-white">The Baker's Editorial</h3>
-              <p className="text-slate-500 italic text-sm">
-                "Baking is a conversation between the grains and the baker. Every loaf we make tells the story of the farmer who grew the wheat, the water that fed it, and the fire that transformed it."
+            <div className="p-6 border-l-4 border-[var(--bakery-primary)] bg-[var(--bakery-bg-soft)] rounded-r-3xl">
+              <h3 className="font-sans text-2xl font-bold mb-3 text-[var(--bakery-heading)]">The Baker's Editorial</h3>
+              <p className="text-[var(--bakery-text-muted)] italic text-sm">
+                "{story.bio}"
               </p>
             </div>
           </div>
-          <div className="prose prose-slate dark:prose-invert">
-            <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+          <div className="prose prose-stone dark:prose-invert">
+            <p className="text-lg text-[var(--bakery-text)] leading-relaxed font-sans">
               When I first started this journey in the heart of Jos, I had nothing but a handful of family recipes and a persistent dream of bringing artisan quality to every breakfast table. Today, Orient Bakery is more than just a place to buy bread; it's a testament to the community that supported us.
             </p>
-            <p className="text-slate-500 leading-relaxed text-sm">
+            <p className="text-[var(--bakery-text-muted)] leading-relaxed text-sm">
               We sourcing 90% of our ingredients locally because we believe the soil of Northern Nigeria produces grains that are unparalleled in flavor and nutrition. Our 48-hour fermentation isn't a marketing tactic; it's a commitment to your health and the integrity of the process.
             </p>
             <div className="flex gap-4 mt-8">
-              <img className="w-16 h-16 rounded-2xl object-cover" src="https://picsum.photos/200" alt="Baker portrait" />
+              <img className="w-16 h-16 rounded-2xl object-cover" src={story.image} alt="Baker portrait" />
               <div>
-                <p className="font-bold text-xl dark:text-white">Jos O.</p>
-                <p className="text-primary font-bold uppercase tracking-widest text-xs">Founder & CEO</p>
+                <p className="font-bold text-xl text-[var(--bakery-heading)]">{story.bakerName}</p>
+                 <p className="text-[var(--bakery-primary)] font-bold uppercase tracking-widest text-xs">Founder & CEO</p>
               </div>
             </div>
           </div>
@@ -300,7 +277,7 @@ const ProcessStep: React.FC<{ index: number; title: string; desc: string; image:
       >
         <img src={image} className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" alt={title} />
       </div>
-      <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 text-slate-100/10 dark:text-white/5 font-sans text-8xl pointer-events-none font-bold">0{index}</div>
+      <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 text-[var(--bakery-text)] opacity-10 font-sans text-8xl pointer-events-none font-bold">0{index}</div>
     </motion.div>
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -308,10 +285,10 @@ const ProcessStep: React.FC<{ index: number; title: string; desc: string; image:
       viewport={{ once: true }}
       className="w-full md:w-1/2 space-y-4"
     >
-      <span className="text-primary font-bold uppercase tracking-widest text-xs block">Artisan Notes</span>
-      <h3 className="font-sans text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3>
-      <p className="text-base text-slate-500 leading-relaxed font-light">{desc}</p>
-      <button className="text-primary font-bold text-sm flex items-center gap-2 hover:translate-x-2 transition-transform">
+      <span className="text-[var(--bakery-primary)] font-bold uppercase tracking-widest text-xs block">Artisan Notes</span>
+      <h3 className="font-sans text-3xl md:text-4xl font-bold text-[var(--bakery-heading)] tracking-tight">{title}</h3>
+      <p className="text-base text-[var(--bakery-text-muted)] leading-relaxed font-light">{desc}</p>
+      <button className="text-[var(--bakery-primary)] font-bold text-sm flex items-center gap-2 hover:translate-x-2 transition-transform">
         Read the science <span className="material-icons text-sm">arrow_forward</span>
       </button>
     </motion.div>
@@ -321,21 +298,21 @@ const ProcessStep: React.FC<{ index: number; title: string; desc: string; image:
 const RollCard: React.FC<{ title: string; price: string; image: string }> = ({ title, price, image }) => (
   <motion.div
     whileHover={{ y: -8 }}
-    className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-100 dark:border-slate-800"
+    className="bg-[var(--bakery-card-bg)] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-[var(--bakery-card-border)]"
   >
     <div className="relative h-56 overflow-hidden">
       <img src={image} className="w-full h-full object-cover" alt={title} />
-      <div className="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">New</div>
+      <div className="absolute top-3 right-3 bg-[var(--bakery-primary)] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">New</div>
     </div>
     <div className="p-5">
-      <h4 className="font-sans font-bold text-lg mb-1 dark:text-white">{title}</h4>
-      <p className="text-primary font-bold text-sm">{price}</p>
+      <h4 className="font-sans font-bold text-lg mb-1 text-[var(--bakery-heading)]">{title}</h4>
+      <p className="text-[var(--bakery-primary)] font-bold text-sm">{price}</p>
     </div>
   </motion.div>
 );
 
 const CateringCard: React.FC<{ title: string; desc: string; image: string; cta: string; active?: boolean }> = ({ title, desc, image, cta, active }) => (
-  <div className={`p-6 rounded-[32px] transition-all duration-500 ${active ? 'bg-primary scale-105 shadow-[0_20px_40px_rgba(236,109,19,0.3)]' : 'bg-slate-900 hover:bg-slate-800'}`}>
+  <div className={`p-6 rounded-[32px] transition-all duration-500 ${active ? 'bg-[var(--bakery-primary)] scale-105 shadow-[0_20px_40px_rgba(236,109,19,0.3)]' : 'bg-[var(--bakery-bg-soft)] hover:brightness-110'}`}>
     <div className="aspect-video rounded-2xl overflow-hidden mb-6 shadow-inner">
       <img src={image} className="w-full h-full object-cover opacity-80" alt={title} />
     </div>
@@ -344,7 +321,7 @@ const CateringCard: React.FC<{ title: string; desc: string; image: string; cta: 
       <h3 className="text-xl font-sans font-bold">{title}</h3>
     </div>
     <p className={`text-xs mb-6 leading-relaxed ${active ? 'text-white' : 'text-slate-400'}`}>{desc}</p>
-    <button className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${active ? 'bg-white text-primary' : 'bg-slate-950 text-white hover:bg-black'}`}>
+    <button className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${active ? 'bg-white text-[var(--bakery-primary)]' : 'bg-[var(--bakery-bg)] text-[var(--bakery-text)] hover:bg-[var(--bakery-card-bg)] border border-[var(--bakery-card-border)]'}`}>
       {cta}
     </button>
   </div>

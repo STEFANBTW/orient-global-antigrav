@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Montserrat:wght@400;500;600;700;800;900&display=swap");
-
 @theme {
+
+  /* ── Requested PDP Variables ─────────────────────────── */
+  --color-bg-light: #ffffff;
+  --color-accent-light: #ff6a00;
+  --color-text-light: #ffffff;
+  --radius-md: 0.75rem;
+
+
+  /* ── Market App Global Colors ─────────────────────────── */
+  --market-primary: #ff6a00;
+  --market-primary-hover: #e65c00;
+  --market-bg: #f8f7f5;
+  --market-surface: #ffffff;
+  --market-card: #ffffff;
+  --market-heading: #0f172a;
+  --market-text: #334155;
+  --market-muted: #64748b;
+  --market-border: #e2e8f0;
+
   /* ── Orient Brand ───────────────────────────────────────── */
   --color-primary: #ff7300;
   --color-primary-dark: #cc5c00;
@@ -48,8 +65,9 @@
   --color-sidebar-ring: hsl(24 95% 53%);
 
   /* ── Typography — Corporate Luxury Dual Pairing ─────────── */
-  --font-headline: "Cormorant Garamond", "Georgia", ui-serif, serif;
-  --font-body: "Montserrat", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Montserrat", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-display: "Manrope", sans-serif;
   --font-code: "Source Code Pro", ui-monospace, SFMono-Regular, monospace;
 
   /* ── Unified Physics — Global Easing ─────────────────────── */
@@ -78,6 +96,23 @@
 
 @layer base {
   .dark {
+
+    /* ── Requested PDP Variables (Dark Mode) ── */
+    --color-bg-light: #0f172a;
+    --color-accent-light: #ff8c33;
+    --color-text-light: #f8fafc;
+
+    /* ── Market Dark Colors ── */
+    --market-primary: #ff8c33;
+    --market-primary-hover: #ff9d52;
+    --market-bg: #020617;
+    --market-surface: #0f172a;
+    --market-card: #1e293b;
+    --market-heading: #f8fafc;
+    --market-text: #cbd5e1;
+    --market-muted: #94a3b8;
+    --market-border: #334155;
+
     /* ── Shadcn Dark Theme Variables ──────────────────────── */
     --color-background: hsl(224 71.4% 4.1%);
     --color-foreground: hsl(210 20% 98%);
@@ -125,6 +160,19 @@
     --color-accent-foreground: #022c22;
   }
 
+  /* ── GLOBAL THEME TRANSITION ── */
+  .theme-transition {
+    transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+      color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transition * {
+    transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+      color 600ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   /* ── Login Page Theme ─────────────────────────────────── */
   .login-theme {
     /* Page Background & Text */
@@ -162,6 +210,153 @@
     --login-error-bg: #fef2f2;
     --login-error-text: #dc2626;
     --login-error-border: #fecaca;
+
+    /* Cinematic Nav Variables */
+    --nav-opaque: rgba(255, 255, 255, 1);
+    --nav-blur: rgba(255, 255, 255, 0.7);
+  }
+
+  .dark {
+    --nav-opaque: rgba(15, 23, 42, 1);
+    --nav-blur: rgba(15, 23, 42, 0.7);
+  }
+
+  /* ── Bakery Division Theme ──────────────────────────────── */
+  .bakery-theme {
+    /* Colors */
+    --bakery-bg: #fdfbf7;
+    --bakery-bg-soft: #f5f2ed;
+    --bakery-card-bg: #ffffff;
+    --bakery-card-border: #f1f1f1;
+    --bakery-text: #1e293b;
+    --bakery-text-muted: #475569;
+    /* Slate-600, darkened from Slate-500 */
+    --bakery-heading: #0f172a;
+    --bakery-nav-bg: rgba(255, 255, 255, 0.7);
+    --bakery-nav-border: rgba(0, 0, 0, 0.05);
+
+    /* Functional Colors */
+    --bakery-primary: #f26c0d;
+    --bakery-primary-soft: rgba(242, 108, 13, 0.1);
+    --bakery-success: #10b981;
+    --bakery-error: #ef4444;
+    --bakery-high-tier: #a855f7;
+    --bakery-accent: #3b82f6;
+
+    /* Shadows & Effects */
+    --bakery-shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+    --bakery-shadow-md: 0 8px 30px rgb(0 0 0 / 0.04);
+    --bakery-overlay-dark: rgba(28, 25, 23, 0.6);
+    --bakery-glass-bg: rgba(255, 255, 255, 0.8);
+    --bakery-glass-border: rgba(255, 255, 255, 0.2);
+
+    /* Home Specific */
+    --home-bg: #ffffff;
+    --home-bg-soft: #f8fafc;
+    --home-card-bg: #ffffff;
+    --home-card-border: rgba(0, 0, 0, 0.05);
+    --home-text: #0f172a;
+    --home-text-muted: #64748b;
+    --home-heading: #0f172a;
+    --home-border: rgba(0, 0, 0, 0.05);
+    --home-primary: #3b82f6;
+    /* Blue for Home/Global */
+    --home-font-headline: "Inter", sans-serif;
+    --home-font-body: "Inter", sans-serif;
+  }
+
+  .dark .bakery-theme {
+    /* Colors */
+    --bakery-bg: #0a0805;
+    --bakery-bg-soft: #14110d;
+    --bakery-card-bg: #1c1917;
+    --bakery-card-border: #292524;
+    --bakery-text: #d4d4d8;
+    --bakery-text-muted: #a1a1aa;
+    --bakery-heading: #fafafa;
+    --bakery-nav-bg: rgba(10, 8, 5, 0.7);
+    --bakery-nav-border: rgba(255, 255, 255, 0.1);
+
+    --bakery-success: #10b981;
+    --bakery-error: #ef4444;
+    --bakery-high-tier: #c084fc;
+    --bakery-accent: #60a5fa;
+    --bakery-glass-bg: rgba(28, 25, 23, 0.8);
+    --bakery-glass-border: rgba(255, 255, 255, 0.05);
+
+    /* Home Specific Dark */
+    --home-bg: #0f172a;
+    --home-bg-soft: #1e293b;
+    --home-card-bg: #1e293b;
+    --home-card-border: rgba(255, 255, 255, 0.1);
+    --home-text: #f8fafc;
+    --home-text-muted: #94a3b8;
+    --home-heading: #ffffff;
+    --home-border: rgba(255, 255, 255, 0.1);
+    --home-primary: #60a5fa;
+  }
+
+  /* ── Water Division Theme ──────────────────────────────── */
+  .water-theme {
+    /* Base Colors */
+    --water-bg: #f8fafc;
+    --water-bg-soft: #f1f5f9;
+    --water-card-bg: #ffffff;
+    --water-text: #0f172a;
+    --water-text-muted: #64748b;
+    --water-heading: #020617;
+    --water-border: #e2e8f0;
+
+    /* Primary (Blue) */
+    --water-primary: #2563eb;
+    --water-primary-soft: rgba(37, 99, 235, 0.1);
+    --water-primary-dark: #1d4ed8;
+
+    /* Secondary (Green) */
+    --water-secondary: #16a34a;
+    --water-secondary-soft: rgba(22, 163, 74, 0.1);
+
+    /* Status */
+    --water-status-warning: #f59e0b;
+    /* yellow-500 */
+    --water-status-error: #ef4444;
+    /* red-500 */
+
+    /* Gradients */
+    --water-gradient-from: #3b82f6;
+    /* blue-500 */
+    --water-gradient-to: #38bdf8;
+    /* sky-400 */
+  }
+
+  .dark .water-theme {
+    /* Base Colors */
+    --water-bg: #020617;
+    --water-bg-soft: #0f172a;
+    --water-card-bg: #1e293b;
+    --water-text: #f8fafc;
+    --water-text-muted: #94a3b8;
+    --water-heading: #ffffff;
+    --water-border: #1e293b;
+
+    /* Primary (Blue) */
+    --water-primary: #3b82f6;
+    --water-primary-soft: rgba(59, 130, 246, 0.1);
+    --water-primary-dark: #60a5fa;
+
+    /* Secondary (Green) */
+    --water-secondary: #22c55e;
+    --water-secondary-soft: rgba(34, 197, 94, 0.1);
+
+    /* Status */
+    --water-status-warning: #f59e0b;
+    /* yellow-500 */
+    --water-status-error: #ef4444;
+    /* red-500 */
+
+    /* Gradients */
+    --water-gradient-from: #3b82f6;
+    --water-gradient-to: #38bdf8;
   }
 }
 
@@ -180,6 +375,18 @@
 
   .text-reveal-mask {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 }
 
@@ -307,4 +514,105 @@ html {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+/* ── Bakery Ticker Marquee ─────────────────────────────── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-3150px);
+  }
+
+  /* 10.5 items @ 300px each to ensure overlap on ultra-wide */
+}
+
+/* More dramatic version for massive screens */
+@keyframes marquee-tv {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-4200px);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 80s linear infinite;
+}
+
+@media (min-width: 2500px) {
+  .animate-marquee {
+    animation: marquee-tv 120s linear infinite;
+  }
+}
+
+.pause-on-hover:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* ── Bakery Menu Sticky Variables ────────────────────── */
+:root {
+  --bakery-nav-height: 52px;
+  --bakery-ticker-label-height: 44px;
+}
+
+/* ── Smart TV & Ultra-wide Scaling ───────────────────── */
+@media (min-width: 1920px) {
+  :root {
+    --bakery-scale: 1.25;
+  }
+}
+
+@media (min-width: 2500px) {
+  :root {
+    --bakery-scale: 1.5;
+  }
+
+  .bakery-theme {
+    font-size: 1.25rem;
+  }
+}
+/*  Market CMS (.mcms) Scoped Theme  */
+.mcms {
+  --mcms-bg: #f8fafc;
+  --mcms-surface: #ffffff;
+  --mcms-card: #ffffff;
+  --mcms-card-border: #e2e8f0;
+  --mcms-text: #0f172a;
+  --mcms-text-muted: #64748b;
+  --mcms-text-micro: #94a3b8;
+  --mcms-heading: #0f172a;
+  --mcms-accent: #E85D04; /* Orient Orange */
+  --mcms-accent-soft: rgba(232, 93, 4, 0.08);
+  --mcms-border: #e2e8f0;
+  --mcms-input-bg: #ffffff;
+  --mcms-kanban-bg: #f1f5f9;
+  --mcms-hover: #f8fafc;
+  --mcms-btn-primary: #0f172a;
+  --mcms-btn-primary-text: #ffffff;
+  
+  transition: all 0.3s ease;
+}
+
+.mcms-dark {
+  --mcms-bg: #0a0a0a;
+  --mcms-surface: #141414;
+  --mcms-card: #1a1a1a;
+  --mcms-card-border: #2a2a2a;
+  --mcms-text: #e2e8f0;
+  --mcms-text-muted: #94a3b8;
+  --mcms-text-micro: #64748b;
+  --mcms-heading: #f8fafc;
+  --mcms-accent: #ff8c33; /* Lighter Orange for dark mode */
+  --mcms-accent-soft: rgba(255, 140, 51, 0.12);
+  --mcms-border: #2a2a2a;
+  --mcms-input-bg: #111111;
+  --mcms-kanban-bg: #111111;
+  --mcms-hover: #1f1f1f;
+  --mcms-btn-primary: #f8fafc;
+  --mcms-btn-primary-text: #0f172a;
 }

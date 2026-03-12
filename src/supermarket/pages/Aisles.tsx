@@ -1,107 +1,148 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import {
+  Apple,
+  Laptop,
+  Zap,
+  Sofa,
+  Shirt,
+  HeartPulse,
+  Baby,
+  BookOpen,
+  ShoppingBag,
+  Dumbbell,
+  Car,
+  Coffee,
+} from 'lucide-react';
+import { useMarketProducts } from '../hooks/useMarketProducts';
 
 interface Props {
   onNavigate: (page: any) => void;
 }
 
-const aisles = [
-  { id: 'produce', name: 'Fresh Produce', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB1xd2NZ3opaoe4vIhkG1KskQa5eycV1mBsXfOpf4j-MJsKt-ypLr-6_f-boyuKPonX3JvaXMTTGJY1hKM0gEqNIgAkn5V9b1TkeoiqKOc8GE1gvBAc-0rZTeFQXb2hVo2qsOMh-mQjOIQyjMOqqNlfYfFsvBlSYuCF5w-_Pq0TYPBlahOL2PCyCACTheQjxsJQIsNA5NND-7NqRH8t_thzBfpoRNDtE-gks7qVYG2cBaVC8C0IL9am7k5uv13czpM1U-14-_uj-Q9w', color: 'bg-green-100 text-green-800' },
-  { id: 'bakery', name: 'Bakery & Bread', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnmhadoCVKHfYOfzPDp4J-6pCxjbZzTpGP75Vr_EksxMx5s-niabV7JQ0xEJAGhT6JS3uI5vilRbeFyK2EZzgvV2tCNaDGuY3AUvcd-1qmWdnf_UTBwWXlavafUaKatDnX2FVp60K_6UujA-_6AQVuHME2tSYnvfAGbqOh-74zdGtg6ddQmlBGHxLRQwJBGzO3cc0woi5qtRnAAH41xL31J5tx7UGTq9Adz2r-cl9V4BEIC4ZxsSZ_kPlJiju2gk4htfJnj3ppuzqM', color: 'bg-yellow-100 text-yellow-800' },
-  { id: 'dairy', name: 'Dairy & Eggs', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbd0wFC57LwPQUOyUC38exd7j2pV9Jh0K_hLRw0yjkF5iFVsqmQz3jfBgM6_G9ZX2p6VAPIkOf-aOOXEFojpbgtgemiFiYnfzuWMcxe_MW3GkeN7U1_fuwGfrPp_Mffjm4aVHsil05PJE3o7PJg3_DDy0iQgexr7xzJPYp9S1no5rXRRZyo7BpWPEieVoHvLFrn_Nv8NF65PZWTEUQQwc7WIMR7bDeekusfqamGTmuycHFki2QQcAFevyUSfJUH8gln0PTyPBEB5MX', color: 'bg-blue-100 text-blue-800' },
-  { id: 'pantry', name: 'Pantry Staples', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBfoq8Qt1i7X_77OeMmegd2_Pq0DTvro1D9LRM41EHPXBvfhGfBUFUH9Hxz6iRXpsKH0WopOq6O_kC6qnviNMVijikGIXmg2_kEoGYs1dpOg2jDHPARVYUD9l8q5TSbVWMd66a8oJEmxm4TKvrUgiDQSj9NVd1rcUAE7R5dxHnKIrs9TFbKXLxgjuA6DVPTbfZ01F1DuQ5dl6lAIl20nZh9Y_PpPo159YTLemPsPv9zW0IBTa5E5lL9qd5UMd_feG8lscDICVmlTxgD', color: 'bg-orange-100 text-orange-800' },
-  { id: 'meat', name: 'Meat & Seafood', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAZaVZsuIcPt-Snqtd00ARadGGhvApZXRSLHFds0nhdY0X2XM2kV9tJ5rjDPZWKo4HpfqVXQcISZG8W__pRUmkDBo-9tDRZlXZm0pVeIXQPvACFQQhs5QEZyWOk4geSuBrWEs6y2_XEARkWI6z2I0R7u_HbsazyDkQ5x0UGRcWg6nhBc5ra-0d9EJZt0vTj8cE5joHZpNhvptffB8mcLhxiHj5rVSqj7JQF2yNfwy71ShpKudl8Vb6DtIxHTEtSYdZ9nVtAk1gNU01e', color: 'bg-red-100 text-red-800' },
-  { id: 'frozen', name: 'Frozen Foods', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBoLnVeL44jkjtmwQxjCJ4Fbt14l3Jbz8YC278yJslk1GE1LehJCw8YjnicdmDXRWfEDtkqb483NspodmfrV1Q0Jo9EbwICzgvukibkvP4bi0kSS4h-WKj3njHMuF18yFP0Lhvq5s22o0-PuE1ybYNyWLBLXJws_wfIIddru9TozcLJdj0HbIO7sU1go_xmCYJ313XT4HeCkqsoPDNpgB7NilpejuOfSstw0xnlZtse27wNMW3ChICF4PI9gXgRDtttmtbd9jw51FWU', color: 'bg-cyan-100 text-cyan-800' },
-  { id: 'beverages', name: 'Beverages', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB6yO9YpD7WzXoPz8rWqU2tV9sQ4xR3yM6nO1lA2bC5dE8fG9hI0jK3mL4nP5oQ6rS7tU8vW9xY0zB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0uV1wW2xY3zA4bC5dE6fG7hI8jK9lM0nO1pQ2r', color: 'bg-purple-100 text-purple-800' },
-  { id: 'household', name: 'Household', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAR3BqvgI_JtzoDPnzd2B4va9ct4322umJBsiC4ir_l-N3MBrGNm4n-c9mdgd4GV-At7oFks2rep4HKnSd1YNmkpQWJxm3JUk-2XngzcLnstZd9nWgJldDEnqie660w8R5k5JtBm4a6XJMLa8HapRDf1S2RAw6CrZPTaGdyPkrcd8ESOfAiZOilFrNsR-RgK99FauncBpDUmq7rmrGhove30EiaBy9Rf9z2162_Y_5D34T-oRqR404T-IX9RC-m2fPDnhc62KzIHA66', color: 'bg-gray-100 text-gray-800' },
+const staticCategories = [
+  { name: "Groceries", id: "groceries", icon: <Apple size={32} strokeWidth={1.5} />, active: true, color: "text-green-500 border-green-200 bg-green-50" },
+  { name: "Electronics", id: "electronics", icon: <Laptop size={32} strokeWidth={1.5} />, color: "text-blue-500 border-blue-200 bg-blue-50" },
+  { name: "Appliances", id: "appliances", icon: <Zap size={32} strokeWidth={1.5} />, color: "text-yellow-500 border-yellow-200 bg-yellow-50" },
+  { name: "Furniture", id: "furniture", icon: <Sofa size={32} strokeWidth={1.5} />, color: "text-amber-600 border-amber-200 bg-amber-50" },
+  { name: "Fashion", id: "fashion", icon: <Shirt size={32} strokeWidth={1.5} />, color: "text-pink-500 border-pink-200 bg-pink-50" },
+  { name: "Health", id: "health", icon: <HeartPulse size={32} strokeWidth={1.5} />, color: "text-rose-500 border-rose-200 bg-rose-50" },
+  { name: "Baby & Kids", id: "baby", icon: <Baby size={32} strokeWidth={1.5} />, color: "text-indigo-500 border-indigo-200 bg-indigo-50" },
+  { name: "Books & Stationery", id: "books", icon: <BookOpen size={32} strokeWidth={1.5} />, color: "text-cyan-500 border-cyan-200 bg-cyan-50" },
+  { name: "Household", id: "household", icon: <ShoppingBag size={32} strokeWidth={1.5} />, color: "text-teal-500 border-teal-200 bg-teal-50" },
+  { name: "Sports", id: "sports", icon: <Dumbbell size={32} strokeWidth={1.5} />, color: "text-[var(--color-accent-light)] border-orange-200 bg-orange-50" },
+  { name: "Hardware", id: "hardware", icon: <Car size={32} strokeWidth={1.5} />, color: "text-gray-500 border-gray-200 bg-gray-50" },
+  { name: "Beverages", id: "beverages", icon: <Coffee size={32} strokeWidth={1.5} />, color: "text-stone-500 border-stone-200 bg-stone-50" },
 ];
 
-const container = {
+const containerAnim = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05
     }
   }
 };
 
 const itemAnim = {
-  hidden: { opacity: 0, y: 30, scale: 0.9 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 50 } }
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 50 } as any }
 };
 
 const Aisles: React.FC<Props> = ({ onNavigate }) => {
+  const { products } = useMarketProducts();
+
+  const displayCategories = useMemo(() => {
+    const dbCategories = Array.from(new Set(products.map(p => p.category)));
+
+    // Sort logic to prioritize DB categories while falling back to static ones initially
+    if (dbCategories.length === 0) return staticCategories;
+
+    return dbCategories.map(catName => {
+      const matched = staticCategories.find(c => c.name.toLowerCase() === catName.toLowerCase());
+      if (matched) return { ...matched, name: catName }; // Ensure exact case from DB
+
+      // Fallback for new categories created in CMS
+      return {
+        name: catName,
+        id: catName.toLowerCase().replace(/\s+/g, '-'),
+        icon: <ShoppingBag size={32} strokeWidth={1.5} />,
+        color: "text-slate-500 border-slate-200 bg-slate-50"
+      };
+    });
+  }, [products]);
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6 transition-colors duration-300 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 md:p-12 transition-colors duration-300 pt-[68px] mt-10">
       <div className="max-w-[1600px] mx-auto">
-        <motion.button 
+        <motion.button
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          onClick={() => onNavigate('Home')} 
-          className="mb-4 text-orange-600 flex items-center gap-2 font-bold hover:underline uppercase tracking-widest text-xs font-sans"
+          onClick={() => onNavigate('Home')}
+          className="mb-8 text-[var(--color-accent-light)] flex items-center gap-2 font-bold hover:underline"
         >
-          <span className="material-icons text-sm">arrow_back</span> Back to Storefront
+          <span className="material-icons">arrow_back</span> Back to Storefront
         </motion.button>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
+          className="mb-10 text-center sm:text-left"
         >
-           <h1 className="text-2xl font-bold mb-1 text-slate-900 dark:text-white">Shop by Aisle</h1>
-           <p className="text-slate-500 dark:text-slate-400 text-xs font-sans font-light max-w-2xl">Explore our departments to find exactly what you need.</p>
+          <h1 className="text-4xl sm:text-5xl font-black mb-3 text-slate-900 dark:text-white tracking-tight">Explore Departments</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl">Browse our extensive catalogue spanning everything from fresh groceries to the latest high-end electronics.</p>
         </motion.div>
 
-        <motion.div 
-          variants={container}
+        <motion.div
+          variants={containerAnim}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6"
         >
-           {aisles.map((aisle) => (
-              <motion.div 
-                key={aisle.id} 
-                variants={itemAnim}
-                whileHover={{ y: -10 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                   if (aisle.id === 'produce') onNavigate('Produce');
-                   else if (aisle.id === 'bakery') onNavigate('Bakery');
-                   // Can add more specific navigations here
-                   else onNavigate('Home'); // Fallback to home with filter pre-selected in a real app
-                }}
-                className="group relative h-56 bg-white dark:bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-lg hover:shadow-xl cursor-pointer border border-slate-100 dark:border-slate-800 transition-all duration-500"
-              >
-                 <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800">
-                    <img src={aisle.img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" alt={aisle.name} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                 </div>
-                 
-                 <div className="absolute bottom-0 left-0 p-6 w-full z-10">
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <motion.span 
-                          className={`inline-block px-3 py-1 rounded-full text-[9px] font-bold mb-2 shadow-sm uppercase tracking-widest bg-white/20 backdrop-blur-md text-white border border-white/20`}
-                        >
-                           {aisle.id}
-                        </motion.span>
-                        <h2 className="text-3xl font-bold text-white leading-none mb-1 group-hover:text-orange-200 transition-colors">{aisle.name}</h2>
-                      </div>
-                      <motion.div 
-                        initial={{ opacity: 0, x: -10 }}
-                        whileHover={{ opacity: 1, x: 0 }}
-                        className="bg-white text-slate-900 rounded-full p-2 shadow-lg"
-                      >
-                         <span className="material-icons text-lg">arrow_forward</span>
-                      </motion.div>
-                    </div>
-                 </div>
-              </motion.div>
-           ))}
+          {displayCategories.map((cat) => (
+            <motion.div
+              key={cat.id}
+              variants={itemAnim}
+              whileHover={{ y: -5, scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                const name = cat.name.toLowerCase();
+                if (name === 'groceries') {
+                  onNavigate('Produce');
+                } else if (name === 'electronics') {
+                  onNavigate('Home#electronics');
+                } else if (name === 'appliances') {
+                  onNavigate('Home#appliances');
+                } else if (name === 'furniture') {
+                  onNavigate('Home#furniture');
+                } else if (name === 'fashion') {
+                  onNavigate('Home#fashion');
+                } else if (name === 'health') {
+                  onNavigate('Home#health');
+                } else if (name.includes('baby')) {
+                  onNavigate('Home#baby');
+                } else {
+                  onNavigate('Home');
+                }
+              }}
+              className="group relative flex flex-col items-center justify-center bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800 transition-all duration-300 cursor-pointer"
+            >
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110 shadow-inner overflow-hidden ${cat.color || "text-slate-500 bg-slate-100 border-slate-200"}`}>
+                <div className="relative z-10">
+                  {cat.icon}
+                </div>
+              </div>
+
+              <h2 className="text-sm sm:text-base font-bold text-slate-700 dark:text-slate-200 text-center leading-tight group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                {cat.name}
+              </h2>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </div>
   );
 };
+
 export default Aisles;

@@ -4,9 +4,10 @@ import { ScrollContext } from './ScrollContext';
 import { Architect } from './BakeryArchitect';
 import { Wholesale } from './BakeryWholesale';
 import { Story } from './BakeryStory';
-import { useCMS } from './hooks/useCMS';
-import { BakeryNarrativeArc } from './BakeryNarrativeArc';
 import { BakeryMenu } from './BakeryMenu';
+import { BakeryNarrativeArc } from './BakeryNarrativeArc';
+import { useBakeryCms } from './lib/bakeryCmsData';
+import { mockDb } from './lib/mockDb';
 
 const menuItems = [
   { title: "Butter Croissant", category: "Pastries", price: "₦4,500", desc: "27 layers of pure bliss. Baked fresh every 2 hours to ensure maximum flake.", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCzuTGeynABEZq_RNMW_0DWnpySiwUdY708i6ZVWjZ7aIl0DpPLMJq1VQVEwuiE3nMamKg_bwuczTqbcV6ecYVDUXjY9SZK519_nntwfz9HAhku_iqDi_Ef3RUdWrVu9jrh-MWAyUVc-FKp3_XCiyFx_P2OM-jDXRGULnYJqVqUqqx6jyHp_XoHc7SCS-NUZMRZsCvKWvMaSW8Dsah1KUa05a9i3V7cPWokidQYzWZ7hkP9T04I1yuxLjt0g6HhgWkppOALuJnR6wrU", ingredients: "High-fat French Butter, Organic Wheat Flour, Sea Salt, Fresh Yeast" },
@@ -27,247 +28,286 @@ const menuItems = [
 ];
 
 const BakeryMenuItem: React.FC<{ title: string; price: string; desc: string; image: string; ingredients: string }> = ({ title, price, desc, image, ingredients }) => (
-  <div className="group relative bg-[#FDFBF7] dark:bg-stone-900 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 break-inside-avoid mb-6 border border-stone-100 dark:border-stone-800">
+  <div className="group relative bg-[var(--bakery-card-bg)] rounded-[32px] overflow-hidden shadow-[var(--bakery-shadow-md)] transition-all duration-500 break-inside-avoid mb-6 border border-[var(--bakery-card-border)]">
     <div className="relative aspect-[4/3] md:aspect-auto overflow-hidden">
       <img src={image} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" alt={title} />
-      <div className="absolute top-4 right-4 bg-white/90 dark:bg-background-dark/90 backdrop-blur text-xs font-bold px-4 py-1.5 rounded-full text-primary shadow-sm font-serif tracking-wider">{price}</div>
-      <div className="absolute inset-0 bg-stone-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-8 text-center backdrop-blur-[2px]">
+      <div className="absolute top-4 right-4 bg-[var(--bakery-glass-bg)] backdrop-blur text-xs font-bold px-4 py-1.5 rounded-full text-[var(--bakery-primary)] shadow-sm font-sans tracking-wider">{price}</div>
+      <div className="absolute inset-0 bg-[var(--bakery-overlay-dark)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-8 text-center backdrop-blur-[2px]">
         <div>
-          <p className="text-white/80 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Ingredients</p>
+          <p className="white/80 text-xs font-bold uppercase tracking-[0.2em] mb-3">Ingredients</p>
           <p className="text-white font-serif text-xl leading-relaxed italic">{ingredients}</p>
         </div>
       </div>
     </div>
     <div className="p-8">
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-serif text-2xl text-stone-800 dark:text-white font-medium">{title}</h3>
-        <button className="text-stone-400 hover:text-primary transition-colors"><span className="material-icons">favorite_border</span></button>
+        <h3 className="font-serif text-2xl text-[var(--bakery-heading)] font-medium">{title}</h3>
+        <button className="text-[var(--bakery-text-muted)] hover:text-[var(--bakery-primary)] transition-colors"><span className="material-icons">favorite_border</span></button>
       </div>
-      <p className="text-stone-500 dark:text-stone-400 text-sm mb-6 line-clamp-2 font-sans leading-relaxed">{desc}</p>
-      <button className="w-full py-3 border border-stone-200 dark:border-stone-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-white hover:border-primary transition-colors">Add to Order</button>
+      <p className="text-[var(--bakery-text-muted)] text-sm mb-6 line-clamp-2 font-sans leading-relaxed">{desc}</p>
+      <button className="w-full py-3 border border-[var(--bakery-card-border)] rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[var(--bakery-primary)] hover:text-white hover:border-[var(--bakery-primary)] transition-colors text-[var(--bakery-text)]">Add to Order</button>
     </div>
   </div>
 );
 
 const BakeryFeatureItem: React.FC<{ icon: string; title: string; desc: string }> = ({ icon, title, desc }) => (
   <div className="flex items-center gap-4">
-    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+    <div className="w-12 h-12 rounded-full bg-[var(--bakery-primary)]/10 flex items-center justify-center text-[var(--bakery-primary)]">
       <span className="material-icons">{icon}</span>
     </div>
     <div>
-      <h4 className="font-bold text-slate-900 dark:text-white">{title}</h4>
-      <p className="text-sm text-stone-500">{desc}</p>
+      <h4 className="font-bold text-[var(--bakery-heading)] text-base">{title}</h4>
+      <p className="text-sm text-[var(--bakery-text-muted)] leading-relaxed">{desc}</p>
     </div>
   </div>
 );
 
 const BakeryBulkCard: React.FC<{ icon: string; title: string; desc: string }> = ({ icon, title, desc }) => (
-  <div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-primary/50 transition-colors">
-    <span className="material-icons text-primary text-4xl mb-4">{icon}</span>
+  <div className="bg-[var(--bakery-glass-bg)] backdrop-blur-sm p-8 rounded-xl border border-[var(--bakery-glass-border)] hover:border-[var(--bakery-primary)]/50 transition-colors">
+    <span className="material-icons text-[var(--bakery-primary)] text-4xl mb-4">{icon}</span>
     <h3 className="font-serif text-xl font-bold mb-2">{title}</h3>
-    <p className="text-stone-400 text-sm mb-6">{desc}</p>
-    <a className="text-primary text-sm font-bold hover:underline" href="#">Download Menu</a>
+    <p className="text-[var(--bakery-text-muted)] text-sm mb-6">{desc}</p>
+    <a className="text-[var(--bakery-primary)] text-sm font-bold hover:underline" href="#">Download Menu</a>
   </div>
 );
 
 const BakerySensoryItem: React.FC<{ icon: string; text: string }> = ({ icon, text }) => (
   <div className="flex items-center gap-4 text-white">
     <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
-      <span className="material-icons text-primary text-xl">{icon}</span>
+      <span className="material-icons text-[var(--bakery-primary)] text-xl">{icon}</span>
     </div>
     <span className="text-sm font-medium tracking-wide">{text}</span>
   </div>
 );
 
 const BakeryPairingCard: React.FC<{ title: string; desc: string; image: string }> = ({ title, desc, image }) => (
-  <motion.div whileHover={{ y: -10 }} className="bg-[#FDFBF7] dark:bg-stone-900 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 dark:border-stone-800 group transition-all">
+  <motion.div whileHover={{ y: -10 }} className="bg-[var(--bakery-card-bg)] rounded-[32px] overflow-hidden shadow-[var(--bakery-shadow-md)] border border-[var(--bakery-card-border)] group transition-all">
     <div className="h-56 overflow-hidden relative">
-      <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors z-10" />
+      <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10" />
       <img src={image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-105" alt={title} />
     </div>
     <div className="p-10">
-      <h4 className="font-serif text-2xl text-stone-800 dark:text-white mb-4 italic">{title}</h4>
-      <p className="text-stone-500 text-sm leading-relaxed font-sans">{desc}</p>
+      <h4 className="font-serif text-2xl text-[var(--bakery-heading)] mb-4 italic">{title}</h4>
+      <p className="text-[var(--bakery-text-muted)] text-sm leading-relaxed font-sans">{desc}</p>
     </div>
   </motion.div>
 );
 
 export const BakeryHome: React.FC = () => {
-  const { content, loading } = useCMS('bakery');
+  const { data: bakeryData } = useBakeryCms();
 
-  if (loading) {
+  if (!bakeryData) {
     return (
-      <div className="bg-slate-50 dark:bg-background-dark min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-primary font-serif italic text-2xl">Warming the ovens...</div>
+      <div className="bakery-theme bg-[var(--bakery-bg)] min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--bakery-primary)] font-serif italic text-2xl">Warming the ovens...</div>
       </div>
     );
   }
 
-  return <BakeryHomeContent content={content} />;
+  return <BakeryHomeContent bakeryData={bakeryData} />;
 };
 
-const BakeryHomeContent: React.FC<{ content: any }> = ({ content }) => {
+const BakeryHomeContent: React.FC<{ bakeryData: any }> = ({ bakeryData }) => {
   const ref = useRef(null);
   const { scrollContainerRef } = React.useContext(ScrollContext);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    container: scrollContainerRef || undefined,
-    offset: ["start start", "end start"]
-  });
-  const yParallax = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const josSectionRef = useRef(null);
 
-  const customCakes = content?.products?.items?.filter((i: any) => i.category === 'Cakes' || i.name?.includes('Cake')) || [];
+  const { scrollYProgress: josScroll } = useScroll({
+    target: josSectionRef,
+    offset: ["start start", "end end"],
+    container: scrollContainerRef
+  });
+
+
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+    container: scrollContainerRef
+  });
+
+  const josContentFade = useTransform(josScroll, [0, 0.2], [1, 0]);
+  const sensoryBackgroundMorph = useTransform(josScroll, [0.1, 0.6], ["var(--bakery-bg-soft)", "var(--bakery-bg)"]);
+  const sensoryCardY = useTransform(josScroll, [0.4, 0.75], [800, 0]);
+  const sensoryCardOpacity = useTransform(josScroll, [0.4, 0.6], [0, 1]);
+  const sensoryImageOpacity = useTransform(josScroll, [0.7, 0.85], [0, 1]);
+  const sensoryImageScale = useTransform(josScroll, [0.7, 0.95], [1.5, 1]);
+  const josTextOpacity = useTransform(josScroll, [0.85, 0.98], [0, 1]);
+  const josTextScale = useTransform(josScroll, [0.85, 0.98], [0.8, 1]);
+  const sensoryShadow = useTransform(josScroll, [0.75, 0.9], ["0px 0px 0px rgba(0,0,0,0)", "0px 20px 50px rgba(0,0,0,0.3)"]);
+  const sensoryBgScale = useTransform(josScroll, [0.3, 0.6], [0.95, 1]);
+
+  const yParallax = useTransform(heroScroll, [0, 1], [0, -200]);
+
+  const home = bakeryData.home;
   const heroData = {
-    title: content?.hero?.title || "Jos’s Morning <span className=\"text-primary italic\">Ritual</span>.",
-    subtitle: content?.hero?.subtitle || "Hot, fresh, and ready by 7:00 AM. Hand-kneaded dough, patience, and the warmth of a real fire.",
-    cta: content?.hero?.cta || "Order Pickup",
-    image: content?.hero?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuD6SG_V94G3jAOPP14HMgaAc2y6fE1y54l-T9C_E8xI1lee7tUiF_qJrO8kXpExWPXmuyi8aqoigi93IDoakFe7g9F7qjyPpIDuf5zvLq-T9HQck89ar2rvOtJOWbapiebrimVajx_o7xAq0UfknDkv0sjaGWYqUmPn7GOzTdfsSZqTNiJPRV2YdCQ87VO5yahIhmngNShbsfl5AgO4_w5JoN1TT8lQmCaRisnMIBX9YW4YySXwnKh-Uwv2ioOH1i39jT1EUr1eVcIX"
+    title: home.heroTitle,
+    subtitle: home.heroSubtext,
+    cta: home.btn1Text,
+    image: home.heroImage
   };
 
   return (
-    <div ref={ref} className="bg-slate-50 dark:bg-background-dark overflow-x-hidden pt-0">
+    <div ref={ref} className="bakery-theme bg-[var(--bakery-bg)] text-[var(--bakery-text)] pt-0">
       {/* Cinematic Hero Section */}
-      <header className="relative w-full h-[85vh] overflow-hidden flex items-center justify-center bg-background-dark">
+      <header className="sticky top-0 w-full h-[85vh] overflow-hidden flex items-center justify-center bg-[var(--bakery-bg-soft)] z-0">
         <div className="absolute inset-0 z-0">
           <motion.img style={{ y: yParallax }} alt="Bakery Hero" className="w-full h-full object-cover opacity-60" src={heroData.image} />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bakery-bg)] via-[var(--bakery-bg)]/40 to-transparent"></div>
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-block py-1 px-3 border border-white/30 rounded-full text-white/80 text-xs font-serif italic mb-6 backdrop-blur-sm">
+          <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-block py-1 px-3 border border-[var(--bakery-card-border)] rounded-full text-[var(--bakery-text-muted)] text-xs font-serif italic mb-6 backdrop-blur-sm">
             Est. 2024
           </motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-xl" dangerouslySetInnerHTML={{ __html: String(heroData.title || "") }}>
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-[var(--bakery-heading)] font-bold leading-tight mb-6 drop-shadow-xl" dangerouslySetInnerHTML={{ __html: String(heroData.title || "") }}>
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="font-display text-base sm:text-lg md:text-xl text-stone-200 font-light tracking-wide mb-10 max-w-xl mx-auto">
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="font-sans text-base sm:text-lg md:text-xl text-[var(--bakery-text)] font-light tracking-wide mb-10 max-w-xl mx-auto">
             {heroData.subtitle}
           </motion.p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-stone-900 hover:bg-stone-100 font-medium py-3 px-8 rounded-full transition-colors transform active:scale-95">
+            <button className="bg-white text-[var(--bakery-heading)] hover:bg-stone-100 font-medium py-3 px-8 rounded-full transition-colors transform active:scale-95">
               {heroData.cta || "Order Pickup"}
             </button>
-            <button className="border border-white/40 text-white hover:bg-white/10 backdrop-blur-sm font-medium py-3 px-8 rounded-full transition-colors flex items-center justify-center gap-2 transform active:scale-95">
+            <button className="border border-[var(--bakery-card-border)] text-[var(--bakery-text)] hover:bg-[var(--bakery-bg-soft)] backdrop-blur-sm font-medium py-3 px-8 rounded-full transition-colors flex items-center justify-center gap-2 transform active:scale-95">
               <span className="material-icons text-sm">play_circle</span> Watch the Process
             </button>
           </div>
         </div>
         {/* Live Marquee */}
-        <div className="absolute bottom-0 w-full bg-primary text-white py-3 overflow-hidden border-t border-white/10 z-20">
+        <div className="absolute bottom-0 w-full bg-[var(--bakery-primary)] text-white py-3 overflow-hidden border-t border-white/10 z-20">
           <div className="flex animate-scroll whitespace-nowrap">
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2"><span className="w-2 h-2 bg-white rounded-full animate-pulse"></span> FRESH OUT NOW: SOURDOUGH LOAVES (9 LEFT)</span>
+            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span> {home.newsHeadline.toUpperCase()}
+            </span>
             <span className="mx-8 font-medium tracking-wider opacity-80">•</span>
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">CINNAMON ROLLS (FRESH TRAY)</span>
+            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">{home.newsHeadline.toUpperCase()}</span>
             <span className="mx-8 font-medium tracking-wider opacity-80">•</span>
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">OLIVE FOCACCIA (SELLING FAST)</span>
-            <span className="mx-8 font-medium tracking-wider opacity-80">•</span>
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">CRUSTY BAGUETTES (JUST BAKED)</span>
-            <span className="mx-8 font-medium tracking-wider opacity-80">•</span>
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2"><span className="w-2 h-2 bg-white rounded-full animate-pulse"></span> FRESH OUT NOW: SOURDOUGH LOAVES (9 LEFT)</span>
-            <span className="mx-8 font-medium tracking-wider opacity-80">•</span>
-            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">CINNAMON ROLLS (FRESH TRAY)</span>
+            <span className="mx-8 font-medium tracking-wider flex items-center gap-2">{home.newsHeadline.toUpperCase()}</span>
           </div>
         </div>
       </header>
+      {/* Macro Ingredient Spotlight & Sensory Journey Transition */}
+      <section ref={josSectionRef} className="relative h-[400vh] z-10">
+        <motion.div
+          style={{ backgroundColor: sensoryBackgroundMorph }}
+          className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden"
+        >
+          <div className="w-full h-full flex items-center justify-center relative">
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+              {[...Array(20)].map((_, i) => (
+                <motion.div key={i} className="absolute w-1 h-1 bg-white rounded-full" initial={{ x: Math.random() * 2000, y: Math.random() * 1000 }} animate={{ y: [null, Math.random() * -500], opacity: [0, 1, 0] }} transition={{ duration: Math.random() * 10 + 5, repeat: Infinity, ease: "linear" }} />
+              ))}
+            </div>
 
-      {/* Macro Ingredient Spotlight */}
-      <section className="py-24 bg-background-dark relative overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
-          {[...Array(20)].map((_, i) => (
-            <motion.div key={i} className="absolute w-1 h-1 bg-white rounded-full" initial={{ x: Math.random() * 2000, y: Math.random() * 1000 }} animate={{ y: [null, Math.random() * -500], opacity: [0, 1, 0] }} transition={{ duration: Math.random() * 10 + 5, repeat: Infinity, ease: "linear" }} />
-          ))}
-        </div>
-        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-6 md:space-y-8">
-            <span className="text-primary font-bold uppercase tracking-widest text-xs border-b border-primary/30 pb-1">The Essence</span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white leading-tight">Grown in Jos, <br /> Perfected in <span className="text-primary italic">Fire.</span></h2>
-            <p className="text-stone-400 text-base md:text-lg font-light leading-relaxed">
-              Our flour isn't just an ingredient; it's a legacy. Sourced directly from family-run farms in the Plateau, we use 100% organic heritage grains that carry the mineral-rich essence of our soil.
-            </p>
-            <div className="flex gap-8 md:gap-12">
-              <div className="text-center">
-                <span className="block text-3xl md:text-4xl font-bold text-white mb-2 font-serif italic">0%</span>
-                <span className="text-[10px] uppercase tracking-widest text-stone-500">Additives</span>
+            {/* Grown in Jos Content */}
+            <motion.div
+              style={{ opacity: josContentFade, pointerEvents: josContentFade.get() < 0.1 ? 'none' : 'auto' }}
+              className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 md:gap-16 items-center w-full absolute z-10"
+            >
+              <div className="space-y-6 md:space-y-8">
+                <span className="text-[var(--bakery-primary)] font-bold uppercase tracking-widest text-xs border-b border-[var(--bakery-primary)]/30 pb-1">The Essence</span>
+                <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[var(--bakery-heading)] leading-tight">Grown in Jos, <br /> Perfected in <span className="text-[var(--bakery-primary)] italic">Fire.</span></h2>
+                <p className="text-[var(--bakery-text-muted)] text-base md:text-lg font-light leading-relaxed">
+                  Our flour isn't just an ingredient; it's a legacy. Sourced directly from family-run farms in the Plateau, we use 100% organic heritage grains that carry the mineral-rich essence of our soil.
+                </p>
+                <div className="flex gap-8 md:gap-12">
+                  <div className="text-center">
+                    <span className="block text-3xl md:text-4xl font-bold text-[var(--bakery-heading)] mb-2 font-serif italic">0%</span>
+                    <span className="text-xs uppercase tracking-widest text-[var(--bakery-text-muted)]">Additives</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="block text-3xl md:text-4xl font-bold text-[var(--bakery-heading)] mb-2 font-serif italic">100%</span>
+                    <span className="text-xs uppercase tracking-widest text-[var(--bakery-text-muted)]">Love</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-center">
-                <span className="block text-3xl md:text-4xl font-bold text-white mb-2 font-serif italic">100%</span>
-                <span className="text-[10px] uppercase tracking-widest text-stone-500">Love</span>
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative max-w-md mx-auto md:max-w-none">
+                <div className="aspect-square rounded-full border-2 border-[var(--bakery-primary)]/20 p-4 md:p-8 flex items-center justify-center animate-[spin_20s_linear_infinite]">
+                  <div className="w-full h-full rounded-full border border-[var(--bakery-primary)]/40 p-8 md:p-12"></div>
+                </div>
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYvf77WkTzo48ZPbJwUbQetCY5GnPm0VNmBHX0NT52ceOmSMsQZHiYsq9NcCufvHkW87mOr6Z7DTgftYf8q1h6AHQM8XNZeZnPrLJoJNhWZvwsRgqxS8vOeeR2JCDpJoMJqdY6l7G-xynMPgrNZX3i-mBcBfzq3YlV640wg5x5BjcnS_G_UbOryxsD1iSmAv08WogejIlucFklzxkv2CI0kfa_ilSMPwqWo6-tr1Z6Wd7aoOqW5gpClZIalrlkkyU4U9a7i9ViNPEd" className="absolute inset-0 m-auto w-3/4 h-3/4 object-cover rounded-full shadow-2xl border-4 border-[var(--bakery-bg)]" alt="Artisan Grain" />
+              </motion.div>
+            </motion.div>
+
+            {/* Sensory Journey Unified Content - Map pinned to edges */}
+            <div className="absolute top-0 right-0 w-full lg:w-1/2 h-screen pointer-events-none overflow-hidden">
+              <motion.img
+                style={{ opacity: sensoryImageOpacity, scale: sensoryImageScale }}
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmprho5MDhuLhOfVgQEqJ-MUQ5tryytP6ON6i2vb0Yoas281JrIx5dNJAucfKXPOOFFUgNLyIFF4GZuXazlicapLXhwWNXITxICQlPYIF5qZZniDLtCUMgTKpW_oYroBsTc7QQXHjG5DrZB2-GZhlhc50WljO155_6CVN9WtYDkI7vb0cr3eUJuULhifa5fu8oEtvjoUZQZig2wEWyhSS28U56WA_hXDK5WNWmWJpkPusDA0D68wwI5alXHGVzZnbZty1Hr66H0pYU"
+                className="w-full h-full object-cover"
+                alt="Wheat details"
+              />
+
+              {/* LARGE STYLIZED JOS TEXT */}
+              <div className="absolute bottom-12 right-12 z-10">
+                <motion.h4
+                  style={{ opacity: josTextOpacity, scale: josTextScale }}
+                  className="font-serif text-[12rem] md:text-[20rem] font-black text-white/10 uppercase tracking-tighter leading-none select-none blur-[1px]"
+                >
+                  Jos
+                </motion.h4>
               </div>
             </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative max-w-md mx-auto md:max-w-none">
-            <div className="aspect-square rounded-full border-2 border-primary/20 p-4 md:p-8 flex items-center justify-center animate-[spin_20s_linear_infinite]">
-              <div className="w-full h-full rounded-full border border-primary/40 p-8 md:p-12"></div>
+
+            <div className="max-w-7xl mx-auto px-4 relative z-10 w-full flex items-center justify-start lg:justify-start">
+              <motion.div
+                style={{
+                  y: sensoryCardY,
+                  opacity: sensoryCardOpacity,
+                  boxShadow: sensoryShadow,
+                  scale: sensoryBgScale
+                }}
+                className="max-w-2xl bg-[var(--bakery-card-bg)]/80 backdrop-blur-xl p-8 sm:p-12 rounded-[2rem] sm:rounded-[3rem] border border-[var(--bakery-card-border)] relative z-20"
+              >
+                <h3 className="font-serif text-3xl sm:text-5xl text-[var(--bakery-heading)] mb-6">A Sensory <br /> <span className="text-[var(--bakery-primary)] italic">Journey.</span></h3>
+                <p className="text-[var(--bakery-text)] text-base sm:text-lg font-light leading-relaxed mb-8">
+                  Close your eyes. Hear the crackle of the crust as it cools. Inhale the deep, toasted aroma of 48-hour fermented dough. Feel the warmth radiating from a loaf that was an hour ago just flour, water, and fire.
+                </p>
+                <div className="space-y-4 sm:space-y-6">
+                  <BakerySensoryItem icon="hearing" text="The Crackle of Excellence" />
+                  <BakerySensoryItem icon="air" text="The Aroma of Tradition" />
+                  <BakerySensoryItem icon="touch_app" text="The Texture of Hand-Kneaded Quality" />
+                </div>
+              </motion.div>
             </div>
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYvf77WkTzo48ZPbJwUbQetCY5GnPm0VNmBHX0NT52ceOmSMsQZHiYsq9NcCufvHkW87mOr6Z7DTgftYf8q1h6AHQM8XNZeZnPrLJoJNhWZvwsRgqxS8vOeeR2JCDpJoMJqdY6l7G-xynMPgrNZX3i-mBcBfzq3YlV640wg5x5BjcnS_G_UbOryxsD1iSmAv08WogejIlucFklzxkv2CI0kfa_ilSMPwqWo6-tr1Z6Wd7aoOqW5gpClZIalrlkkyU4U9a7i9ViNPEd" className="absolute inset-0 m-auto w-3/4 h-3/4 object-cover rounded-full shadow-2xl border-4 border-stone-900" alt="Artisan Grain" />
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Sensory Journey */}
-      <section className="relative min-h-screen flex items-center bg-background-dark py-20 sm:py-32 overflow-hidden">
-        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full opacity-20 lg:opacity-30">
-          <motion.img initial={{ scale: 1.2, x: 100 }} whileInView={{ scale: 1, x: 0 }} transition={{ duration: 2 }} src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmprho5MDhuLhOfVgQEqJ-MUQ5tryytP6ON6i2vb0Yoas281JrIx5dNJAucfKXPOOFFUgNLyIFF4GZuXazlicapLXhwWNXITxICQlPYIF5qZZniDLtCUMgTKpW_oYroBsTc7QQXHjG5DrZB2-GZhlhc50WljO155_6CVN9WtYDkI7vb0cr3eUJuULhifa5fu8oEtvjoUZQZig2wEWyhSS28U56WA_hXDK5WNWmWJpkPusDA0D68wwI5alXHGVzZnbZty1Hr66H0pYU" className="w-full h-full object-cover" alt="Wheat details" />
-        </div>
-        <div className="max-w-7xl mx-auto px-4 relative z-10 w-full">
-          <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-2xl bg-background-dark/80 backdrop-blur-xl p-8 sm:p-12 rounded-[2rem] sm:rounded-[3rem] border border-white/5 shadow-2xl">
-            <h3 className="font-serif text-3xl sm:text-5xl text-white mb-6">A Sensory <br /> <span className="text-primary italic">Journey.</span></h3>
-            <p className="text-stone-300 text-base sm:text-lg font-light leading-relaxed mb-8">
-              Close your eyes. Hear the crackle of the crust as it cools. Inhale the deep, toasted aroma of 48-hour fermented dough. Feel the warmth radiating from a loaf that was an hour ago just flour, water, and fire.
-            </p>
-            <div className="space-y-4 sm:space-y-6">
-              <BakerySensoryItem icon="hearing" text="The Crackle of Excellence" />
-              <BakerySensoryItem icon="air" text="The Aroma of Tradition" />
-              <BakerySensoryItem icon="touch_app" text="The Texture of Hand-Kneaded Quality" />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 3D Showcase Section */}
-      <section className="py-20 bg-stone-100 dark:bg-background-dark border-t border-stone-200 dark:border-stone-800" id="custom-cakes">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative w-full aspect-square bg-gradient-to-br from-white to-stone-200 dark:from-stone-800 dark:to-stone-900 rounded-2xl shadow-inner flex items-center justify-center group cursor-grab active:cursor-grabbing overflow-hidden border border-stone-200 dark:border-stone-700">
-              <div className="relative z-10 w-3/4 h-3/4" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
-                <img alt="3D Model of Raspberry Velvet Cake" className="w-full h-full object-contain drop-shadow-2xl transition-transform" style={{ animation: 'spin 20s linear infinite' }} src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO0ZKFr0Vq3u2qIGbwTklVk1NRf5LudR3o-9VQzWsVuBWiMBm3gxTiHb7qBh3fYEk0cekwvM0yU9p15-SjoL5kWnxf9mWHV_5_ZsKyOsTlIJOJb_pOnEf4EfjaMOCSP9Tc4-jCtBART-M6O0BPS3TdgOAMoa9e2TH5TVRHZXhD8zWBsvjqg0_T7ylozMovy05X9SAfSvH6TlwHSA4bdT0PmjMrzw3T37Zh7kynz6ox1Xp0FwJrkOXYmvuQBHfAO9m9x-S4TWUZZ3th" />
+      {/* 3D Showcase Section (Cake of the Week) */}
+      {home.cakeOfWeek.show && (
+        <section className="relative z-10 py-20 bg-[var(--bakery-bg-soft)] border-t border-[var(--bakery-card-border)]" id="custom-cakes">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="relative w-full aspect-square bg-gradient-to-br from-[var(--bakery-card-bg)] to-[var(--bakery-bg-soft)] rounded-2xl shadow-inner flex items-center justify-center group cursor-grab active:cursor-grabbing overflow-hidden border border-[var(--bakery-card-border)]">
+                <div className="relative z-10 w-3/4 h-3/4" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
+                  <img alt={home.cakeOfWeek.name} className="w-full h-full object-contain drop-shadow-2xl transition-transform" style={{ animation: 'spin 20s linear infinite' }} src={home.cakeOfWeek.image} />
+                </div>
+                <div className="absolute top-6 left-6 bg-[var(--bakery-bg)] text-[var(--bakery-text)] text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider shadow-lg flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[var(--bakery-success)] rounded-full animate-pulse"></span> Live 2D Preview
+                </div>
               </div>
-              <div className="absolute bottom-6 left-0 w-full flex justify-center gap-4 z-20 opacity-50 group-hover:opacity-100 transition-opacity">
-                <button className="bg-white/80 dark:bg-stone-900/80 p-2 rounded-full shadow-lg hover:text-primary"><span className="material-icons">rotate_left</span></button>
-                <button className="bg-white/80 dark:bg-stone-900/80 p-2 rounded-full shadow-lg hover:text-primary"><span className="material-icons">zoom_in</span></button>
-                <button className="bg-white/80 dark:bg-stone-900/80 p-2 rounded-full shadow-lg hover:text-primary"><span className="material-icons">rotate_right</span></button>
-              </div>
-              <div className="absolute top-6 left-6 bg-background-dark text-white text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider shadow-lg flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live 3D Preview
-              </div>
-            </div>
-            <div>
-              <span className="text-primary font-bold uppercase tracking-widest text-sm mb-2 block">Cake of the Week</span>
-              <h2 className="font-serif text-3xl sm:text-5xl text-slate-900 dark:text-white font-bold mb-6">The Raspberry Velvet</h2>
-              <p className="text-stone-600 dark:text-stone-300 text-base sm:text-lg mb-8 leading-relaxed">
-                An architectural marvel of taste. Four layers of rich red velvet sponge, separated by white chocolate ganache and fresh raspberry coulis. Rotate the model to inspect the hand-piped rosette details.
-              </p>
-              <div className="space-y-4 mb-10">
-                <BakeryFeatureItem icon="cake" title="Customizable Inscription" desc="Add your personal message in chocolate." />
-                <BakeryFeatureItem icon="local_shipping" title="24h Delivery" desc="Order by 2PM for next-day celebration." />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-primary hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center gap-2">
-                  Customize & Order <span className="bg-white/20 px-2 py-0.5 rounded text-sm">₦65,000</span>
-                </button>
-                <button className="border border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-900 text-slate-900 dark:text-white font-medium py-4 px-8 rounded-lg transition-all">
-                  View All Cakes
-                </button>
+              <div>
+                <span className="text-[var(--bakery-primary)] font-bold uppercase tracking-widest text-sm mb-2 block">Cake of the Week</span>
+                <h2 className="font-serif text-3xl sm:text-5xl text-[var(--bakery-heading)] font-bold mb-6">{home.cakeOfWeek.name}</h2>
+                <p className="text-[var(--bakery-text-muted)] text-base sm:text-lg mb-8 leading-relaxed">
+                  {home.cakeOfWeek.desc}
+                </p>
+                <div className="space-y-4 mb-10">
+                  <BakeryFeatureItem icon="cake" title="Artisanal Quality" desc="Baked with the finest ingredients." />
+                  <BakeryFeatureItem icon="local_shipping" title="Daily Delivery" desc="Freshly delivered to your doorstep." />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* The Perfect Morning Pairing */}
-      <section className="py-32 bg-slate-50 dark:bg-background-dark">
+      <section className="relative z-10 py-32 bg-[var(--bakery-bg)]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="font-serif text-5xl dark:text-white mb-4">The Perfect Pairing</h2>
-            <p className="text-stone-500 max-w-xl mx-auto italic">Crafted to complement our loaves. Explore the synergy of flavor.</p>
+            <h2 className="font-serif text-5xl text-[var(--bakery-heading)] mb-4">The Perfect Pairing</h2>
+            <p className="text-[var(--bakery-text-muted)] max-w-xl mx-auto italic text-base font-serif">Crafted to complement our loaves. Explore the synergy of flavor.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-12">
             <BakeryPairingCard title="Espresso & Sourdough" desc="The bright acidity of our African roast balances the deep malty crust of our rustic sourdough." image="https://lh3.googleusercontent.com/aida-public/AB6AXuD9AdQcTD0npuPqeB1MkUOpzNcQ_bmlr55FObJd7BiXSrLsv21dC8nYt7TMtdWa9rUF2xR7Dv7ZjA8VTXqcWt961UQEfZIsle-QgyvY-W_l2FdtGhXgDxcPC7BVvYBlihw6uwo8qGfPj1HFG0LUTU-6-xUllZRQ_sNuGDnDR1ndaGj4QlDrwzLDNnx8NFDEk9xAUKMJzSBMJ4EdWxutNIiONZeeTQDLxyIdSsUImu6287f0OhweUM6HW_lF5K8CBEnwGxwdvygXaPFT" />
@@ -278,12 +318,12 @@ const BakeryHomeContent: React.FC<{ content: any }> = ({ content }) => {
       </section>
 
       {/* Bulk Section */}
-      <section className="relative py-24 bg-background-dark text-white overflow-hidden" id="bulk">
+      <section className="relative z-10 py-24 bg-[var(--bakery-bg-soft)] text-[var(--bakery-text)] overflow-hidden" id="bulk">
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBSaC03G9LGtlLe-oNUZwxegwIE1-7jv2yhAJuyo6dO_6QYttyMtQP7sW4o6yg8QPguMOeuEJZxciHyUxmFfJAqa1OfK_usyU0off1TXBcn9h03lNIZjk3G0fM37ROk6WDFFemKqyakawf8CasKlyXpdXBITpOLLe8jxhj09voZ5xCpM6hrBlxQKVx_OhWUcBmqGv3OPGu0igkiKPdNEJ7TdOM-pbDAPxEShm11taIBzawTKcW1MxfCx8GYSifzEG9epvXOqTpDgVEM')" }}></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-serif text-4xl font-bold mb-4">Catering & Bulk Orders</h2>
-            <p className="text-stone-400 text-lg">Planning an event? Let us bring the warmth of the bakery to your office, wedding, or party.</p>
+            <h2 className="font-serif text-4xl font-bold mb-4 text-[var(--bakery-heading)]">Catering & Bulk Orders</h2>
+            <p className="text-[var(--bakery-text-muted)] text-lg font-sans">Planning an event? Let us bring the warmth of the bakery to your office, wedding, or party.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <BakeryBulkCard icon="business" title="Corporate" desc="Morning pastry boxes and coffee travelers for the whole team." />
@@ -293,23 +333,26 @@ const BakeryHomeContent: React.FC<{ content: any }> = ({ content }) => {
         </div>
       </section>
 
+      {/* Story Arc Relocated */}
+      <BakeryNarrativeArc />
+
       {/* Local Roots & Community */}
-      <section className="py-24 bg-slate-50 dark:bg-background-dark border-t border-stone-200 dark:border-stone-800">
+      <section className="relative z-10 py-24 bg-[var(--bakery-bg)] border-t border-[var(--bakery-card-border)]">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-20 items-center">
-          <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-2 lg:order-1">
+          <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <div className="grid grid-cols-2 gap-4">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnDkmQLViId92Xb5EIwK923g9s4vEyP7kRlaoy-PSt-Q5O0XHMLFkbPtmcHArRNuxNfF0tn5WpSr4cadPNsC7b9MCBCn1LdhvH_CGIUR-ktHXG4FsOH1apFckqn7x4tnXxB0QVPJDycxVhTK2kWSOBdfFrldA95svT7P3iGydLOAxlyeiM07nPh86t_cM1naYI95F7GOQFfRaCn9oTK5SHmBnOS5QQKAPj7G81IFRGKK6nMwwdbaX0m0WZrSvRW8-rJDYLC9zGGoUC" className="w-full h-64 object-cover rounded-[2rem] shadow-xl" alt="Local farm" />
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8jmr4oztTQ8QwKXjjb4cQPlKaOB4R-eWMBq8_Csa1ENWeji-HcmhbUesMcE8hbj-0Ax3JZhTLc0GyCOeRcwrbYzTViEqywn3R_2-SthdRopZVMVTNZ1WqnQBr8-LK7OnNKYx4rWuj8_szD_q6-mKdt56d1BeZHSURh5EXpjkKwfe7LNALEI6xpoF0MENRWl-MIwX0My0xHjChEy7JhmtHGr-AYk4l1f6dCEOxq-0Ep04yKLYygUtXUhb5RozBayayNVk-Lug0tPjj" className="w-full h-64 object-cover rounded-[2rem] shadow-xl mt-12" alt="Artisan hands" />
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnDkmQLViId92Xb5EIwK923g9s4vEyP7kRlaoy-PSt-Q5O0XHMLFkbPtmcHArRNuxNfF0tn5WpSr4cadPNsC7b9MCBCn1LdhvH_CGIUR-ktHXG4FsOH1apFckqn7x4tnXxB0QVPJDycxVhTK2kWSOBdfFrldA95svT7P3iGydLOAxlyeiM07nPh86t_cM1naYI95F7GOQFfRaCn9oTK5SHmBnOS5QQKAPj7G81IFRGKK6nMwwdbaX0m0WZrSvRW8-rJDYLC9zGGoUC" className="w-full h-64 object-cover rounded-[2rem] shadow-[var(--bakery-shadow-md)]" alt="Local farm" />
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8jmr4oztTQ8QwKXjjb4cQPlKaOB4R-eWMBq8_Csa1ENWeji-HcmhbUesMcE8hbj-0Ax3JZhTLc0GyCOeRcwrbYzTViEqywn3R_2-SthdRopZVMVTNZ1WqnQBr8-LK7OnNKYx4rWuj8_szD_q6-mKdt56d1BeZHSURh5EXpjkKwfe7LNALEI6xpoF0MENRWl-MIwX0My0xHjChEy7JhmtHGr-AYk4l1f6dCEOxq-0Ep04yKLYygUtXUhb5RozBayayNVk-Lug0tPjj" className="w-full h-64 object-cover rounded-[2rem] shadow-[var(--bakery-shadow-md)] mt-12" alt="Artisan hands" />
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 lg:order-2 space-y-6 md:space-y-8">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl dark:text-white leading-tight">Grown in Jos, <br /> Fed by <span className="text-primary italic">Community.</span></h2>
-            <p className="text-stone-500 text-base md:text-lg leading-relaxed">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[var(--bakery-heading)] leading-tight">Grown in Jos, <br /> Fed by <span className="text-[var(--bakery-primary)] italic">Community.</span></h2>
+            <p className="text-[var(--bakery-text-muted)] text-base md:text-lg leading-relaxed font-sans">
               We aren't just a bakery; we are a hub for local agriculture. By partnering directly with Plateau farmers, we ensure our wheat travels less and tastes like home. Every loaf purchased supports the growth of our beautiful state.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-8 py-3 bg-background-dark dark:bg-white text-white dark:text-stone-900 rounded-full font-bold text-sm hover:opacity-80 transition-all">Meet Our Farmers</button>
-              <button className="px-8 py-3 border border-stone-300 rounded-full font-bold text-sm hover:bg-stone-100 transition-all dark:text-white">Our Impact</button>
+              <button className="px-8 py-3 bg-[var(--bakery-heading)] text-[var(--bakery-bg)] rounded-full font-bold text-sm hover:opacity-80 transition-all">Meet Our Farmers</button>
+              <button className="px-8 py-3 border border-[var(--bakery-nav-border)] rounded-full font-bold text-sm hover:bg-[var(--bakery-bg-soft)] transition-all text-[var(--bakery-text)]">Our Impact</button>
             </div>
           </motion.div>
         </div>
@@ -318,8 +361,29 @@ const BakeryHomeContent: React.FC<{ content: any }> = ({ content }) => {
   );
 };
 
-export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setView: (v: 'home' | 'menu' | 'architect' | 'wholesale' | 'story') => void, localTheme?: 'dark' | 'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
+export const BakeryNav: React.FC<{
+  navHidden: boolean,
+  currentView: string,
+  setView: (v: 'home' | 'menu' | 'architect' | 'wholesale' | 'story') => void,
+  setGlobalView?: (v: any) => void,
+  currentUser?: any,
+  isAppNavHovered?: boolean,
+  onHoverChange?: (hovered: boolean) => void,
+  heroOutOfView?: boolean,
+  scrolled?: boolean
+}> = ({ currentView, setView, setGlobalView, currentUser, isAppNavHovered = false, onHoverChange, heroOutOfView = false, scrolled }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      const cart = mockDb.getCart();
+      setCartCount(cart.reduce((sum, item) => sum + item.quantity, 0));
+    };
+    updateCount();
+    const interval = setInterval(updateCount, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -329,16 +393,23 @@ export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setV
   }, []);
 
   return (
-    <motion.div
-      initial={{ y: -100 }}
-      animate={{ y: navHidden ? -100 : 0 }}
-      transition={{ duration: navHidden ? 0.1 : 0.4, ease: "easeOut" }}
-      className="sticky w-full z-40 top-12 sm:top-14 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-stone-200 dark:border-white/10 shadow-lg"
+    <nav
+      className={`transition-all duration-500 sticky top-0 w-full z-40 h-[68px] theme-transition`}
+      style={{
+        backgroundColor: heroOutOfView
+          ? 'var(--bakery-nav-opaque)'
+          : ((isAppNavHovered) ? 'var(--bakery-nav-blur)' : 'transparent'),
+        backdropFilter: (heroOutOfView || isAppNavHovered) ? 'blur(20px)' : 'none',
+        borderBottom: heroOutOfView ? '1px solid rgba(242,158,13,0.1)' : '1px solid transparent',
+        color: heroOutOfView ? '#000' : 'inherit' // Will be managed by global .dark anyway
+      }}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-12">
+        <div className="flex items-center justify-between h-[45px] sm:h-[51px]">
           <div className="flex-1"></div>
-          <div className="flex items-center justify-center space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar px-4">
+          <div className="flex items-center justify-center space-x-6 sm:space-x-10 overflow-x-auto no-scrollbar px-4">
             {[
               { id: 'home', label: 'Bakery' },
               { id: 'menu', label: 'Menu' },
@@ -352,33 +423,45 @@ export const BakeryNav: React.FC<{ navHidden: boolean, currentView: string, setV
                   setView(item.id as any);
                   document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${currentView === item.id ? 'text-primary' : 'text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white'
+                className={`text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${currentView === item.id ? 'text-[var(--bakery-primary)]' : 'text-[var(--bakery-text-muted)] hover:text-[var(--bakery-heading)]'
                   }`}
               >
                 {item.label}
               </button>
             ))}
           </div>
-          <div className="flex-1 flex justify-end">
-            {toggleLocalTheme && (
-              <button onClick={toggleLocalTheme} className="p-1.5 rounded-full bg-stone-200 dark:bg-white/10 hover:bg-stone-300 dark:hover:bg-white/20 transition-colors text-stone-600 dark:text-stone-300">
-                <span className="material-icons text-sm">{localTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+          <div className="flex-1 flex justify-end items-center gap-4">
+            <button
+              onClick={() => {
+                if (!currentUser) setGlobalView?.('auth-login');
+                else setGlobalView?.('checkout');
+              }}
+              className="bg-[var(--bakery-heading)] text-[var(--bakery-bg)] p-2 rounded-xl flex items-center justify-center relative hover:opacity-90 transition-opacity"
+            >
+              <span className="material-icons text-sm">shopping_bag</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-[var(--bakery-primary)] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{cartCount}</span>
+              )}
+            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button onClick={() => setGlobalView('checkout')} className="relative p-1.5 sm:p-2 text-[var(--bakery-text-muted)] hover:text-[var(--bakery-text)] transition-colors">
+                <span className="material-icons sm:text-xl text-[18px]">local_mall</span>
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </nav>
   );
 };
 
-export const BakeryApp: React.FC<{ currentView: 'home' | 'menu' | 'architect' | 'wholesale' | 'story' }> = ({ currentView }) => {
+export const BakeryApp: React.FC<{ currentView: 'home' | 'menu' | 'architect' | 'wholesale' | 'story', setCurrentView?: (v: any) => void, currentUser?: any }> = ({ currentView, setCurrentView, currentUser }) => {
   return (
-    <div>
-      {currentView === 'home' && <><BakeryNarrativeArc /><BakeryHome /></>}
-      {currentView === 'menu' && <BakeryMenu />}
+    <div className="bakery-theme">
+      {currentView === 'home' && <BakeryHome />}
+      {currentView === 'menu' && <BakeryMenu setCurrentView={setCurrentView} currentUser={currentUser} />}
       {currentView === 'architect' && <Architect />}
-      {currentView === 'wholesale' && <Wholesale />}
+      {currentView === 'wholesale' && <Wholesale setCurrentView={setCurrentView} currentUser={currentUser} />}
       {currentView === 'story' && <Story />}
     </div>
   );

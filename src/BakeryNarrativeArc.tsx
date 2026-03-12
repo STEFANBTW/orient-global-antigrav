@@ -16,11 +16,8 @@ const WARMTH_FACTS = [
 export function BakeryNarrativeArc() {
     return (
         <section
-            className="relative min-h-[100vh] flex flex-col justify-center overflow-hidden"
+            className="bakery-theme relative z-10 min-h-[100vh] flex flex-col justify-center overflow-hidden bg-[var(--bakery-bg)] transition-colors duration-500"
             aria-label="Bakery Division — The Science of Warmth"
-            style={{
-                background: 'linear-gradient(160deg, #fef3c7 0%, #fff8f0 40%, #fde8d0 100%)',
-            }}
         >
             {/* Blurred grain texture overlay */}
             <div
@@ -33,13 +30,13 @@ export function BakeryNarrativeArc() {
                 animate={{ scale: [1, 1.08, 1], x: [0, 15, 0] }}
                 transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute top-[-10%] right-[-5%] w-[50vw] h-[50vw] rounded-full blur-[100px] pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.30) 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, var(--bakery-primary-soft) 0%, transparent 70%)' }}
             />
             <motion.div
                 animate={{ scale: [1.05, 1, 1.05], x: [0, -10, 0] }}
                 transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] rounded-full blur-[100px] pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.20) 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, var(--bakery-primary-soft) 0%, transparent 70%)', opacity: 0.6 }}
             />
 
             <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 py-24">
@@ -50,7 +47,7 @@ export function BakeryNarrativeArc() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-                        className="inline-block text-[10px] font-bold uppercase tracking-[0.5em] text-amber-600 mb-6"
+                        className="inline-block text-[10px] font-bold uppercase tracking-[0.5em] text-[var(--bakery-primary)] mb-6"
                     >
                         Orient Bakery ·  The Science of Warmth
                     </motion.span>
@@ -60,12 +57,12 @@ export function BakeryNarrativeArc() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.1, ease: [0.25, 1, 0.5, 1] }}
-                        className="font-headline italic font-bold leading-none tracking-tighter text-slate-900"
+                        className="font-serif italic font-bold leading-none tracking-tighter text-[var(--bakery-heading)]"
                         style={{ fontSize: 'clamp(3.5rem, 10vw, 9rem)' }}
                     >
                         Every Crust
                         <br />
-                        <span className="text-amber-500">Has Memory.</span>
+                        <span className="text-[var(--bakery-primary)]">Has Memory.</span>
                     </motion.h1>
 
                     <motion.p
@@ -73,7 +70,7 @@ export function BakeryNarrativeArc() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.4 }}
-                        className="mt-8 text-slate-600 text-lg max-w-xl leading-relaxed font-body"
+                        className="mt-8 text-[var(--bakery-text)] text-lg max-w-xl leading-relaxed font-sans"
                     >
                         Bread is not baked — it is cultivated. Every loaf in our production line passes through
                         a 48-hour cold fermentation ritual that coaxes extraordinary flavour from
@@ -90,22 +87,23 @@ export function BakeryNarrativeArc() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.25, 1, 0.5, 1] }}
-                            className="p-6 rounded-2xl border relative overflow-hidden group"
+                            className="p-6 rounded-2xl border relative overflow-hidden group shadow-sm transition-all"
                             style={{
-                                background: 'rgba(255,255,255,0.6)',
+                                background: 'var(--bakery-card-bg)',
+                                opacity: 0.9,
                                 backdropFilter: 'blur(12px)',
-                                borderColor: 'rgba(251,191,36,0.2)',
+                                borderColor: 'var(--bakery-card-border)',
                             }}
                         >
                             <div
                                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                                 style={{ background: 'radial-gradient(circle at 50% 0%, rgba(251,191,36,0.12), transparent 70%)' }}
                             />
-                            <p className="text-amber-600 font-bold text-[10px] uppercase tracking-[0.3em] mb-3">{fact.label}</p>
-                            <p className="font-headline font-bold text-slate-900 mb-2" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                                {fact.value}<span className="text-amber-500 text-xl">{fact.suffix}</span>
+                            <p className="text-[var(--bakery-primary)] font-bold text-[10px] uppercase tracking-[0.3em] mb-3">{fact.label}</p>
+                            <p className="font-serif font-bold text-[var(--bakery-heading)] mb-2" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+                                {fact.value}<span className="text-[var(--bakery-primary)] text-xl">{fact.suffix}</span>
                             </p>
-                            <p className="text-slate-500 text-xs leading-relaxed">{fact.desc}</p>
+                            <p className="text-[var(--bakery-text-muted)] text-xs leading-relaxed">{fact.desc}</p>
                         </motion.div>
                     ))}
                 </div>

@@ -8,7 +8,7 @@ const Bundles: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-white p-8">
       <div className="max-w-[1600px] mx-auto">
-        <button onClick={() => onNavigate('Deals')} className="mb-4 text-[#ff6a00] flex items-center gap-1 font-medium"><span className="material-icons">arrow_back</span> Back to Deals</button>
+        <button onClick={() => onNavigate('Deals')} className="mb-4 text-[var(--color-accent-light)] flex items-center gap-1 font-medium"><span className="material-icons">arrow_back</span> Back to Deals</button>
         <h1 className="text-3xl font-bold mb-6">Bulk Bundles</h1>
         <p className="text-gray-500">Save more when you buy together.</p>
       </div>

@@ -74,10 +74,10 @@ const SmartPaste: React.FC<SmartPasteProps> = ({ onClose }) => {
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 shrink-0">
              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#ff6a00]/10 rounded-lg"><span className="material-icons text-[#ff6a00] text-xl">content_paste</span></div>
+                <div className="p-2 bg-[var(--color-accent-light)]/10 rounded-lg"><span className="material-icons text-[var(--color-accent-light)] text-xl">content_paste</span></div>
                 <div>
                    <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                     <span className="text-[#ff6a00]">ORIENT</span> SUPERMARKET <span className="text-gray-400 font-normal">| Smart Paste</span>
+                     <span className="text-[var(--color-accent-light)]">ORIENT</span> SUPERMARKET <span className="text-gray-400 font-normal">| Smart Paste</span>
                    </h2>
                    <p className="text-xs text-gray-500 dark:text-gray-400">Paste your raw list and let AI find the items.</p>
                 </div>
@@ -90,7 +90,7 @@ const SmartPaste: React.FC<SmartPasteProps> = ({ onClose }) => {
              <div className="w-5/12 border-r border-gray-200 dark:border-slate-800 bg-[#f8f5f2] dark:bg-slate-950 flex flex-col p-6 relative">
                 <div className="flex justify-between items-center mb-2">
                    <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Your Note</span>
-                   <button className="text-xs text-[#ff6a00] underline" onClick={() => { setInput(''); setResults([]); setAnalyzed(false); }}>Clear List</button>
+                   <button className="text-xs text-[var(--color-accent-light)] underline" onClick={() => { setInput(''); setResults([]); setAnalyzed(false); }}>Clear List</button>
                 </div>
                 <div className="relative flex-1 bg-white dark:bg-slate-900 rounded-lg shadow-sm ring-1 ring-black/5 dark:ring-white/10 focus-within:ring-2 focus-within:ring-[#ff6a00]/50">
                    <textarea 
@@ -110,7 +110,7 @@ const SmartPaste: React.FC<SmartPasteProps> = ({ onClose }) => {
                    <div className="flex items-center gap-2">
                       {processing ? (
                           <>
-                             <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                             <span className="w-2 h-2 rounded-full bg-[var(--color-accent-light)] animate-ping"></span>
                              <span className="text-xs font-semibold text-[#96320e] dark:text-orange-400 uppercase tracking-wide">Processing...</span>
                           </>
                       ) : analyzed ? (
@@ -135,7 +135,7 @@ const SmartPaste: React.FC<SmartPasteProps> = ({ onClose }) => {
                          <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-start">
                                <div><h4 className="font-semibold text-gray-900 dark:text-white">{item.name}</h4><p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.match}</p></div>
-                               <div className="text-right"><span className="block font-bold text-[#ff6a00] text-lg">₦{item.price.toLocaleString()}</span></div>
+                               <div className="text-right"><span className="block font-bold text-[var(--color-accent-light)] text-lg">₦{item.price.toLocaleString()}</span></div>
                             </div>
                             <div className="mt-2 flex items-center justify-between">
                                <div className="flex items-center border border-gray-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-700 h-8">
@@ -171,7 +171,7 @@ const SmartPaste: React.FC<SmartPasteProps> = ({ onClose }) => {
                 <button 
                   onClick={processList}
                   disabled={processing}
-                  className="px-8 py-2.5 rounded-lg bg-[#ff6a00] text-white font-semibold hover:bg-[#d65a05] shadow-lg flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="px-8 py-2.5 rounded-lg bg-[var(--color-accent-light)] text-white font-semibold hover:bg-[#d65a05] shadow-lg flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {processing ? (
                         <>Processing...</>

@@ -1,109 +1,200 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Home from './components/Home';
-import Process from './components/Process';
-import Impact from './components/Impact';
-import Logistics from './components/Logistics';
+import React, { useState, useEffect, createContext, useContext } from "react";
+import {
+  Droplets, Truck, ShoppingCart, ShieldCheck, MapPin,
+  Minus, Plus, RefreshCw, PackageSearch, Clock, ArrowRight,
+  CheckCircle2, Beaker, Zap, GlassWater, Factory,
+  ChevronRight, Phone, Mail, Instagram, Twitter, Trash2, Check, User,
+  Building2, Home as HomeIcon, CalendarDays, CreditCard
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import WaterHome from "./components/WaterHome";
+import Process from "./components/Process";
+import Logistics from "./components/Logistics";
+import Quality from "./components/Quality";
+import Impact from "./components/Impact";
+import {
+  DirectStoreView,
+  B2BView,
+  CartView,
+  TrackDeliveryView
+} from "./backup/OriginalWaterViews";
 
-export type WaterPage = 'home' | 'process' | 'impact' | 'logistics';
+export type WaterPage = 'home' | 'd2c' | 'b2b' | 'process' | 'logistics' | 'quality' | 'impact' | 'cart' | 'track';
 
-export const WaterNav: React.FC<{ navHidden: boolean, currentPage: WaterPage, onNavigate: (p: WaterPage) => void, localTheme?: 'dark'|'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentPage, onNavigate, localTheme, toggleLocalTheme }) => {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+interface WaterContextType {
+  cartCount: number;
+  setCartCount: React.Dispatch<React.SetStateAction<number>>;
+  addToCart: () => void;
+}
+
+const WaterContext = createContext<WaterContextType | undefined>(undefined);
+
+export const useWater = () => {
+  const context = useContext(WaterContext);
+  if (!context) throw new Error("useWater must be used within a WaterProvider");
+  return context;
+};
+
+// ============================================================================
+// PROVIDER
+// ============================================================================
+
+export const WaterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [cartCount, setCartCount] = useState(0);
+  const addToCart = () => setCartCount(prev => prev + 1);
 
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: navHidden ? -100 : 0 }}
-      transition={{ duration: navHidden ? 0.1 : 0.4, ease: "easeOut" }}
-      className="sticky top-12 sm:top-14 w-full z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-white/20 dark:border-white/5 shadow-lg"
-    >
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 lg:px-24">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-4 cursor-pointer group shrink-0" onClick={() => onNavigate('home')}>
-            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors duration-500">
-              <span className="material-icons text-blue-500 text-xl font-light">water_drop</span>
-            </div>
-            <span className="font-sans font-light text-lg tracking-[0.2em] text-slate-900 dark:text-white uppercase">
-              Orient<span className="font-medium text-blue-500 ml-1">Water</span>
-            </span>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-12">
-            {[
-              { id: 'home', label: 'Home' },
-              { id: 'process', label: 'Process' },
-              { id: 'impact', label: 'Impact' },
-              { id: 'logistics', label: 'Logistics' }
-            ].map((item) => (
-              <button 
-                key={item.id}
-                onClick={() => {
-                  onNavigate(item.id as WaterPage);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }} 
-                className={`relative text-[11px] font-medium uppercase tracking-[0.3em] transition-colors duration-500 ${
-                  currentPage === item.id ? 'text-blue-500' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                }`}
-              >
-                {item.label}
-                {currentPage === item.id && (
-                  <motion.div 
-                    layoutId="water-nav-indicator"
-                    className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500"
-                  />
-                )}
-              </button>
-            ))}
-          </div>
+    <WaterContext.Provider value={{ cartCount, setCartCount, addToCart }}>
+      {children}
+    </WaterContext.Provider>
+  );
+};
 
-          <div className="flex items-center gap-6">
-            {toggleLocalTheme && (
-              <button onClick={toggleLocalTheme} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 transition-colors duration-500 text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <span className="material-icons text-sm font-light">{localTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-              </button>
-            )}
-            <button className="hidden sm:flex items-center justify-center px-8 py-3 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white transition-all duration-500">
-              Order Now
-            </button>
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+export const WaterNav: React.FC<{
+  currentPage: WaterPage,
+  onNavigate: (p: WaterPage) => void,
+  isAppNavHovered?: boolean,
+  onHoverChange?: (hovered: boolean) => void,
+  heroOutOfView?: boolean
+}> = ({ currentPage, onNavigate, isAppNavHovered = false, onHoverChange, heroOutOfView = false }) => {
+  const { cartCount } = useWater();
+
+  const navItems = [
+    { id: "home", label: "Home" },
+    { id: "process", label: "Process" },
+    { id: "logistics", label: "Logistics" },
+    { id: "quality", label: "Quality Control" },
+    { id: "impact", label: "Impact" },
+    { id: "d2c", label: "Store" },
+  ];
+
+  return (
+    <nav
+      className={`transition-all duration-500 sticky top-0 w-full z-40 h-[68px] theme-transition`}
+      style={{
+        backgroundColor: heroOutOfView
+          ? 'var(--water-nav-opaque)'
+          : ((isAppNavHovered) ? 'var(--water-nav-blur)' : 'transparent'),
+        backdropFilter: (heroOutOfView || isAppNavHovered) ? 'blur(20px)' : 'none',
+        borderBottom: heroOutOfView ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid transparent',
+        color: heroOutOfView ? '#fff' : 'inherit'
+      }}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
+    >
+      <div className="max-w-[1440px] mx-auto px-8 h-full flex items-center justify-between">
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate("home")}>
+          <div className="size-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-md flex items-center justify-center text-white shadow-sm transition-transform">
+            <Droplets size={18} strokeWidth={2} />
+          </div>
+          <div>
+            <h1 className="text-lg font-medium tracking-tight text-blue-950 leading-none">Orient</h1>
+            <p className="text-[9px] font-medium text-cyan-600 uppercase tracking-[0.15em] leading-none mt-1">Water Div.</p>
           </div>
         </div>
+
+        <nav className="hidden lg:flex items-center gap-10">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.id as WaterPage)}
+              className={`text-sm transition-colors ${currentPage === item.id ? "text-cyan-600 font-medium" : "text-slate-500 hover:text-blue-900"}`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <button onClick={() => onNavigate('track')} className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-full bg-sky-500 hover:bg-sky-400 transition-colors text-white font-bold text-[10px] sm:text-xs tracking-wider uppercase shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+            Subscribe
+          </button>
+          <button onClick={() => onNavigate('cart')} className="relative p-1.5 text-slate-600 hover:text-blue-950 transition-colors">
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 size-4 bg-cyan-500 text-white text-[9px] font-medium flex items-center justify-center rounded-sm">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 
 export const WaterApp: React.FC<{ currentPage: WaterPage, onNavigate: (p: WaterPage) => void }> = ({ currentPage, onNavigate }) => {
-  const renderPage = () => {
+  const { addToCart } = useWater();
+
+  const renderView = () => {
     switch (currentPage) {
-      case 'home': return <Home onNavigate={onNavigate} />;
-      case 'process': return <Process />;
-      case 'impact': return <Impact />;
-      case 'logistics': return <Logistics />;
-      default: return <Home onNavigate={onNavigate} />;
+      case "home": return <WaterHome onNavigate={onNavigate} />;
+      case "d2c": return <DirectStoreView addToCart={addToCart} />;
+      case "b2b": return <B2BView />;
+      case "process": return <Process />;
+      case "logistics": return <Logistics />;
+      case "quality": return <Quality />;
+      case "impact": return <Impact />;
+      case "cart": return <CartView onNavigate={onNavigate} />;
+      case "track": return <TrackDeliveryView />;
+      default: return <WaterHome onNavigate={onNavigate} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#020617] font-sans selection:bg-blue-500/30">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentPage}
-          initial={{ opacity: 0, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, filter: 'blur(10px)' }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {renderPage()}
-        </motion.div>
-      </AnimatePresence>
+    <div className="flex flex-col min-h-screen pt-16 lg:pt-[72px]">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+        .water-theme { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+      `}} />
+      <main className="flex-1 water-theme bg-white">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPage}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+          >
+            {renderView()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+      <WaterFooter />
     </div>
   );
 };
+
+// ============================================================================
+// SHARED COMPONENTS
+// ============================================================================
+
+function WaterFooter() {
+  return (
+    <footer className="bg-blue-950 text-slate-300 py-20 border-t-2 border-cyan-500">
+      <div className="max-w-[1440px] mx-auto px-8 flex flex-col md:flex-row justify-between gap-12">
+        <div>
+          <h2 className="text-white font-medium text-xl mb-4">Orient Water</h2>
+          <p className="max-w-xs text-sm text-blue-200/60 font-light">Sourced from Plateau State. Purified for Nigeria.</p>
+        </div>
+        <div className="flex gap-16 text-xs uppercase tracking-widest text-blue-200/40">
+          <span>© 2026 Orient Global</span>
+          <div className="flex gap-4"><Instagram size={14} /><Twitter size={14} /></div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// NOTE: Original views moved to backup/OriginalWaterViews.tsx as per user request.
 

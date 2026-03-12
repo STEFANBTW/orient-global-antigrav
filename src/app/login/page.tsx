@@ -9,24 +9,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function LoginPage({ onCancel }: { onCancel?: () => void }) {
   const { setCurrentUser } = useRoles();
   const navigate = useNavigate();
-  const [userId, setUserId] = useState('');
-  const [secret, setSecret] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [focusedInput, setFocusedInput] = useState<'id' | 'secret' | null>(null);
+  const [focusedInput, setFocusedInput] = useState<'email' | 'password' | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    if (userId.trim().toLowerCase() === 'admin' && secret.trim() === 'boss') {
+    if (email.trim().toLowerCase() === 'ceo@og.com' && password.trim() === 'boss') {
       const adminProfile = MOCK_PERSONAS.find((p: any) => p.id === 'admin');
       if (adminProfile) {
         setCurrentUser(adminProfile);
         navigate('/dashboard', { replace: true });
       }
     } else {
-      setError('Invalid ID or Secret.');
+      setError('Invalid credentials.');
     }
   };
 
@@ -89,9 +89,9 @@ export default function LoginPage({ onCancel }: { onCancel?: () => void }) {
               )}
             </AnimatePresence>
             
-            {/* Admin ID Field */}
+            {/* Admin Email Field */}
             <motion.div 
-              animate={{ scale: focusedInput === 'id' ? 1.02 : 1 }}
+              animate={{ scale: focusedInput === 'email' ? 1.02 : 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="space-y-3"
             >
@@ -99,31 +99,31 @@ export default function LoginPage({ onCancel }: { onCancel?: () => void }) {
                 className="text-[10px] font-black uppercase tracking-[0.2em] pl-2 block"
                 style={{ color: 'var(--login-label)' }}
               >
-                Administrator ID
+                Administrator Email
               </label>
               <div className="relative group">
                 <input 
-                  type="text" 
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  onFocus={() => setFocusedInput('id')}
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => setFocusedInput('email')}
                   onBlur={() => setFocusedInput(null)}
-                  placeholder="Enter ID"
+                  placeholder="admin@og.com"
                   className="w-full h-14 rounded-2xl px-5 text-base font-bold focus:outline-none transition-all"
                   style={{
                     background: 'var(--login-input-bg)',
                     border: '1px solid var(--login-input-border)',
                     color: 'var(--login-input-text)',
-                    boxShadow: focusedInput === 'id' ? '0 0 0 2px var(--login-input-focus-ring)' : 'none',
+                    boxShadow: focusedInput === 'email' ? '0 0 0 2px var(--login-input-focus-ring)' : 'none',
                   }}
                   required
                 />
               </div>
             </motion.div>
 
-            {/* Secret Field */}
+            {/* Password Field */}
             <motion.div 
-              animate={{ scale: focusedInput === 'secret' ? 1.02 : 1 }}
+              animate={{ scale: focusedInput === 'password' ? 1.02 : 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="space-y-3"
             >
@@ -131,22 +131,22 @@ export default function LoginPage({ onCancel }: { onCancel?: () => void }) {
                 className="text-[10px] font-black uppercase tracking-[0.2em] pl-2 block"
                 style={{ color: 'var(--login-label)' }}
               >
-                Security Secret
+                Security Password
               </label>
               <div className="relative group">
                 <input 
                   type={showPassword ? "text" : "password"}
-                  value={secret}
-                  onChange={(e) => setSecret(e.target.value)}
-                  onFocus={() => setFocusedInput('secret')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setFocusedInput('password')}
                   onBlur={() => setFocusedInput(null)}
-                  placeholder="Enter Secret"
+                  placeholder="••••••••"
                   className="w-full h-14 rounded-2xl pl-5 pr-14 text-base font-bold focus:outline-none transition-all"
                   style={{
                     background: 'var(--login-input-bg)',
                     border: '1px solid var(--login-input-border)',
                     color: 'var(--login-input-text)',
-                    boxShadow: focusedInput === 'secret' ? '0 0 0 2px var(--login-input-focus-ring)' : 'none',
+                    boxShadow: focusedInput === 'password' ? '0 0 0 2px var(--login-input-focus-ring)' : 'none',
                   }}
                   required
                 />

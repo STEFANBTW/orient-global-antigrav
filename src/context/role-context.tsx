@@ -145,7 +145,7 @@ export interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const MOCK_PERSONAS: UserProfile[] = [
-  { id: 'admin', name: 'Admin', email: 'admin@orient.com', role: 'admin', division: 'global', avatar: 'A' },
+  { id: 'admin', name: 'Admin', email: 'ceo@og.com', role: 'admin', division: 'global', avatar: 'A' },
 ];
 
 export function RoleProvider({ children }: { children: ReactNode }) {

@@ -8,9 +8,17 @@ import DeliveryScreen from './components/DeliveryScreen';
 import ReservationsScreen from './components/ReservationsScreen';
 import { DiningNarrativeArc } from './NarrativeArc';
 
-export type DiningView = 'dashboard' | 'menu' | 'about' | 'sommelier' | 'delivery' | 'reservations';
+export type DiningView = 'dashboard' | 'menu' | 'about' | 'sommelier' | 'delivery' | 'reservations' | 'booking';
 
-export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, setView: (v: DiningView) => void, localTheme?: 'dark' | 'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentView, setView, localTheme, toggleLocalTheme }) => {
+export const DiningNav: React.FC<{
+  navHidden: boolean,
+  currentView: DiningView,
+  setView: (v: DiningView) => void,
+  isAppNavHovered?: boolean,
+  onHoverChange?: (hovered: boolean) => void,
+  heroOutOfView?: boolean,
+  scrolled?: boolean
+}> = ({ currentView, setView, isAppNavHovered = false, onHoverChange, heroOutOfView = false, scrolled }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -21,14 +29,20 @@ export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, 
   }, []);
 
   return (
-    <motion.div
-      initial={{ y: -100 }}
-      animate={{ y: navHidden ? -100 : 0 }}
-      transition={{ duration: navHidden ? 0.1 : 0.4, ease: "easeOut" }}
-      className="sticky w-full z-40 top-12 sm:top-14 bg-black/90 backdrop-blur-md border-b border-white/10 h-12 sm:h-14 px-2 sm:px-4 shadow-lg"
+    <nav
+      className={`transition-all duration-500 sticky top-0 w-full z-40 h-[68px] border-b theme-transition`}
+      style={{
+        backgroundColor: heroOutOfView
+          ? 'var(--dining-nav-opaque)'
+          : ((isAppNavHovered) ? 'var(--dining-nav-blur)' : 'transparent'),
+        backdropFilter: (heroOutOfView || isAppNavHovered) ? 'blur(20px)' : 'none',
+        borderColor: heroOutOfView ? 'rgba(255,255,255,0.1)' : 'transparent',
+        color: heroOutOfView ? '#fff' : 'inherit'
+      }}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
     >
       <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-2">
-        <div className="flex-1 hidden sm:block"></div>
         <div className="flex items-center justify-start sm:justify-center space-x-3 sm:space-x-6 overflow-x-auto no-scrollbar px-2 flex-grow">
           {(['menu', 'sommelier', 'reservations', 'delivery', 'about', 'dashboard'] as DiningView[]).map((view) => (
             <button
@@ -37,24 +51,22 @@ export const DiningNav: React.FC<{ navHidden: boolean, currentView: DiningView, 
                 setView(view);
                 document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap px-3 py-1.5 rounded-full ${currentView === view
-                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              className={`text-[11px] sm:text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap px-4 py-2 rounded-full ${currentView === view
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : (heroOutOfView ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-slate-500 hover:text-slate-900 hover:bg-black/5')
                 }`}
             >
               {view}
             </button>
           ))}
         </div>
-        <div className="flex-1 flex justify-end shrink-0">
-          {toggleLocalTheme && (
-            <button onClick={toggleLocalTheme} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
-              <span className="material-icons text-sm">{localTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-            </button>
-          )}
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <button onClick={() => setView('booking')} className="px-3 sm:px-4 py-1.5 rounded-full bg-rose-600 hover:bg-rose-500 transition-colors text-white font-bold text-[10px] sm:text-xs">
+            Reservations
+          </button>
         </div>
       </div>
-    </motion.div>
+    </nav>
   );
 };
 
@@ -67,6 +79,7 @@ export const DiningApp: React.FC<{ currentView: DiningView }> = ({ currentView }
       case 'sommelier': return <SommelierScreen />;
       case 'delivery': return <DeliveryScreen />;
       case 'reservations': return <ReservationsScreen />;
+      case 'booking': return <ReservationsScreen />; // Assuming 'booking' also renders ReservationsScreen
       default: return <MenuScreen />;
     }
   };

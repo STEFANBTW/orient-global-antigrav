@@ -42,7 +42,12 @@ import {
   Cpu,
   ShoppingCart,
   History,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Tag,
+  Leaf,
+  MessageSquare,
+  FolderOpen,
+  LayoutDashboard
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useRoles } from "@/context/role-context";
@@ -95,10 +100,13 @@ const divisionModules: Record<string, any[]> = {
     { id: 'cms', label: 'Site Content', icon: Globe },
   ],
   market: [
+    { id: 'dashboard', label: 'Operations Overview', icon: LayoutDashboard },
+    { id: 'orders', label: 'Active Pipeline', icon: ShoppingCart },
+    { id: 'deliveries', label: 'Logistics Center', icon: Truck },
     { id: 'inventory', label: 'Stock Master', icon: Box },
-    { id: 'ai', label: 'AI Analytics', icon: Cpu },
-    { id: 'wholesale', label: 'Bulk Orders', icon: ShoppingCart },
-    { id: 'cms', label: 'Site Content', icon: Globe },
+    { id: 'promotions', label: 'Flash Sales', icon: Tag },
+    { id: 'crm', label: 'Support & CRM', icon: MessageSquare },
+    { id: 'categories', label: 'Catalog Design', icon: FolderOpen },
   ],
   water: [
     { id: 'quality', label: 'Purity Reports', icon: ShieldCheck },

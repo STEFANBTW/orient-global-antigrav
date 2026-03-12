@@ -55,9 +55,9 @@ export const Architect: React.FC = () => {
   const jumpToStep = (s: number) => setStep(s);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-background-dark pt-0">
+    <div className="bakery-theme h-screen flex overflow-hidden bg-[var(--bakery-bg)] pt-0">
       {/* Left Panel: 3D Viewport */}
-      <section className="relative flex-grow h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden group">
+      <section className="relative flex-grow h-full bg-[var(--bakery-bg-soft)] flex items-center justify-center overflow-hidden group">
         <div className="relative w-full h-full flex items-center justify-center">
           <AnimatePresence mode='wait'>
             <motion.div
@@ -103,18 +103,18 @@ export const Architect: React.FC = () => {
               </div>
             </motion.div>
           </AnimatePresence>
-          <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
+          <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-[var(--bakery-overlay-dark)]/5 to-transparent pointer-events-none"></div>
         </div>
 
         {/* View Controls */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-full px-6 py-3 flex items-center gap-4 shadow-lg">
-          <button className="p-2 hover:bg-primary/10 rounded-full transition-colors"><span className="material-icons">rotate_left</span></button>
-          <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-          <button className="p-2 hover:bg-primary/10 rounded-full transition-colors"><span className="material-icons">remove</span></button>
-          <span className="text-xs font-bold text-gray-500">100%</span>
-          <button className="p-2 hover:bg-primary/10 rounded-full transition-colors"><span className="material-icons">add</span></button>
-          <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-          <button className="p-2 hover:bg-primary/10 rounded-full transition-colors"><span className="material-icons">rotate_right</span></button>
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-[var(--bakery-card-bg)]/70 backdrop-blur-md rounded-full px-6 py-3 flex items-center gap-4 shadow-lg border border-[var(--bakery-card-border)]">
+          <button className="p-2 hover:bg-[var(--bakery-primary)]/10 rounded-full transition-colors"><span className="material-icons text-[var(--bakery-text-muted)]">rotate_left</span></button>
+          <div className="w-px h-4 bg-[var(--bakery-card-border)]"></div>
+          <button className="p-2 hover:bg-[var(--bakery-primary)]/10 rounded-full transition-colors"><span className="material-icons text-[var(--bakery-text-muted)]">remove</span></button>
+          <span className="text-xs font-bold text-[var(--bakery-text-muted)]">100%</span>
+          <button className="p-2 hover:bg-[var(--bakery-primary)]/10 rounded-full transition-colors"><span className="material-icons text-[var(--bakery-text-muted)]">add</span></button>
+          <div className="w-px h-4 bg-[var(--bakery-card-border)]"></div>
+          <button className="p-2 hover:bg-[var(--bakery-primary)]/10 rounded-full transition-colors"><span className="material-icons text-[var(--bakery-text-muted)]">rotate_right</span></button>
         </div>
 
         {/* Toggles */}
@@ -126,24 +126,24 @@ export const Architect: React.FC = () => {
       </section>
 
       {/* Right Panel: Configurator */}
-      <aside className="w-[450px] flex-none bg-white dark:bg-background-dark border-l border-gray-200 dark:border-white/10 flex flex-col shadow-2xl relative z-10">
-        <div className="px-6 py-6 border-b border-gray-100 dark:border-white/5">
+      <aside className="w-[450px] flex-none bg-[var(--bakery-card-bg)] border-l border-[var(--bakery-card-border)] flex flex-col shadow-2xl relative z-10">
+        <div className="px-6 py-6 border-b border-[var(--bakery-card-border)]/50">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-primary uppercase tracking-wider">Step {step} of 4</span>
-            <span className="text-xs text-gray-400 font-mono">ID: #CA-8921</span>
+            <span className="text-xs font-bold text-[var(--bakery-primary)] uppercase tracking-wider">Step {step} of 4</span>
+            <span className="text-xs text-[var(--bakery-text-muted)] font-mono">ID: #CA-8921</span>
           </div>
-          <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-1.5 w-full bg-[var(--bakery-bg-soft)] rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(step / 4) * 100}%` }}
-              className="h-full bg-primary rounded-full transition-all duration-500"
+              className="h-full bg-[var(--bakery-primary)] rounded-full transition-all duration-500"
             ></motion.div>
           </div>
-          <div className="flex justify-between mt-2 text-[10px] font-medium text-gray-400">
-            <span className={step >= 1 ? 'text-primary' : ''}>Base</span>
-            <span className={step >= 2 ? 'text-primary' : ''}>Flavor</span>
-            <span className={step >= 3 ? 'text-primary' : ''}>Frosting</span>
-            <span className={step >= 4 ? 'text-primary' : ''}>Accents</span>
+          <div className="flex justify-between mt-2 text-[10px] font-medium text-[var(--bakery-text-muted)]">
+            <span className={step >= 1 ? 'text-[var(--bakery-primary)]' : ''}>Base</span>
+            <span className={step >= 2 ? 'text-[var(--bakery-primary)]' : ''}>Flavor</span>
+            <span className={step >= 3 ? 'text-[var(--bakery-primary)]' : ''}>Frosting</span>
+            <span className={step >= 4 ? 'text-[var(--bakery-primary)]' : ''}>Accents</span>
           </div>
         </div>
 
@@ -151,21 +151,21 @@ export const Architect: React.FC = () => {
           {/* Step 1: Tier */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 font-sans">Select Size & Tier</h3>
+              <h3 className="text-lg font-bold text-[var(--bakery-heading)] mb-6 font-sans">Select Size & Tier</h3>
               <div className="space-y-3">
                 {tierOptions.map((tier) => (
                   <button
                     key={tier.value}
                     onClick={() => setConfig({...config, tier: tier.value})}
                     className={`w-full p-4 rounded-xl border-2 text-left flex justify-between items-center transition-all ${
-                      config.tier === tier.value ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                      config.tier === tier.value ? 'border-[var(--bakery-primary)] bg-[var(--bakery-primary)]/5' : 'border-[var(--bakery-card-border)] hover:border-[var(--bakery-primary)]/50'
                     }`}
                   >
                     <div>
-                      <span className="block font-bold text-gray-800 dark:text-white">{tier.label}</span>
-                      <span className="text-xs text-gray-500">{tier.desc}</span>
+                      <span className="block font-bold text-[var(--bakery-heading)]">{tier.label}</span>
+                      <span className="text-xs text-[var(--bakery-text-muted)]">{tier.desc}</span>
                     </div>
-                    <span className="font-bold text-primary">${tier.price}</span>
+                    <span className="font-bold text-[var(--bakery-primary)]">${tier.price}</span>
                   </button>
                 ))}
               </div>
@@ -175,19 +175,19 @@ export const Architect: React.FC = () => {
           {/* Step 2: Flavor */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 font-sans">Choose Flavor Profile</h3>
+              <h3 className="text-lg font-bold text-[var(--bakery-heading)] mb-6 font-sans">Choose Flavor Profile</h3>
               <div className="grid grid-cols-2 gap-3">
                 {flavorOptions.map((flavor) => (
                   <button
                     key={flavor.name}
                     onClick={() => setConfig({...config, flavor: flavor.name})}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
-                      config.flavor === flavor.name ? 'border-primary bg-primary/5' : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                      config.flavor === flavor.name ? 'border-[var(--bakery-primary)] bg-[var(--bakery-primary)]/5' : 'border-[var(--bakery-card-border)] hover:border-[var(--bakery-primary)]/50'
                     }`}
                   >
                     <div className="w-8 h-8 rounded-full mb-3 border border-black/10 shadow-sm" style={{ backgroundColor: flavor.color === 'none' ? '#fdf5e6' : flavor.color }}></div>
-                    <span className="block font-bold text-sm text-gray-900 dark:text-white">{flavor.name}</span>
-                    <span className="text-xs text-gray-500">{flavor.desc}</span>
+                    <span className="block font-bold text-sm text-[var(--bakery-heading)]">{flavor.name}</span>
+                    <span className="text-xs text-[var(--bakery-text-muted)]">{flavor.desc}</span>
                   </button>
                 ))}
               </div>
@@ -197,22 +197,22 @@ export const Architect: React.FC = () => {
           {/* Step 3: Frosting */}
           {step === 3 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 font-sans">Frosting Style</h3>
+              <h3 className="text-lg font-bold text-[var(--bakery-heading)] mb-6 font-sans">Frosting Style</h3>
               <div className="space-y-3">
                 {frostingOptions.map((opt) => (
                   <button
                     key={opt.name}
                     onClick={() => setConfig({...config, frosting: opt.name})}
                     className={`w-full p-4 rounded-xl border-2 flex items-center gap-4 transition-all ${
-                      config.frosting === opt.name ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary/50'
+                      config.frosting === opt.name ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-[var(--bakery-card-border)] bg-[var(--bakery-card-bg)] hover:border-primary/50'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${config.frosting === opt.name ? 'bg-white dark:bg-gray-800 shadow-sm' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                      <span className={`material-icons ${config.frosting === opt.name ? 'text-primary' : 'text-gray-400'}`}>{opt.icon}</span>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${config.frosting === opt.name ? 'bg-[var(--bakery-card-bg)] shadow-sm' : 'bg-[var(--bakery-bg-soft)]'}`}>
+                      <span className={`material-icons ${config.frosting === opt.name ? 'text-[var(--bakery-primary)]' : 'text-[var(--bakery-text-muted)]'}`}>{opt.icon}</span>
                     </div>
                     <div className="text-left">
-                      <span className="block font-bold text-sm text-gray-900 dark:text-white">{opt.name}</span>
-                      <span className="block text-xs text-gray-500">{opt.desc}</span>
+                      <span className="block font-bold text-sm text-[var(--bakery-heading)]">{opt.name}</span>
+                      <span className="block text-xs text-[var(--bakery-text-muted)]">{opt.desc}</span>
                     </div>
                   </button>
                 ))}
@@ -223,21 +223,21 @@ export const Architect: React.FC = () => {
           {/* Step 4: Toppings */}
           {step === 4 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 font-sans">Add Final Touches</h3>
+              <h3 className="text-lg font-bold text-[var(--bakery-heading)] mb-6 font-sans">Add Final Touches</h3>
               <div className="grid grid-cols-2 gap-3">
                 {toppingOptions.map((top) => (
                   <button
                     key={top.name}
                     onClick={() => handleToppingToggle(top.name)}
                     className={`p-4 rounded-xl border-2 text-center transition-all relative ${
-                      config.toppings.includes(top.name) ? 'border-primary bg-primary/5' : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                      config.toppings.includes(top.name) ? 'border-primary bg-primary/5' : 'border-[var(--bakery-card-border)] hover:border-primary/50'
                     }`}
                   >
                     <div className="text-3xl mb-2">{top.icon}</div>
-                    <span className="block font-bold text-sm text-gray-900 dark:text-white">{top.name}</span>
-                    <span className="text-xs text-primary font-bold">+${top.price}</span>
+                    <span className="block font-bold text-sm text-[var(--bakery-heading)]">{top.name}</span>
+                    <span className="text-xs text-[var(--bakery-primary)] font-bold">+${top.price}</span>
                     {config.toppings.includes(top.name) && (
-                      <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full text-white flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-5 h-5 bg-[var(--bakery-primary)] rounded-full text-white flex items-center justify-center">
                         <span className="material-icons text-[14px]">check</span>
                       </div>
                     )}
@@ -248,7 +248,7 @@ export const Architect: React.FC = () => {
           )}
 
           {/* Summary of Selection (Visible when not editing that step) */}
-          <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/5 space-y-4">
+          <div className="mt-8 pt-8 border-t border-[var(--bakery-card-border)] space-y-4">
             {step > 1 && <CompletedStep number={1} title="Size" value={tierOptions.find(t => t.value === config.tier)?.label || ''} onEdit={() => jumpToStep(1)} />}
             {step > 2 && <CompletedStep number={2} title="Flavor" value={config.flavor} onEdit={() => jumpToStep(2)} />}
             {step > 3 && <CompletedStep number={3} title="Frosting" value={config.frosting} onEdit={() => jumpToStep(3)} />}
@@ -256,34 +256,34 @@ export const Architect: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="p-6 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-white/10 shadow-lg">
+        <div className="p-6 bg-[var(--bakery-card-bg)] border-t border-[var(--bakery-card-border)] shadow-lg">
           <div className="flex justify-between items-end mb-6">
             <div>
-              <p className="text-xs text-slate-500 uppercase font-semibold">Estimated Total</p>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white font-sans">${calculateTotal().toFixed(2)}</p>
+              <p className="text-xs text-[var(--bakery-text-muted)] uppercase font-semibold">Estimated Total</p>
+              <p className="text-3xl font-bold text-[var(--bakery-heading)] font-sans">${calculateTotal().toFixed(2)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-green-600 flex items-center justify-end gap-1">
+              <p className="text-xs text-[var(--bakery-success)] flex items-center justify-end gap-1">
                 <span className="material-icons text-[14px]">local_shipping</span> Free delivery
               </p>
             </div>
           </div>
           <div className="grid grid-cols-4 gap-3">
             {step > 1 ? (
-              <button onClick={prevStep} className="border border-gray-200 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <button onClick={prevStep} className="border border-[var(--bakery-card-border)] rounded-lg flex items-center justify-center text-[var(--bakery-text-muted)] hover:bg-[var(--bakery-bg-soft)] transition-colors">
                 <span className="material-icons">arrow_back</span>
               </button>
             ) : (
-              <button className="border border-gray-200 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-300 cursor-not-allowed">
+              <button className="border border-[var(--bakery-card-border)] rounded-lg flex items-center justify-center text-[var(--bakery-card-border)] cursor-not-allowed">
                 <span className="material-icons">arrow_back</span>
               </button>
             )}
             {step < 4 ? (
-              <button onClick={nextStep} className="col-span-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 font-bold py-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all text-white">
+              <button onClick={nextStep} className="col-span-3 bg-[var(--bakery-heading)] text-[var(--bakery-bg)] font-bold py-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
                 Next Step
               </button>
             ) : (
-              <button className="col-span-3 bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
+              <button className="col-span-3 bg-[var(--bakery-primary)] hover:opacity-90 text-white font-bold py-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all">
                 <span>Order via WhatsApp</span>
                 <span className="material-icons">send</span>
               </button>
@@ -296,22 +296,22 @@ export const Architect: React.FC = () => {
 };
 
 const IconButton: React.FC<{ icon: string }> = ({ icon }) => (
-  <button className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md p-3 rounded-lg hover:bg-white transition-colors shadow-sm">
-    <span className="material-icons-outlined text-gray-600 dark:text-gray-300">{icon}</span>
+  <button className="bg-[var(--bakery-card-bg)]/70 backdrop-blur-md p-3 rounded-lg hover:bg-[var(--bakery-card-bg)] transition-colors shadow-sm">
+    <span className="material-icons-outlined text-[var(--bakery-text-muted)]">{icon}</span>
   </button>
 );
 
 const CompletedStep: React.FC<{ number: number; title: string; value: string; onEdit: () => void }> = ({ title, value, onEdit }) => (
   <div className="opacity-60 hover:opacity-100 transition-opacity">
     <div className="flex justify-between items-center mb-1">
-      <h3 className="text-xs font-bold flex items-center gap-2 text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-        <span className="w-4 h-4 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px]"><span className="material-icons text-[10px]">check</span></span>
+      <h3 className="text-xs font-bold flex items-center gap-2 text-[var(--bakery-heading)] uppercase tracking-wider">
+        <span className="w-4 h-4 rounded-full bg-[var(--bakery-success)] text-white flex items-center justify-center text-[10px]"><span className="material-icons text-[10px]">check</span></span>
         {title}
       </h3>
-      <button onClick={onEdit} className="text-xs text-primary underline hover:text-orange-600">Edit</button>
+      <button onClick={onEdit} className="text-xs text-[var(--bakery-primary)] underline hover:opacity-80">Edit</button>
     </div>
     <div className="pl-6">
-      <p className="text-sm font-semibold text-gray-900 dark:text-white">{value}</p>
+      <p className="text-sm font-semibold text-[var(--bakery-heading)]">{value}</p>
     </div>
   </div>
 );

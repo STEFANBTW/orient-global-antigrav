@@ -1,179 +1,108 @@
 import React from 'react';
-import { useCMS } from '@/hooks/useCMS';
+import { motion } from 'framer-motion';
+import { WaterNarrativeArc } from './NarrativeArc';
 
 const Impact: React.FC = () => {
-    const { content: cmsData } = useCMS('water');
-    const impactBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'impact')?.content_payload || {
-        hero: {
-            title1: "Nourishing Communities,",
-            title2: "Empowering Lives.",
-            location: "Jos, Nigeria.",
-            bgImage: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
-        },
-        initiative: {
-            tag: "Sustainability Initiative",
-            title: 'Our "Zero Plastic Waste" Initiative: The 19L Dispenser Lifecycle',
-            desc: "We believe in a circular economy. Our sturdy 19L dispenser bottles are designed for hundreds of reuses, drastically reducing single-use plastic in our landfills.",
-            btnText: "Explore the Process"
-        },
-        loop: {
-            title: "The Recycling Loop",
-            subtitle: "How we maintain zero waste.",
-            steps: [
-                {
-                    title: "Production & Delivery",
-                    desc: "Clean 19L bottles enter the cycle.",
-                    img: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=200&q=80"
-                },
-                {
-                    title: "Community Use & Return",
-                    desc: "Families use water, bottles are collected.",
-                    img: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?auto=format&fit=crop&w=200&q=80"
-                },
-                {
-                    title: "Sanitization & Refill",
-                    desc: "Intense sterilization for reuse.",
-                    img: "https://images.unsplash.com/photo-1584036561566-b93a50208c3c?auto=format&fit=crop&w=200&q=80"
-                },
-                {
-                    title: "Material Recovery",
-                    desc: "Damaged bottles are recycled into new products.",
-                    img: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=200&q=80"
-                }
-            ]
-        },
-        stories: [
-            {
-                title: "Staff Interview: Musa, Delivery Driver",
-                desc: "On delivering clean water and its impact.",
-                thumb: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80",
-                videoUrl: "#"
-            },
-            {
-                title: "Community Member: Mrs. Fatima, Jos",
-                desc: "How clean water changed her family's health.",
-                thumb: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80",
-                videoUrl: "#"
-            }
-        ],
-        partners: [
-            { name: "Jos Central Primary", since: "2018" },
-            { name: "Plateau Specialist Hospital", since: "2018" },
-            { name: "Hillside Academy", since: "2018" },
-            { name: "Community Health Center", since: "2018" }
-        ]
-    };
-
     return (
-        <div className="min-h-screen pt-20 bg-background-light dark:bg-slate-950 transition-colors duration-500">
-            {/* Hero Split */}
-            <div className="relative h-[600px] flex flex-col md:flex-row">
-                <div className="w-full md:w-1/2 relative h-full">
-                    <img src={impactBlock.hero.bgImage} className="w-full h-full object-cover" alt="Community" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-12">
-                        <div>
-                            <h1 className="text-white text-4xl md:text-5xl font-bold mb-4">{impactBlock.hero.title1}<br />{impactBlock.hero.title2}</h1>
-                            <p className="text-white/80 text-xl"><span className="material-icons align-middle mr-2 text-sm">location_on</span>{impactBlock.hero.location}</p>
-                        </div>
-                    </div>
+        <div className="w-full font-sans bg-slate-50 dark:bg-slate-950">
+            <WaterNarrativeArc />
+
+            {/* Impact Hero */}
+            <header className="relative pt-32 pb-48 px-6 overflow-hidden">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <motion.div
+                        animate={{ 
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 5, 0]
+                        }}
+                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                        className="absolute bottom-[-10%] left-[-10%] w-[80vw] h-[80vw] rounded-full bg-emerald-500/10 blur-[150px]"
+                    />
                 </div>
-                <div className="w-full md:w-1/2 bg-white dark:bg-slate-900 flex items-center justify-center p-12 transition-colors duration-500">
-                    <div className="max-w-md">
-                        <span className="text-green-600 dark:text-green-400 font-bold tracking-widest uppercase text-xs mb-2 block">{impactBlock.initiative.tag}</span>
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">{impactBlock.initiative.title}</h2>
-                        <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
-                            {impactBlock.initiative.desc}
-                        </p>
-                        <button className="bg-green-600 text-white px-8 py-3 rounded-full hover:bg-green-700 transition-colors">
-                            {impactBlock.initiative.btnText}
-                        </button>
-                    </div>
+
+                <div className="relative z-20 max-w-7xl mx-auto text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center justify-center px-4 py-1 mb-8 border border-emerald-500/10 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-xl"
+                    >
+                        <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-emerald-600 dark:text-emerald-400">Sustainability & Community</span>
+                    </motion.div>
+                    <h1 className="text-5xl md:text-9xl font-light text-slate-900 dark:text-white mb-10 tracking-tighter leading-[0.85]">
+                        Water for the <br/><span className="italic font-serif text-emerald-600">Next Generation</span>
+                    </h1>
+                    <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
+                        We believe in a circular future. Our goal is not just to provide water, but to protect the source and eliminate plastic waste from the ecosystem.
+                    </p>
                 </div>
-            </div>
+            </header>
 
-            {/* Recycling Loop Visual */}
-            <div className="py-24 bg-blue-50 dark:bg-slate-900/50 transition-colors duration-500">
-                <div className="max-w-5xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{impactBlock.loop.title}</h2>
-                        <p className="text-slate-500 dark:text-slate-400">{impactBlock.loop.subtitle}</p>
-                    </div>
+            {/* Impact Stats */}
+            <section className="relative z-30 -mt-24 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                    { label: 'Plastic Saved', val: '2.4M', unit: 'Single-use bottles', color: 'text-blue-600' },
+                    { label: 'Community Liters', val: '450k', unit: 'Donated annually', color: 'text-emerald-600' },
+                    { label: 'Carbon Offset', val: '80%', unit: 'Solar-powered plant', color: 'text-sky-600' }
+                ].map((stat, idx) => (
+                    <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="bg-white dark:bg-slate-900 p-12 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-blue-500/5 group hover:-translate-y-2 transition-transform duration-500"
+                    >
+                        <div className="text-[10px] text-slate-400 uppercase tracking-[0.3em] mb-4">{stat.label}</div>
+                        <div className={`text-6xl font-light ${stat.color} mb-2 tracking-tighter`}>{stat.val}</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 font-light">{stat.unit}</div>
+                    </motion.div>
+                ))}
+            </section>
 
-                    <div className="relative">
-                        {/* Central line */}
-                        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-green-200 dark:bg-green-900 -translate-x-1/2 hidden md:block border-l border-dashed border-green-400 dark:border-green-700"></div>
-
-                        <div className="space-y-12 md:space-y-24">
-                            {impactBlock.loop.steps.map((step: any, idx: number) => {
-                                const isEven = idx % 2 !== 0;
-                                const mdFlexDir = isEven ? 'md:flex-row-reverse' : 'md:flex-row';
-                                const mdTextDir = isEven ? 'md:text-left' : 'md:text-right';
-                                const paddingLeft = isEven ? 'pl-8' : 'pr-8';
-                                const paddingRight = isEven ? 'pr-8' : 'pl-8';
-                                const mdTextDirReverse = isEven ? 'md:text-right' : 'md:text-left';
-                                const imgJustify = isEven ? 'justify-end' : 'justify-start';
-                                const imgMargin = isEven ? 'mx-auto md:mx-0' : '';
-
-                                return (
-                                    <div key={idx} className={`flex flex-col ${mdFlexDir} items-center gap-8 relative z-10`}>
-                                        <div className={`w-full md:w-1/2 ${mdTextDir} ${paddingLeft} hidden md:block`}>
-                                            <h3 className="text-xl font-bold text-slate-800 dark:text-white">{step.title}</h3>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">{step.desc}</p>
-                                        </div>
-                                        <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 border-4 border-green-500 flex items-center justify-center shadow-lg text-green-600 dark:text-green-400 font-bold text-xl">{idx + 1}</div>
-                                        <div className={`w-full md:w-1/2 ${paddingRight} md:block flex flex-col items-center text-center ${mdTextDirReverse}`}>
-                                            <div className="block md:hidden mb-2">
-                                                <h3 className="text-xl font-bold text-slate-800 dark:text-white">{step.title}</h3>
-                                            </div>
-                                            <div className={`flex ${imgJustify} w-full md:w-auto`}>
-                                                <img src={step.img} className={`w-32 h-32 rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-md ${imgMargin}`} alt={step.title} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Impact Stories */}
-            <div className="py-24 bg-white dark:bg-slate-900 transition-colors duration-500">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">Impact Stories <span className="block text-sm font-normal text-slate-500 dark:text-slate-400 mt-2">Voices of Change</span></h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {impactBlock.stories.map((story: any, i: number) => (
-                            <div key={i} className="rounded-xl overflow-hidden shadow-lg group relative cursor-pointer">
-                                <img src={story.thumb} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500" alt="Video Thumb" />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
-                                    <span className="material-icons text-white text-6xl">play_circle</span>
-                                </div>
-                                <div className="p-4 bg-white dark:bg-slate-800">
-                                    <h3 className="font-bold text-slate-900 dark:text-white">{story.title}</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">{story.desc}</p>
+            {/* Circular Economy Section */}
+            <section className="py-48 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+                <div>
+                    <h2 className="text-4xl md:text-6xl font-light text-slate-900 dark:text-white mb-8 tracking-tight uppercase">The Circular <br/><span className="font-serif italic capitalize">Loop</span></h2>
+                    <p className="text-lg text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-12">
+                        Our 19L dispenser program is built on zero-waste principles. We recover, sanitize, and refill every container, ensuring no plastic enters the landfill.
+                    </p>
+                    
+                    <div className="space-y-8">
+                        {[
+                            { step: 'Recovery', desc: 'Empty containers are retrieved during your next delivery.' },
+                            { step: 'Sanitization', desc: '8-stage high-temperature pressurized medical wash.' },
+                            { step: 'Refill', desc: 'Hermetically sealed with UV-sterilized caps.' }
+                        ].map((item, i) => (
+                            <div key={i} className="flex gap-6 items-start">
+                                <span className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 text-xs font-bold shrink-0">{i+1}</span>
+                                <div>
+                                    <h4 className="font-medium text-slate-900 dark:text-white mb-1">{item.step}</h4>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 font-light">{item.desc}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
+                </div>
 
-                    {/* Partners */}
-                    <div className="mt-20 bg-green-50 dark:bg-green-900/10 rounded-2xl p-8">
-                        <h3 className="text-center font-bold text-slate-800 dark:text-white mb-8">Growing Together: Local Schools & Hospitals</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                            {impactBlock.partners.map((partner: any, i: number) => (
-                                <div key={i} className="flex flex-col items-center text-center">
-                                    <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-sm mb-3">
-                                        <span className="material-icons text-green-600 dark:text-green-400">school</span>
-                                    </div>
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{partner.name}</span>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">Partner since {partner.since}</span>
-                                </div>
-                            ))}
+                <div className="relative aspect-square">
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 border-2 border-dashed border-emerald-500/20 rounded-full"
+                    />
+                    <div className="absolute inset-12 rounded-full bg-emerald-500/5 backdrop-blur-3xl flex items-center justify-center overflow-hidden border border-emerald-500/10">
+                        <img 
+                            src="https://images.unsplash.com/photo-1542601906990-b4d3fb773b09?w=800&q=80" 
+                            className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all duration-700 scale-110"
+                            alt="Sustainable nature"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/40 to-transparent"></div>
+                        <div className="relative text-center p-8">
+                            <span className="material-icons text-white text-6xl mb-4 animate-pulse">recycling</span>
+                            <div className="text-white font-serif italic text-2xl">Forever Clean</div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     );
 };

@@ -8,7 +8,7 @@ const Receipts: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-white p-8">
       <div className="max-w-[1600px] mx-auto">
-        <button onClick={() => onNavigate('Dashboard')} className="mb-4 text-[#ff6a00] flex items-center gap-1 font-medium"><span className="material-icons">arrow_back</span> Back to Dashboard</button>
+        <button onClick={() => onNavigate('Dashboard')} className="mb-4 text-[var(--color-accent-light)] flex items-center gap-1 font-medium"><span className="material-icons">arrow_back</span> Back to Dashboard</button>
         <h1 className="text-3xl font-bold mb-6">Purchase History</h1>
         <div className="space-y-4">
            {[1,2,3].map(i => (
@@ -17,7 +17,7 @@ const Receipts: React.FC<Props> = ({ onNavigate }) => {
                    <p className="font-bold">Order #{4000+i}</p>
                    <p className="text-sm text-gray-500">Placed on Oct {10+i}, 2023</p>
                 </div>
-                <button className="text-[#ff6a00] font-medium text-sm">View Details</button>
+                <button className="text-[var(--color-accent-light)] font-medium text-sm">View Details</button>
              </div>
            ))}
         </div>

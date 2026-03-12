@@ -1,20 +1,28 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { MOCK_PRODUCTS } from '../data/mockDb';
+import { useMarketProducts } from '../hooks/useMarketProducts';
 import { Product } from '../types';
 import { useCMS } from '../../hooks/useCMS';
 
 interface HomeProps {
   onNavigate: (page: any) => void;
   onOpenSmartPaste?: () => void;
+  onSearchOutOfView?: (out: boolean) => void;
+  extSearchTerm?: string;
+  onExtSearchChange?: (term: string) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste, onSearchOutOfView, extSearchTerm = '', onExtSearchChange }) => {
+  const [internalSearchTerm, setInternalSearchTerm] = useState('');
+  const searchTerm = extSearchTerm || internalSearchTerm;
+  const setSearchTerm = onExtSearchChange || setInternalSearchTerm;
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(200000);
+  const [minRating, setMinRating] = useState<number>(0);
   const [sortOption, setSortOption] = useState('relevance');
+  const searchRef = React.useRef<HTMLDivElement>(null);
 
   // States for interactive elements
   const [isMicListening, setIsMicListening] = useState(false);
@@ -25,9 +33,51 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
     { sender: 'bot', text: "Hi! I noticed you're buying pasta. Need tomato sauce?" }
   ]);
 
-  const { addToCart, cart, updateQuantity } = useCart();
+  // Flash Deals Slides
+  const FLASH_DEALS = [
+    {
+      id: 'deal-coffee',
+      name: 'Premium Arabica Coffee Beans (1kg)',
+      price: 12990,
+      oldPrice: 24000,
+      category: 'Beverages',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1wZpJFJka3FlypGKUsr0BoyDreoSK1yO0HNItuIXwL45jTS5sMWtJDX0xA05wzVKWEcdMe1SOjWb69PBje0fItEcORGH36VHdOesDWcLXtQBkh8La1nnsZScU27G8OcoTKxo7cd4zC8zzD1znfAXSzlVSQq57xNupl-rWunYkpDK1Y_BCzhN_AD2ML0NXdxUY6-hQUG9tyuCXWZ-Q-S4_Aqh-WhDlYgbDQE7EKXAWmmlxMZcK9DNUkIa8eQkEjH15ny70tqJDUwlo',
+      discount: '-45%',
+      context: 'RETAIL' as const,
+      unit: '1kg pack',
+      rating: 4.8
+    },
+    {
+      id: 'deal-pasta',
+      name: 'Artisan Fusilli Pasta (5kg)',
+      price: 8500,
+      oldPrice: 15000,
+      category: 'Pantry',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBfoq8Qt1i7X_77OeMmegd2_Pq0DTvro1D9LRM41EHPXBvfhGfBUFUH9Hxz6iRXpsKH0WopOq6O_kC6qnviNMVijikGIXmg2_kEoGYs1dpOg2jDHPARVYUD9l8q5TSbVWMd66a8oJEmxm4TKvrUgiDQSj9NVd1rcUAE7R5dxHnKIrs9TFbKXLxgjuA6DVPTbfZ01F1DuQ5dl6lAIl20nZh9Y_PpPo159YTLemPsPv9zW0IBTa5E5lL9qd5UMd_feG8lscDICVmlTxgD',
+      discount: '-43%',
+      context: 'WHOLESALE' as const,
+      unit: '5kg bag',
+      rating: 4.7
+    },
+    {
+      id: 'deal-oil',
+      name: 'Extra Virgin Olive Oil (2L)',
+      price: 15990,
+      oldPrice: 28000,
+      category: 'Pantry',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJz7jDkUIg86_TDT-v0KLZPgAO2-9V1pv3RjvCTMcP2qbT01BI4V3idRe0PEcz_r2vmzFKmQW5NV-pJfbSy0LMvmpvLfACa4XrwDwqL2fvs6fl9xW0L1Q27K054mIGVnFLCOm7AqHdPBsT9eNLpjf36h9OOcJmFoPEdqwlT56Xwub4ZPB-teHtwt-C8wf2BBFKqb8E6dI8mO-Xr4rA3uX8GxYHVFrJHBhsOSIkago-Lg7IVnpVJixqjiUQ5VarxA96fq1-7BKGuqEM',
+      discount: '-42%',
+      context: 'RETAIL' as const,
+      unit: '2L bottle',
+      rating: 4.9
+    }
+  ];
+  const [currentDealSlide, setCurrentDealSlide] = useState(0);
 
-  const allCategories = Array.from(new Set(MOCK_PRODUCTS.map(p => p.category)));
+  const { addToCart, cart, updateQuantity } = useCart();
+  const { products: MARKET_PRODUCTS, loading: productsLoading } = useMarketProducts({ context: 'RETAIL' });
+
+  const allCategories = Array.from(new Set(MARKET_PRODUCTS.map(p => p.category)));
 
   const { content: cmsData, loading } = useCMS('market');
 
@@ -69,19 +119,42 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
     return () => clearInterval(timer);
   }, [HERO_SLIDES.length]);
 
+  // Search Bar Visibility Tracking
+  useEffect(() => {
+    if (!searchRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        onSearchOutOfView?.(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(searchRef.current);
+    return () => observer.disconnect();
+  }, [onSearchOutOfView]);
+
+  // Deal Slider Auto-play
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDealSlide(prev => (prev + 1) % FLASH_DEALS.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Filter and Sort Logic
   const filteredProducts = useMemo(() => {
-    return MOCK_PRODUCTS.filter(product => {
+    return MARKET_PRODUCTS.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
       const matchesPrice = product.price <= maxPrice;
-      return matchesSearch && matchesCategory && matchesPrice;
+      const matchesRating = (product.rating || 0) >= minRating;
+      return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     }).sort((a, b) => {
       if (sortOption === 'price-low') return a.price - b.price;
       if (sortOption === 'price-high') return b.price - a.price;
+      if (sortOption === 'rating') return (b.rating || 0) - (a.rating || 0);
       return 0;
     });
-  }, [searchTerm, selectedCategories, maxPrice, sortOption]);
+  }, [MARKET_PRODUCTS, searchTerm, selectedCategories, maxPrice, minRating, sortOption]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev =>
@@ -109,6 +182,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
     setSearchTerm('');
     setSelectedCategories([]);
     setMaxPrice(200000);
+    setMinRating(0);
     setSortOption('relevance');
   };
 
@@ -155,7 +229,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
     }
   };
 
-  const isFiltering = searchTerm !== '' || selectedCategories.length > 0 || maxPrice < 200000;
+  const isFiltering = searchTerm !== '' || selectedCategories.length > 0 || maxPrice < 200000 || minRating > 0;
 
   const fadeInUp: any = {
     hidden: { opacity: 0, y: 100 },
@@ -163,7 +237,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
   };
 
   const stagger = {
-    visible: { transition: { staggerChildren: 0.05 } }
+    visible: { transition: { staggerChildren: 0.03 } }
   };
 
   const dealQty = getProductQtyInCart(DEAL_PRODUCT.id);
@@ -172,24 +246,24 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
     <div className="font-sans text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
       <main className="max-w-[1800px] mx-auto px-4 lg:px-8 py-4 space-y-6">
         {/* Search & Smart Paste */}
-        <section className="relative z-30">
+        <section className="relative z-30" ref={searchRef}>
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-stone-900 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 p-1 flex items-center max-w-3xl mx-auto transition-all duration-300 hover:shadow-xl"
+            className="bg-white dark:bg-stone-900 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 p-1 flex items-center max-w-4xl mx-auto transition-all duration-300 hover:shadow-2xl"
           >
-            <div className="flex-1 flex items-center px-4 py-1">
-              <span className="material-icons text-stone-400 mr-2 text-lg">search</span>
+            <div className="flex-1 flex items-center px-6 py-2">
+              <span className="material-icons text-stone-400 mr-3 text-xl">search</span>
               <input
                 type="text"
-                placeholder={isMicListening ? "Listening..." : "Search fresh inventory..."}
-                className="bg-transparent border-none focus:ring-0 w-full placeholder-stone-400 text-sm font-sans text-stone-900 dark:text-stone-100"
+                placeholder={isMicListening ? "Listening..." : "Search fresh ingredients, wholesale bulk items, or flash deals..."}
+                className="bg-transparent border-none focus:ring-0 w-full placeholder-stone-400 text-base font-sans font-medium text-stone-900 dark:text-stone-100"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                <button onClick={() => setSearchTerm('')} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 mx-2">
                   <span className="material-icons">close</span>
                 </button>
               )}
@@ -198,31 +272,31 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleMicClick}
-                  className={`p-2 rounded-full transition-colors ${isMicListening ? 'bg-orange-100 text-orange-600 animate-pulse' : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400'}`}
+                  className={`p-2 rounded-full transition-colors ${isMicListening ? 'bg-orange-100 text-[var(--color-accent-light)] animate-pulse' : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400'}`}
                 >
                   <span className="material-icons">{isMicListening ? 'mic_off' : 'mic'}</span>
                 </motion.button>
               </div>
             </div>
             {/* Smart Paste & Simulate Transfer triggers */}
-            <div className="flex items-center gap-2 ml-2">
+            <div className="flex items-center gap-2 ml-2 pr-1">
               <motion.button
                 onClick={handleSimulateTransfer}
-                whileHover={{ backgroundColor: "#fce7f3", color: "#db2777" }}
+                whileHover={{ backgroundColor: "rgba(252, 231, 243, 1)", color: "#db2777" }}
                 whileTap={{ scale: 0.98 }}
-                className="bg-pink-100 text-pink-700 font-bold text-[10px] uppercase tracking-wider px-4 py-3 rounded-full flex items-center gap-2 transition-colors shadow-sm whitespace-nowrap"
+                className="bg-pink-50 text-pink-700 font-bold text-[11px] uppercase tracking-wider px-5 py-3.5 rounded-full flex items-center gap-2 transition-colors shadow-sm whitespace-nowrap"
               >
-                <span className="material-icons text-[14px]">receipt_long</span>
-                <span>Simulate Transfer</span>
+                <span className="material-icons text-[16px]">receipt_long</span>
+                <span className="hidden md:inline">Simulate Transfer</span>
               </motion.button>
               <motion.button
                 onClick={onOpenSmartPaste}
-                whileHover={{ backgroundColor: "#f5f5f4" }}
+                whileHover={{ backgroundColor: "rgba(245, 245, 244, 1)" }}
                 whileTap={{ scale: 0.98 }}
-                className="bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-200 font-bold text-[10px] uppercase tracking-wider px-4 py-3 rounded-full flex items-center gap-2 transition-colors shadow-sm whitespace-nowrap"
+                className="bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-200 font-bold text-[11px] uppercase tracking-wider px-5 py-3.5 rounded-full flex items-center gap-2 transition-colors shadow-sm whitespace-nowrap"
               >
-                <span className="material-icons text-stone-900 text-xs">content_paste</span>
-                <span>Smart Paste</span>
+                <span className="material-icons text-stone-900 dark:text-white text-base">content_paste</span>
+                <span className="hidden md:inline">Smart Paste</span>
               </motion.button>
             </div>
           </motion.div>
@@ -238,32 +312,35 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
             className="grid grid-cols-1 lg:grid-cols-3 gap-8"
           >
             {/* Main Hero Slider */}
-            <div className="lg:col-span-2 relative bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-xl h-[280px] group">
+            <div className="lg:col-span-2 relative bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl min-h-[60vh] group border border-white/5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
+                  initial={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                  transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute inset-0 w-full h-full"
                 >
-                  <img src={HERO_SLIDES[currentSlide].img} className="w-full h-full object-cover opacity-80" alt="Hero Slide" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                  <div className={`absolute inset-0 flex flex-col justify-end p-8 md:p-10 text-white`}>
-                    <motion.span
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                  <img src={HERO_SLIDES[currentSlide].img} className="w-full h-full object-cover opacity-70 transform hover:scale-105 transition-transform duration-[10s] ease-linear" alt="Hero Slide" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/90 via-black/40 to-transparent"></div>
+                  <div className={`absolute inset-0 flex flex-col justify-end p-12 md:p-16 text-white`}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-bold uppercase tracking-widest w-fit mb-4 rounded-full"
+                      className="flex items-center gap-2 mb-6"
                     >
-                      {HERO_SLIDES[currentSlide].tag}
-                    </motion.span>
+                      <span className="px-4 py-1.5 bg-orange-600/90 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
+                        {HERO_SLIDES[currentSlide].tag}
+                      </span>
+                      <div className="h-px w-12 bg-white/20"></div>
+                    </motion.div>
                     <motion.h2
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="text-[clamp(1.75rem,4vw,3.5rem)] font-sans font-bold mb-3 leading-tight"
+                      transition={{ delay: 0.4, type: "spring", damping: 12 }}
+                      className="text-[clamp(2.5rem,6vw,5rem)] font-sans font-black mb-6 leading-[0.95] tracking-tight whitespace-pre-line"
                     >
                       {HERO_SLIDES[currentSlide].title}
                     </motion.h2>
@@ -271,7 +348,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="text-slate-200 text-base font-sans font-light mb-5 max-w-lg leading-relaxed"
+                      className="text-slate-300 text-lg md:text-xl font-sans font-light mb-8 max-w-xl leading-relaxed opacity-90"
                     >
                       {HERO_SLIDES[currentSlide].desc}
                     </motion.p>
@@ -280,58 +357,94 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
                       onClick={() => onNavigate(HERO_SLIDES[currentSlide].navTarget)}
-                      className="bg-white text-slate-900 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-100 w-fit flex items-center gap-2 transition-all rounded-full shadow-lg hover:shadow-xl hover:scale-105"
+                      className="group bg-white text-slate-950 px-8 py-4 text-xs font-black uppercase tracking-[0.15em] hover:bg-[var(--color-accent-light)] hover:text-white w-fit flex items-center gap-3 transition-all rounded-full shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] hover:shadow-[#ff6a00]/30 hover:-translate-y-1 active:translate-y-0"
                     >
-                      {HERO_SLIDES[currentSlide].btn} <span className="material-icons text-xs">arrow_forward</span>
+                      {HERO_SLIDES[currentSlide].btn}
+                      <span className="material-icons text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                     </motion.button>
                   </div>
                 </motion.div>
               </AnimatePresence>
 
               {/* Slider Controls */}
-              <div className="absolute top-6 right-6 flex gap-1.5 z-10">
+              <div className="absolute top-10 right-10 flex flex-col gap-3 z-10">
                 {HERO_SLIDES.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${idx === currentSlide ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'}`}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-[var(--color-accent-light)]' : 'w-4 bg-white/30 hover:bg-white/50'}`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Deal of Hour */}
-            <div className="lg:col-span-1 bg-orange-50 dark:bg-slate-800 rounded-[1.5rem] p-4 md:p-5 relative flex flex-col justify-between h-[280px] border border-orange-100 dark:border-slate-700 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-orange-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            {/* Deal of Hour - Vertical Carousel */}
+            <div className="lg:col-span-1 bg-[#1a1c1e] dark:bg-slate-900 rounded-[2.5rem] relative flex flex-col min-h-[60vh] border border-white/5 overflow-hidden group shadow-2xl">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-red-600 z-20"></div>
 
-              <div className="flex justify-between items-start z-10">
+              <div className="p-8 pb-0 z-10 flex justify-between items-start">
                 <div>
-                  <h3 className="font-sans font-bold text-lg text-slate-900 dark:text-white mb-0.5">Flash Deal</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-orange-600 mt-0.5">Limited Stock Available</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    <h3 className="font-sans font-black text-xs uppercase tracking-[0.2em] text-white/50">Flash Deals</h3>
+                  </div>
+                  <h4 className="text-2xl font-black text-white leading-tight underline decoration-orange-500 decoration-4 underline-offset-4">Top Offers</h4>
                 </div>
-                <span className="bg-stone-900 text-white px-2.5 py-1 text-[10px] font-bold rounded-full">-45%</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentDealSlide(prev => (prev - 1 + FLASH_DEALS.length) % FLASH_DEALS.length)}
+                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors border border-white/10"
+                  >
+                    <span className="material-icons text-sm">north</span>
+                  </button>
+                  <button
+                    onClick={() => setCurrentDealSlide(prev => (prev + 1) % FLASH_DEALS.length)}
+                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors border border-white/10"
+                  >
+                    <span className="material-icons text-sm">south</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="flex-1 flex items-center justify-center relative z-10 my-4">
-                <motion.img
-                  src={DEAL_PRODUCT.image}
-                  className="h-40 object-contain z-10 mix-blend-multiply dark:mix-blend-normal drop-shadow-2xl group-hover:scale-110 transition-transform duration-500"
-                  alt="Coffee"
-                />
-              </div>
+              <div className="flex-1 relative overflow-hidden">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={currentDealSlide}
+                    initial={{ y: 200, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: -200, opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 flex flex-col p-8"
+                  >
+                    <div className="relative flex-1 flex items-center justify-center mb-8">
+                      <div className="absolute inset-0 bg-white/5 rounded-full blur-[60px] scale-75"></div>
+                      <img
+                        src={FLASH_DEALS[currentDealSlide].image}
+                        className="h-56 object-contain z-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-700"
+                        alt="Deal"
+                      />
+                      <span className="absolute top-0 right-0 bg-[var(--color-accent-light)] text-white px-4 py-2 text-sm font-black rounded-2xl shadow-xl rotate-12">{FLASH_DEALS[currentDealSlide].discount}</span>
+                    </div>
 
-              <div className="z-10">
-                <h4 className="font-sans font-bold text-base text-slate-900 dark:text-slate-100 mb-1.5 truncate">{DEAL_PRODUCT.name}</h4>
-                <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-2xl font-bold text-orange-600 font-sans">₦{DEAL_PRODUCT.price.toLocaleString()}</span>
-                  <span className="text-xs text-stone-400 line-through font-sans">₦24,000</span>
-                </div>
-                <button
-                  onClick={() => addToCart(DEAL_PRODUCT, 1)}
-                  className="w-full bg-slate-900 text-white py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                >
-                  <span className="material-icons text-xs">shopping_bag</span> Add to Cart
-                </button>
+                    <div className="z-10">
+                      <h4 className="font-sans font-black text-xl text-white mb-2 leading-tight line-clamp-2">{FLASH_DEALS[currentDealSlide].name}</h4>
+                      <div className="flex items-center gap-1 mb-2">
+                        <span className="material-icons text-[var(--color-accent-light)] text-sm">star</span>
+                        <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">{FLASH_DEALS[currentDealSlide].rating || '4.5'}</span>
+                      </div>
+                      <div className="flex items-baseline gap-3 mb-6">
+                        <span className="text-3xl font-black text-[var(--color-accent-light)] font-sans">₦{FLASH_DEALS[currentDealSlide].price.toLocaleString()}</span>
+                        <span className="text-sm text-white/30 line-through font-sans">₦{FLASH_DEALS[currentDealSlide].oldPrice.toLocaleString()}</span>
+                      </div>
+                      <button
+                        onClick={() => addToCart(FLASH_DEALS[currentDealSlide], 1)}
+                        className="group w-full bg-white text-slate-950 py-4 rounded-3xl text-xs font-black uppercase tracking-[0.2em] hover:bg-[var(--color-accent-light)] hover:text-white transition-all shadow-[0_15px_30px_-5px_rgba(0,0,0,0.3)] flex items-center justify-center gap-3"
+                      >
+                        <span className="material-icons text-sm group-hover:rotate-12 transition-transform">bolt</span> Claim Deal
+                      </button>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           </motion.section>
@@ -339,82 +452,107 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
         {/* Main Content */}
         <section className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-32 h-fit space-y-6 z-10">
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-sans font-bold text-base text-slate-900 dark:text-white">Filters</h3>
-                <div className="lg:hidden cursor-pointer" onClick={() => {
-                  // Mobile toggle logic could go here
-                }}>
-                  <span className="material-icons text-base">filter_list</span>
-                </div>
+          <aside className="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-36 h-fit space-y-8 z-10">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-800 transition-all hover:shadow-2xl">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="font-sans font-black text-xl text-slate-950 dark:text-white tracking-tight">Refine</h3>
                 {isFiltering && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs font-bold text-orange-600 hover:text-orange-700 uppercase tracking-wider"
+                    className="text-[10px] font-black text-[var(--color-accent-light)] hover:text-orange-700 uppercase tracking-[0.2em] transition-colors"
                   >
-                    Clear
+                    Reset
                   </button>
                 )}
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-10">
                 <div>
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-stone-400 mb-4">Categories</h4>
-                  <div className="space-y-1.5">
-                    {allCategories.map((cat, i) => (
-                      <label
+                  <h4 className="font-black text-[10px] uppercase tracking-[0.25em] text-slate-400 mb-6">Explore Sections</h4>
+                  <div className="space-y-2">
+                    {allCategories.map((cat) => (
+                      <button
                         key={cat}
-                        className="flex items-center gap-2.5 cursor-pointer group"
+                        onClick={() => toggleCategory(cat)}
+                        className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all group ${selectedCategories.includes(cat) ? 'bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-xl' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                       >
-                        <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${selectedCategories.includes(cat) ? 'bg-stone-900 border-stone-900' : 'border-stone-300 group-hover:border-stone-500'}`}>
-                          {selectedCategories.includes(cat) && <span className="material-icons text-white text-[10px]">check</span>}
-                        </div>
-                        <input
-                          type="checkbox"
-                          className="hidden"
-                          checked={selectedCategories.includes(cat)}
-                          onChange={() => toggleCategory(cat)}
-                        />
-                        <span className={`text-xs transition-colors ${selectedCategories.includes(cat) ? 'font-bold text-stone-900 dark:text-white' : 'text-stone-600 dark:text-stone-400 group-hover:text-stone-900'}`}>{cat}</span>
-                      </label>
+                        <span className={`text-xs font-bold ${selectedCategories.includes(cat) ? '' : 'group-hover:text-slate-950 dark:group-hover:text-white'}`}>{cat}</span>
+                        {selectedCategories.includes(cat) ? (
+                          <span className="material-icons text-sm">remove_circle</span>
+                        ) : (
+                          <span className="material-icons text-sm opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
+                        )}
+                      </button>
                     ))}
                   </div>
                 </div>
+
                 <div>
-                  <h4 className="font-bold text-[10px] uppercase tracking-widest text-stone-400 mb-3">Price Range</h4>
-                  <input
-                    type="range"
-                    min="0"
-                    max="200000"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(Number(e.target.value))}
-                    className="w-full h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
-                  />
-                  <div className="flex justify-between mt-1.5 font-sans text-[10px] text-stone-500">
-                    <span>₦0</span>
-                    <span className="font-bold text-stone-900 dark:text-white">₦{maxPrice.toLocaleString()}</span>
+                  <h4 className="font-black text-[10px] uppercase tracking-[0.25em] text-slate-400 mb-6">Price Budget</h4>
+                  <div className="px-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="200000"
+                      step="1000"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(Number(e.target.value))}
+                      className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#ff6a00]"
+                    />
+                    <div className="flex justify-between mt-4">
+                      <span className="text-[10px] font-bold text-slate-400">₦0</span>
+                      <span className="text-xs font-black text-slate-950 dark:text-white bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-100 dark:border-slate-700">₦{maxPrice.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-black text-[10px] uppercase tracking-[0.25em] text-slate-400 mb-6">Min. Rating</h4>
+                  <div className="flex items-center gap-1.5 justify-between bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setMinRating(star === minRating ? 0 : star)}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${minRating >= star ? 'bg-slate-950 dark:bg-white text-[var(--color-accent-light)] shadow-lg' : 'text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                      >
+                        <span className="material-icons text-base">star</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex justify-center">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{minRating > 0 ? `${minRating}+ Stars Only` : 'Show All Ratings'}</p>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-[var(--color-accent-light)] to-red-600 rounded-[2rem] p-8 text-white shadow-2xl overflow-hidden relative group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <h3 className="text-xl font-black mb-2 relative z-10">Loyalty Rewards</h3>
+              <p className="text-xs text-white/80 mb-6 font-medium relative z-10">Earn 5% back on every fresh produce bunch. Platinum members get free delivery.</p>
+              <button onClick={() => onNavigate('Loyalty')} className="w-full bg-slate-950/20 backdrop-blur-md border border-white/30 text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-slate-950 transition-all relative z-10">View Benefits</button>
             </div>
           </aside>
 
           {/* Grid */}
           <div className="flex-1">
-            <div className="flex justify-between items-center mb-6 sticky top-20 z-20 bg-slate-50 dark:bg-slate-950 py-3 transition-colors">
-              <h2 className="text-xl font-sans font-bold text-slate-900 dark:text-white">Fresh Inventory <span className="text-slate-400 font-normal text-base ml-1.5">({filteredProducts.length})</span></h2>
+            <div className="flex justify-between items-center mb-8 sticky top-[132px] lg:top-[188px] z-20 bg-slate-50 dark:bg-slate-950 py-4 transition-colors">
+              <div className="flex items-center gap-4">
+                <h2 className="text-3xl font-black text-slate-950 dark:text-white tracking-tight">Market Fresh</h2>
+                <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{filteredProducts.length} Items</span>
+              </div>
               <div className="relative group">
                 <select
-                  className="appearance-none bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-full px-5 py-2.5 pr-9 text-[10px] font-bold uppercase tracking-widest focus:ring-0 cursor-pointer shadow-sm hover:shadow-md transition-all text-stone-900 dark:text-white"
+                  className="appearance-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-6 py-3.5 pr-10 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-[var(--color-accent-light)] cursor-pointer shadow-xl hover:shadow-2xl transition-all text-slate-950 dark:text-white"
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
                 >
-                  <option value="relevance">Sort: Relevance</option>
-                  <option value="price-low">Sort: Price Low-High</option>
-                  <option value="price-high">Sort: Price High-Low</option>
+                  <option value="relevance">Relevance</option>
+                  <option value="rating">Top Rated</option>
+                  <option value="price-low">Price: Low-High</option>
+                  <option value="price-high">Price: High-Low</option>
                 </select>
-                <span className="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none text-sm">expand_more</span>
+                <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-base">swap_vert</span>
               </div>
             </div>
 
@@ -425,7 +563,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
                 </div>
                 <h3 className="text-sm font-sans font-bold text-slate-900 dark:text-white mb-0.5">No Items Found</h3>
                 <p className="text-stone-500 text-xs mb-5">Try adjusting your filters or search term.</p>
-                <button onClick={clearFilters} className="text-[10px] font-bold uppercase tracking-widest text-orange-600 hover:text-orange-700 border-b-2 border-orange-600 pb-0.5">Reset Filters</button>
+                <button onClick={clearFilters} className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-accent-light)] hover:text-orange-700 border-b-2 border-orange-600 pb-0.5">Reset Filters</button>
               </div>
             ) : (
               <motion.div
@@ -445,66 +583,83 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
                         layout
                         key={product.id}
                         variants={fadeInUp}
-                        className="bg-white dark:bg-stone-900 p-4 rounded-2xl relative group hover:shadow-xl transition-all duration-300 border border-stone-100 dark:border-stone-800"
+                        className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] relative group hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-800 flex flex-col hover:-translate-y-1"
                         onClick={(e) => handleAddToCart(e, product)}
                       >
-                        <div className="absolute top-3 left-3 z-10 flex gap-1.5">
+                        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
                           {product.context === 'WHOLESALE' && (
-                            <span className="bg-stone-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">BULK</span>
+                            <span className="bg-slate-950 dark:bg-white text-white dark:text-slate-950 text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest shadow-lg">BULK</span>
                           )}
                           {product.oldPrice && (
-                            <span className="bg-orange-100 text-orange-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">SALE</span>
+                            <span className="bg-[var(--color-accent-light)] text-white text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest shadow-lg">DEAL</span>
                           )}
                         </div>
 
-                        {/* Cart Quantity Badge */}
-                        {qty > 0 && (
-                          <div className="absolute top-3 right-3 z-10 bg-slate-900 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow-lg">
-                            {qty}
-                          </div>
-                        )}
+                        {/* Top Right Actions */}
+                        <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                            <span className="material-icons text-base">favorite_border</span>
+                          </button>
+                        </div>
 
-                        <div className="relative h-40 mb-4 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-xl overflow-hidden group-hover:bg-white dark:group-hover:bg-slate-800 transition-colors">
+                        <div className="relative h-48 mb-6 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-3xl overflow-hidden group-hover:bg-white dark:group-hover:bg-slate-800 transition-all duration-500">
                           <img
                             src={product.image}
-                            className="h-28 object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-500"
+                            className="h-32 object-contain mix-blend-multiply dark:mix-blend-normal transform group-hover:scale-110 transition-transform duration-700 ease-out"
                             alt={product.name}
                           />
                           {qty === 0 && (
-                            <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button className="bg-white text-slate-900 text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">
-                                Quick Add
-                              </button>
+                            <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <div className="bg-white text-slate-950 text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <span className="material-icons text-sm">add</span> Add Fast
+                              </div>
                             </div>
                           )}
                         </div>
 
-                        <div>
-                          <div className="h-10 mb-1.5">
-                            <h3 className="font-sans font-bold text-slate-900 dark:text-white text-base leading-tight line-clamp-2 group-hover:text-orange-600 transition-colors">{product.name}</h3>
+                        <div className="flex-1 flex flex-col">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-1 mb-1">
+                                <span className="material-icons text-orange-400 text-xs">star</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{product.rating || '4.5'}</span>
+                              </div>
+                              <h3 className="font-sans font-black text-slate-950 dark:text-white text-base leading-tight line-clamp-2 group-hover:text-[var(--color-accent-light)] transition-colors">{product.name}</h3>
+                            </div>
                           </div>
-                          <div className="flex items-end justify-between">
+
+                          <div className="mt-auto flex items-center justify-between pt-2">
                             <div className="flex flex-col">
-                              {product.oldPrice && <span className="text-xs text-stone-400 line-through font-sans">₦{product.oldPrice.toLocaleString()}</span>}
-                              <span className={`text-xl font-bold font-sans ${product.oldPrice ? 'text-orange-600' : 'text-stone-900 dark:text-stone-100'}`}>₦{product.price.toLocaleString()}</span>
+                              <span className={`text-2xl font-black font-sans tracking-tight ${product.oldPrice ? 'text-[var(--color-accent-light)]' : 'text-slate-950 dark:text-white'}`}>
+                                ₦{product.price.toLocaleString()}
+                              </span>
+                              {product.oldPrice && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-slate-400 line-through font-bold opacity-60">₦{product.oldPrice.toLocaleString()}</span>
+                                  <span className="text-[9px] font-black text-white bg-green-500 px-1.5 py-0.5 rounded-md">SAVE 40%</span>
+                                </div>
+                              )}
                             </div>
 
-                            {/* Minimal Quantity Controls */}
-                            {qty > 0 && cartItem && (
-                              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-0.5" onClick={(e) => e.stopPropagation()}>
+                            {qty > 0 ? (
+                              <div className="flex items-center bg-slate-950 dark:bg-white rounded-2xl p-1 shadow-xl" onClick={(e) => e.stopPropagation()}>
                                 <button
-                                  onClick={() => updateQuantity(cartItem.cartId, qty - 1)}
-                                  className="w-6 h-6 flex items-center justify-center text-stone-500 hover:bg-white dark:hover:bg-stone-700 hover:text-stone-900 rounded-full transition-colors text-xs"
+                                  onClick={() => updateQuantity(cartItem!.cartId, qty - 1)}
+                                  className="w-8 h-8 flex items-center justify-center text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-950 transition-colors"
                                 >
-                                  -
+                                  <span className="material-icons text-sm">remove</span>
                                 </button>
-                                <span className="w-6 text-center font-sans text-xs font-bold text-slate-900 dark:text-white">{qty}</span>
+                                <span className="w-8 text-center font-sans text-xs font-black text-white dark:text-slate-950">{qty}</span>
                                 <button
                                   onClick={() => addToCart(product, 1)}
-                                  className="w-6 h-6 flex items-center justify-center text-stone-500 hover:bg-white dark:hover:bg-stone-700 hover:text-stone-900 rounded-full transition-colors text-xs"
+                                  className="w-8 h-8 flex items-center justify-center text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-950 transition-colors"
                                 >
-                                  +
+                                  <span className="material-icons text-sm">add</span>
                                 </button>
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 group-hover:bg-[var(--color-accent-light)] group-hover:text-white transition-all transform group-hover:rotate-90">
+                                <span className="material-icons text-lg">add</span>
                               </div>
                             )}
                           </div>
@@ -571,7 +726,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
             className="bg-white dark:bg-stone-900 shadow-xl rounded-2xl p-4 mb-2 max-w-xs border border-stone-100 dark:border-stone-800 relative pointer-events-auto"
           >
-            <p className="text-sm text-slate-700 dark:text-slate-200 font-sans">Hi! I noticed you're buying pasta. Need <span className="font-bold text-orange-600">tomato sauce</span>?</p>
+            <p className="text-sm text-slate-700 dark:text-slate-200 font-sans">Hi! I noticed you're buying pasta. Need <span className="font-bold text-[var(--color-accent-light)]">tomato sauce</span>?</p>
             <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-3 h-3 bg-white dark:bg-stone-900 border-r border-b border-stone-100 dark:border-stone-800"></div>
             <button onClick={() => setIsChatOpen(false)} className="absolute top-1 right-1 text-stone-400 hover:text-stone-600"><span className="material-icons text-xs">close</span></button>
           </motion.div>
@@ -583,8 +738,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste }) => {
           className="bg-stone-900 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center relative pointer-events-auto hover:bg-stone-800 transition-colors"
         >
           <span className="material-icons text-2xl">smart_toy</span>
-          <span className="absolute top-0 right-0 w-3 h-3 bg-orange-500 border-2 border-white rounded-full animate-ping"></span>
-          <span className="absolute top-0 right-0 w-3 h-3 bg-orange-500 border-2 border-white rounded-full"></span>
+          <span className="absolute top-0 right-0 w-3 h-3 bg-[var(--color-accent-light)] border-2 border-white rounded-full animate-ping"></span>
+          <span className="absolute top-0 right-0 w-3 h-3 bg-[var(--color-accent-light)] border-2 border-white rounded-full"></span>
         </motion.button>
       </motion.div>
     </div>

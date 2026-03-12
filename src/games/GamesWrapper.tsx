@@ -44,11 +44,11 @@ const GlitchLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => v
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center overflow-hidden border transition-colors duration-200 rounded-sm
+      className={`relative h-12 flex items-center justify-center overflow-hidden border transition-colors duration-200 rounded-sm
       ${isActive ? 'border-primary bg-primary/20 text-primary shadow-[0_0_10px_rgba(255,106,0,0.5)]' : 'border-white/10 bg-black/50 text-gray-500 hover:border-primary/50'}
       `}
       style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}
-      animate={{ width: isHovered || isActive ? 100 : 40 }}
+      animate={{ width: isHovered || isActive ? 120 : 48 }}
     >
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
       <AnimatePresence>
@@ -57,7 +57,7 @@ const GlitchLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => v
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 flex items-center justify-center"
           >
-            <Layout className="w-4 h-4" />
+            <Layout className="w-5 h-5" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -67,7 +67,7 @@ const GlitchLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => v
           <motion.span
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="font-mono font-bold tracking-widest text-[10px] uppercase"
+            className="font-mono font-bold tracking-widest text-xs uppercase"
           >
             {displayText}
           </motion.span>
@@ -94,21 +94,21 @@ const ScanLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => voi
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center overflow-hidden border-l-2 transition-all rounded-sm
+      className={`relative h-12 flex items-center justify-center overflow-hidden border-l-2 transition-all rounded-sm
           ${isActive
           ? 'border-cyan-500 border-l-cyan-500 bg-cyan-500/10 text-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]'
           : 'border-transparent border-l-white/20 bg-black/50 text-gray-500 hover:border-cyan-500/50'}
           `}
-      animate={{ width: isHovered || isActive ? 110 : 40 }}
+      animate={{ width: isHovered || isActive ? 132 : 48 }}
     >
       <div className="z-10 relative flex items-center gap-2">
-        <User className={`w-4 h-4 ${isHovered || isActive ? 'text-cyan-500' : 'text-gray-500'}`} />
+        <User className={`w-5 h-5 ${isHovered || isActive ? 'text-cyan-500' : 'text-gray-500'}`} />
         {(isHovered || isActive) && (
           <motion.span
             initial={{ opacity: 0, filter: 'blur(4px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             transition={{ delay: 0.1 }}
-            className="font-mono text-[10px] font-bold uppercase tracking-widest whitespace-nowrap"
+            className="font-mono text-xs font-bold uppercase tracking-widest whitespace-nowrap"
           >
             PROFILE
           </motion.span>
@@ -138,19 +138,19 @@ const RadarLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => vo
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center bg-black/80 rounded-sm border
+      className={`relative h-12 flex items-center justify-center bg-black/80 rounded-sm border
             ${isActive ? 'border-red-500/50 text-red-500 shadow-[inset_0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/10 text-gray-500 hover:border-red-500/30'}
             `}
-      animate={{ width: isHovered || isActive ? 100 : 40 }}
+      animate={{ width: isHovered || isActive ? 120 : 48 }}
     >
       <div className="relative z-10 flex items-center gap-2">
-        <Map className={`w-4 h-4 ${isHovered || isActive ? 'animate-pulse text-red-500' : ''}`} />
+        <Map className={`w-5 h-5 ${isHovered || isActive ? 'animate-pulse text-red-500' : ''}`} />
         {(isHovered || isActive) && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0, 1] }}
             transition={{ duration: 0.4, times: [0, 0.2, 0.8, 1] }}
-            className="font-mono text-[10px] font-bold text-red-500 tracking-widest whitespace-nowrap"
+            className="font-mono text-xs font-bold text-red-500 tracking-widest whitespace-nowrap"
           >
             ARENA
           </motion.span>
@@ -177,7 +177,7 @@ const GoldLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => voi
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center overflow-hidden rounded-sm border
+      className={`relative h-12 flex items-center justify-center overflow-hidden rounded-sm border
             ${isActive ? 'border-yellow-500/50 text-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)]' : 'border-white/10 text-gray-500 hover:border-yellow-500/30'}
             `}
       style={{
@@ -185,15 +185,15 @@ const GoldLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => voi
           ? 'linear-gradient(135deg, rgba(250, 204, 21, 0.1) 0%, rgba(0,0,0,0.8) 100%)'
           : 'rgba(0,0,0,0.5)'
       }}
-      animate={{ width: isHovered || isActive ? 130 : 40 }}
+      animate={{ width: isHovered || isActive ? 156 : 48 }}
     >
       <div className="relative z-10 flex items-center gap-2">
-        <Trophy className={`w-4 h-4 ${isHovered || isActive ? 'text-yellow-500' : 'text-gray-500'}`} />
+        <Trophy className={`w-5 h-5 ${isHovered || isActive ? 'text-yellow-500' : 'text-gray-500'}`} />
         {(isHovered || isActive) && (
           <motion.span
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-mono text-[10px] font-bold text-yellow-500 tracking-widest uppercase whitespace-nowrap"
+            className="font-mono text-xs font-bold text-yellow-500 tracking-widest uppercase whitespace-nowrap"
           >
             TOURNEYS
           </motion.span>
@@ -214,22 +214,22 @@ const PistonLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => v
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center bg-[#111] border-b-2 rounded-sm
+      className={`relative h-12 flex items-center justify-center bg-[#111] border-b-2 rounded-sm
             ${isActive ? 'border-gray-400 text-white bg-[#222]' : 'border-white/10 text-gray-500 hover:border-gray-600'}
             `}
       animate={{
-        width: isHovered || isActive ? 120 : 40,
+        width: isHovered || isActive ? 144 : 48,
         y: isHovered ? [0, 2, 0] : 0
       }}
       transition={{ width: { duration: 0.2 }, y: { duration: 0.1 } }}
     >
       <div className="relative z-10 flex items-center gap-2">
-        <Cpu className={`w-4 h-4 ${isHovered || isActive ? 'text-white' : 'text-gray-500'}`} />
+        <Cpu className={`w-5 h-5 ${isHovered || isActive ? 'text-white' : 'text-gray-500'}`} />
         {(isHovered || isActive) && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="font-mono text-[10px] font-bold text-gray-300 tracking-widest uppercase whitespace-nowrap"
+            className="font-mono text-xs font-bold text-gray-300 tracking-widest uppercase whitespace-nowrap"
           >
             HARDWARE
           </motion.span>
@@ -249,28 +249,28 @@ const WarpLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => voi
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center overflow-hidden rounded-sm border
+      className={`relative h-12 flex items-center justify-center overflow-hidden rounded-sm border
             ${isActive ? 'bg-purple-900/30 border-purple-500/50 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/50 border-white/10 text-gray-500 hover:border-purple-500/30'}
             `}
       animate={{
-        width: isHovered || isActive ? 110 : 40,
+        width: isHovered || isActive ? 132 : 48,
         skewX: isHovered ? [0, -5, 5, 0] : 0
       }}
       transition={{ duration: 0.2 }}
     >
       <div className="relative z-10 flex items-center gap-2">
-        <Glasses className={`w-4 h-4 ${isHovered || isActive ? 'text-purple-400' : 'text-gray-500'}`} />
+        <Glasses className={`w-5 h-5 ${isHovered || isActive ? 'text-purple-400' : 'text-gray-500'}`} />
         {(isHovered || isActive) && (
           <div className="relative">
             <motion.span
-              className="absolute inset-0 font-mono text-[10px] font-bold text-red-500 tracking-widest uppercase whitespace-nowrap opacity-70 mix-blend-screen"
+              className="absolute inset-0 font-mono text-xs font-bold text-red-500 tracking-widest uppercase whitespace-nowrap opacity-70 mix-blend-screen"
               animate={{ x: isHovered ? [-1, 1, 0] : 0 }}
             >VR_ZONE</motion.span>
             <motion.span
-              className="absolute inset-0 font-mono text-[10px] font-bold text-cyan-500 tracking-widest uppercase whitespace-nowrap opacity-70 mix-blend-screen"
+              className="absolute inset-0 font-mono text-xs font-bold text-cyan-500 tracking-widest uppercase whitespace-nowrap opacity-70 mix-blend-screen"
               animate={{ x: isHovered ? [1, -1, 0] : 0 }}
             >VR_ZONE</motion.span>
-            <span className="relative font-mono text-[10px] font-bold text-white tracking-widest uppercase whitespace-nowrap">
+            <span className="relative font-mono text-xs font-bold text-white tracking-widest uppercase whitespace-nowrap">
               VR_ZONE
             </span>
           </div>
@@ -288,20 +288,20 @@ const OdysseyLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => 
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`relative h-10 flex items-center justify-center overflow-hidden rounded-sm border
+      className={`relative h-12 flex items-center justify-center overflow-hidden rounded-sm border
             ${isActive ? 'bg-primary/10 border-primary/50 text-primary shadow-[0_0_15px_rgba(255,106,0,0.3)]' : 'bg-black/50 border-white/10 text-gray-500 hover:border-primary/30'}
             `}
       animate={{
-        width: isHovered || isActive ? 110 : 40
+        width: isHovered || isActive ? 132 : 48
       }}
     >
       <div className="relative z-10 flex items-center gap-2">
-        <Disc className={`w-4 h-4 ${isHovered || isActive ? 'text-primary animate-spin-slow' : 'text-gray-500'}`} />
+        <Disc className={`w-5 h-5 ${isHovered || isActive ? 'text-primary animate-spin-slow' : 'text-gray-500'}`} />
         {(isHovered || isActive) && (
           <motion.span
             initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
-            className="font-mono text-[10px] font-bold text-white tracking-[0.2em] uppercase whitespace-nowrap"
+            className="font-mono text-xs font-bold text-white tracking-[0.2em] uppercase whitespace-nowrap"
           >
             ODYSSEY
           </motion.span>
@@ -317,13 +317,36 @@ const OdysseyLink = ({ isActive, onClick }: { isActive: boolean, onClick: () => 
   );
 };
 
-export const GamesNav: React.FC<{ navHidden: boolean, currentPage: AppView, onNavigate: (p: AppView) => void, localTheme?: 'dark' | 'light', toggleLocalTheme?: () => void }> = ({ navHidden, currentPage, onNavigate, localTheme, toggleLocalTheme }) => {
+export const GamesNav: React.FC<{
+  currentPage: AppView,
+  onNavigate: (p: AppView) => void,
+  isAppNavHovered?: boolean,
+  onHoverChange?: (hovered: boolean) => void,
+  heroOutOfView?: boolean
+}> = ({ currentPage, onNavigate, isAppNavHovered = false, onHoverChange, heroOutOfView = false }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: navHidden ? -100 : 0 }}
-      transition={{ duration: navHidden ? 0.1 : 0.4, ease: "circOut" }}
-      className="sticky top-12 sm:top-14 w-full z-50 bg-[#050505]/95 backdrop-blur-md border-b border-white/10 h-12 pointer-events-auto shadow-lg"
+    <nav
+      className={`transition-all duration-500 sticky top-0 w-full z-40 h-[68px] theme-transition`}
+      style={{
+        backgroundColor: heroOutOfView
+          ? 'var(--games-nav-opaque)'
+          : ((isAppNavHovered) ? 'var(--games-nav-blur)' : 'transparent'),
+        backdropFilter: (heroOutOfView || isAppNavHovered) ? 'blur(20px)' : 'none',
+        borderBottom: heroOutOfView ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid transparent',
+        boxShadow: heroOutOfView ? '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' : 'none',
+        color: heroOutOfView ? '#fff' : 'inherit'
+      }}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
     >
       {/* Cyberpunk Top Accent Line */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
@@ -332,11 +355,11 @@ export const GamesNav: React.FC<{ navHidden: boolean, currentPage: AppView, onNa
 
         {/* Logo Area */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate(AppView.LANDING)}>
-          <div className="w-8 h-8 bg-primary/10 border border-primary/30 flex items-center justify-center rounded-sm group-hover:bg-primary/20 transition-colors relative overflow-hidden">
+          <div className="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center rounded-sm group-hover:bg-primary/20 transition-colors relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
-            <span className="font-mono font-bold text-primary text-sm relative z-10">OG</span>
+            <span className="font-mono font-bold text-primary text-base relative z-10">OG</span>
           </div>
-          <span className="font-mono font-bold text-sm tracking-widest text-white hidden sm:block">
+          <span className={`font-mono font-bold text-base tracking-widest hidden sm:block text-white`}>
             ORIENT<span className="text-primary">GAMES</span>
           </span>
         </div>
@@ -357,16 +380,16 @@ export const GamesNav: React.FC<{ navHidden: boolean, currentPage: AppView, onNa
         {/* Right Actions */}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex flex-col items-end mr-4">
-            <span className="text-[9px] font-mono text-primary uppercase tracking-widest">System Status</span>
-            <span className="text-[10px] font-mono text-green-500 uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-[10px] font-mono text-primary uppercase tracking-widest">System Status</span>
+            <span className="text-xs font-mono text-green-500 uppercase flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Online
             </span>
           </div>
 
           <button
             onClick={() => onNavigate(AppView.PROFILE)}
-            className="relative px-4 py-1.5 bg-primary/10 border border-primary text-primary font-mono text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-black transition-all duration-300"
+            className="relative px-5 py-2 bg-primary/10 border border-primary text-primary font-mono text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-black transition-all duration-300"
             style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}
           >
             Login
@@ -374,7 +397,7 @@ export const GamesNav: React.FC<{ navHidden: boolean, currentPage: AppView, onNa
         </div>
 
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 

@@ -38,7 +38,7 @@ const Register: React.FC<Props> = ({ onNavigate }) => {
                  <input 
                    type="text" 
                    required
-                   className="w-full rounded-lg border-gray-300 focus:ring-[#ff6a00] focus:border-[#ff6a00]"
+                   className="w-full rounded-lg border-gray-300 focus:ring-[var(--color-accent-light)] focus:border-[var(--color-accent-light)]"
                    placeholder="John Doe"
                    value={name}
                    onChange={e => setName(e.target.value)}
@@ -49,7 +49,7 @@ const Register: React.FC<Props> = ({ onNavigate }) => {
                  <input 
                    type="email" 
                    required
-                   className="w-full rounded-lg border-gray-300 focus:ring-[#ff6a00] focus:border-[#ff6a00]"
+                   className="w-full rounded-lg border-gray-300 focus:ring-[var(--color-accent-light)] focus:border-[var(--color-accent-light)]"
                    placeholder="you@company.com"
                    value={email}
                    onChange={e => setEmail(e.target.value)}
@@ -60,7 +60,7 @@ const Register: React.FC<Props> = ({ onNavigate }) => {
                  <input 
                    type="password" 
                    required
-                   className="w-full rounded-lg border-gray-300 focus:ring-[#ff6a00] focus:border-[#ff6a00]"
+                   className="w-full rounded-lg border-gray-300 focus:ring-[var(--color-accent-light)] focus:border-[var(--color-accent-light)]"
                    placeholder="••••••••"
                    value={pass}
                    onChange={e => setPass(e.target.value)}
@@ -69,14 +69,14 @@ const Register: React.FC<Props> = ({ onNavigate }) => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#ff6a00] hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-70"
+                className="w-full bg-[var(--color-accent-light)] hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-70"
               >
                 {loading ? 'Creating...' : 'Register'} <span className="material-icons text-sm">person_add</span>
               </button>
            </form>
            
            <div className="mt-6 text-center text-sm text-gray-500">
-              Already have an account? <button onClick={() => onNavigate('Login')} className="text-[#ff6a00] font-bold hover:underline">Sign In</button>
+              Already have an account? <button onClick={() => onNavigate('Login')} className="text-[var(--color-accent-light)] font-bold hover:underline">Sign In</button>
            </div>
         </div>
       </motion.div>

@@ -11,6 +11,7 @@ export interface Product {
   oldPrice?: number;
   stock?: number;
   tierInfo?: string;
+  rating?: number;
 }
 
 export interface CartItem extends Product {
