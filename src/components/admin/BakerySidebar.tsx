@@ -47,11 +47,11 @@ export default function BakerySidebar({
             <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
           </div>
         </div>
-        <div className={`w-full h-32 rounded-lg ${bgInput} border ${isDarkMode ? 'border-white/10' : 'border-gray-200'} overflow-hidden relative group cursor-pointer`}>
-          <img src={cmsData.home.heroImage} alt="Preview" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-3">
-            <h4 className="text-white text-xs font-bold font-serif">{cmsData.home.heroTitle}</h4>
-            <p className="text-white/60 text-[8px] truncate mt-0.5">{cmsData.home.heroSubtext}</p>
+        <div className={`w-full h-28 rounded-xl ${bgInput} border ${isDarkMode ? 'border-white/[0.05]' : 'border-slate-100'} overflow-hidden relative group cursor-pointer bg-black/5`}>
+          <img src={cmsData.home.heroImage} alt="Preview" className="w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
+            <h4 className="text-white text-[10px] font-bold font-serif tracking-tight">{cmsData.home.heroTitle}</h4>
+            <p className="text-white/40 text-[8px] truncate mt-0.5 uppercase tracking-widest font-bold">Storefront Live</p>
           </div>
         </div>
       </div>
@@ -101,10 +101,10 @@ export default function BakerySidebar({
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full flex items-center justify-center gap-2 p-3.5 bg-[#d4af37] hover:bg-[#c29f2f] text-black rounded-xl font-bold text-sm transition-all shadow-[0_4px_14px_rgba(212,175,55,0.3)] disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2.5 p-3.5 bg-[#d4af37] hover:bg-[#c29f2f] text-black rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-          {isSaving ? "Saving to Cloud..." : "Save All Changes"}
+          {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+          {isSaving ? "Syncing..." : "Commit Changes"}
         </button>
       </div>
     </div>
@@ -128,8 +128,8 @@ function NavTab({ id, icon, label, activeTab, setActiveTab, isDarkMode }: any) {
       {isActive && (
         <motion.div layoutId="bakerySidebarTab" className="absolute left-0 top-0 bottom-0 w-1 bg-[#d4af37]" />
       )}
-      <span className={`${isActive ? "text-[#d4af37]" : `${isDarkMode ? 'text-white/30' : 'text-slate-300'} group-hover:text-[#d4af37]`} transition-colors`}>{icon}</span>
-      <span className="font-semibold text-sm tracking-wide">{label}</span>
+      <span className={`${isActive ? "text-[#d4af37]" : `${isDarkMode ? 'text-white/20' : 'text-slate-300'} group-hover:text-[#d4af37]`} transition-colors`}>{icon}</span>
+      <span className="font-bold text-sm tracking-tight">{label}</span>
     </button>
   );
 }

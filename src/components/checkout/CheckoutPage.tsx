@@ -1,34 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { mockDb, CartItem, User } from '../../lib/mockDb';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 export const CheckoutPage: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const { cart, cartTotal, placeOrder } = useGlobalCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customerDetails, setCustomerDetails] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
 
-  useEffect(() => {
-    setCart(mockDb.getCart());
-    setUser(mockDb.getCurrentUser());
-  }, []);
-
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const handleCheckout = () => {
-    if (!user) return;
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerDetails.name || !customerDetails.phone || !customerDetails.address) return;
     setIsProcessing(true);
     
-    // Simulate API delay
-    setTimeout(() => {
-      mockDb.addTransaction({
-        userId: user.id,
-        items: cart,
-        total: total,
-      });
-      mockDb.clearCart();
-      setIsProcessing(false);
+    const success = await placeOrder(customerDetails);
+
+    setIsProcessing(false);
+    if (success) {
       onComplete();
-    }, 1500);
+    }
   };
 
   if (cart.length === 0 && !isProcessing) {
@@ -63,19 +57,56 @@ export const CheckoutPage: React.FC<{ onComplete: () => void }> = ({ onComplete 
             </div>
           </div>
 
-          <div className="bg-[var(--bakery-card-bg)] rounded-3xl border border-[var(--bakery-card-border)] p-6 shadow-xl">
+          <form id="checkout-form" onSubmit={handleCheckout} className="bg-[var(--bakery-card-bg)] rounded-3xl border border-[var(--bakery-card-border)] p-6 shadow-xl">
             <h3 className="text-lg font-bold text-[var(--bakery-heading)] mb-6 flex items-center gap-2">
               <span className="material-icons text-primary">local_shipping</span> Delivery Information
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="text-[10px] font-bold text-[var(--bakery-text-muted)] uppercase tracking-widest">Delivery Address</label>
-                <div className="mt-1 p-3 bg-[var(--bakery-bg)] border border-[var(--bakery-card-border)] rounded-xl text-sm text-[var(--bakery-text)]">
-                  Standard Delivery to Jos Metropolis
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[var(--bakery-text-muted)] uppercase tracking-widest pl-1">Full Name *</label>
+                <input
+                  required
+                  type="text"
+                  value={customerDetails.name}
+                  onChange={e => setCustomerDetails({...customerDetails, name: e.target.value})}
+                  className="w-full bg-[var(--bakery-bg)] border border-[var(--bakery-card-border)] rounded-2xl p-3.5 text-sm text-[var(--bakery-text)] focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="John Doe"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[var(--bakery-text-muted)] uppercase tracking-widest pl-1">Email Address</label>
+                <input
+                  type="email"
+                  value={customerDetails.email}
+                  onChange={e => setCustomerDetails({...customerDetails, email: e.target.value})}
+                  className="w-full bg-[var(--bakery-bg)] border border-[var(--bakery-card-border)] rounded-2xl p-3.5 text-sm text-[var(--bakery-text)] focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[var(--bakery-text-muted)] uppercase tracking-widest pl-1">Phone Number *</label>
+                <input
+                  required
+                  type="tel"
+                  value={customerDetails.phone}
+                  onChange={e => setCustomerDetails({...customerDetails, phone: e.target.value})}
+                  className="w-full bg-[var(--bakery-bg)] border border-[var(--bakery-card-border)] rounded-2xl p-3.5 text-sm text-[var(--bakery-text)] focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="0801 234 5678"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[var(--bakery-text-muted)] uppercase tracking-widest pl-1">Delivery Address *</label>
+                <input
+                  required
+                  type="text"
+                  value={customerDetails.address}
+                  onChange={e => setCustomerDetails({...customerDetails, address: e.target.value})}
+                  className="w-full bg-[var(--bakery-bg)] border border-[var(--bakery-card-border)] rounded-2xl p-3.5 text-sm text-[var(--bakery-text)] focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="123 Luxury Ave, Jos"
+                />
               </div>
             </div>
-          </div>
+          </form>
         </div>
 
         <div className="lg:col-span-1">
@@ -84,7 +115,7 @@ export const CheckoutPage: React.FC<{ onComplete: () => void }> = ({ onComplete 
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-sm text-[var(--bakery-text-muted)] font-medium">
                 <span>Subtotal</span>
-                <span>₦{total.toLocaleString()}</span>
+                <span>₦{cartTotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm text-[var(--bakery-text-muted)] font-medium">
                 <span>Delivery</span>
@@ -93,12 +124,13 @@ export const CheckoutPage: React.FC<{ onComplete: () => void }> = ({ onComplete 
               <div className="h-px bg-[var(--bakery-card-border)] my-4"></div>
               <div className="flex justify-between items-end">
                 <span className="text-xs font-bold uppercase tracking-widest text-[var(--bakery-text)]">Grand Total</span>
-                <span className="text-3xl font-black text-[var(--bakery-heading)] tracking-tighter">₦{total.toLocaleString()}</span>
+                <span className="text-3xl font-black text-[var(--bakery-heading)] tracking-tighter">₦{cartTotal.toLocaleString()}</span>
               </div>
             </div>
 
             <button 
-              onClick={handleCheckout}
+              form="checkout-form"
+              type="submit"
               disabled={isProcessing}
               className="w-full py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all transform active:scale-95 flex items-center justify-center gap-3"
             >

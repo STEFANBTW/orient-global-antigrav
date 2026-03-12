@@ -20,7 +20,7 @@ interface DeliveryZone {
     is_active: boolean;
 }
 
-export default function DeliveriesManager() {
+export default function DeliveriesManager({ isDarkMode = true }: { isDarkMode?: boolean }) {
     const [zones, setZones] = useState<DeliveryZone[]>([]);
     const [activeDeliveries, setActiveDeliveries] = useState<MarketOrder[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,8 +33,9 @@ export default function DeliveriesManager() {
         const { data: zData } = await supabase.from("delivery_zones").select("*").order("name");
         if (zData) setZones(zData);
 
-        const { data: oData } = await supabase.from("market_orders")
+        const { data: oData } = await supabase.from("unified_orders")
             .select("*")
+            .eq("division", "market")
             .in("status", ["confirmed", "preparing", "dispatched"])
             .order("created_at", { ascending: false });
         if (oData) setActiveDeliveries(oData);
@@ -47,7 +48,12 @@ export default function DeliveriesManager() {
     // Realtime
     useEffect(() => {
         const channel1 = supabase.channel("zones_changes").on("postgres_changes", { event: "*", schema: "public", table: "delivery_zones" }, fetchZonesAndDeliveries).subscribe();
-        const channel2 = supabase.channel("deliveries_changes").on("postgres_changes", { event: "*", schema: "public", table: "market_orders" }, fetchZonesAndDeliveries).subscribe();
+        const channel2 = supabase.channel("deliveries_changes").on("postgres_changes", { 
+            event: "*", 
+            schema: "public", 
+            table: "unified_orders",
+            filter: "division=eq.market"
+        }, fetchZonesAndDeliveries).subscribe();
         return () => { supabase.removeChannel(channel1); supabase.removeChannel(channel2); };
     }, []);
 
@@ -71,64 +77,78 @@ export default function DeliveriesManager() {
     };
 
     return (
-        <div className="space-y-6 mcms">
+        <div className="space-y-10 mcms">
             {/* Active Deliveries Pipeline */}
-            <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--mcms-heading)' }}><Truck className="w-5 h-5" style={{ color: 'var(--mcms-accent)' }} /> Active Delivery Pipeline</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {activeDeliveries.length === 0 ? (
-                    <p className="text-sm col-span-3 pb-4" style={{ color: 'var(--mcms-text-muted)' }}>No active deliveries pending or dispatched.</p>
-                ) : activeDeliveries.map(order => (
-                    <Card key={order.id} className="p-4 border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
-                        <div className="flex justify-between items-start mb-3">
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--mcms-kanban-bg)', color: 'var(--mcms-text-muted)' }}>#{order.id.slice(0, 8)}</span>
-                            <Badge className="border-none" style={{
-                                backgroundColor: order.status === "dispatched" ? "rgba(99, 102, 241, 0.1)" : order.status === "preparing" ? "rgba(168, 85, 247, 0.1)" : "rgba(59, 130, 246, 0.1)",
-                                color: order.status === "dispatched" ? "#6366f1" : order.status === "preparing" ? "#a855f7" : "#3b82f6"
-                            }}>{order.status.toUpperCase()}</Badge>
+            <div>
+                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2" style={{ color: 'var(--mcms-text-muted)' }}>
+                    <Truck className="w-4 h-4" style={{ color: 'var(--mcms-accent)' }} /> Active Delivery Pipeline
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeDeliveries.length === 0 ? (
+                        <div className="col-span-3 py-12 border-2 border-dashed rounded-2xl flex items-center justify-center opacity-20" style={{ borderColor: 'var(--mcms-card-border)' }}>
+                            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--mcms-text-muted)' }}>No queue active</span>
                         </div>
-                        <p className="font-bold flex items-center gap-1.5" style={{ color: 'var(--mcms-text)' }}><MapPin className="w-4 h-4" style={{ color: 'var(--mcms-text-muted)' }} /> {order.customer_address}</p>
-                        <p className="text-sm ml-5.5 mt-1" style={{ color: 'var(--mcms-text-muted)' }}>{order.customer_name} · {order.customer_phone}</p>
-                        <div className="mt-4 pt-3 border-t flex items-center gap-2 text-xs" style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text-muted)' }}>
-                            <Truck className="w-3.5 h-3.5" />
-                            Rider: <span className="font-semibold" style={{ color: 'var(--mcms-text)' }}>{order.rider_name || "Unassigned"}</span>
-                        </div>
-                    </Card>
-                ))}
+                    ) : activeDeliveries.map(order => (
+                        <Card key={order.id} className="p-5 border shadow-sm hover:shadow-md transition-all duration-300 group" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="text-[9px] font-mono opacity-40" style={{ color: 'var(--mcms-text)' }}>#{order.id.slice(0, 8).toUpperCase()}</span>
+                                <Badge className="border px-2 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider" style={{
+                                    backgroundColor: order.status === "dispatched" ? "rgba(99, 102, 241, 0.05)" : order.status === "preparing" ? "rgba(168, 85, 247, 0.05)" : "rgba(59, 130, 246, 0.05)",
+                                    color: order.status === "dispatched" ? "#818cf8" : order.status === "preparing" ? "#c084fc" : "#60a5fa",
+                                    borderColor: order.status === "dispatched" ? "rgba(99, 102, 241, 0.1)" : order.status === "preparing" ? "rgba(168, 85, 247, 0.1)" : "rgba(59, 130, 246, 0.1)"
+                                }}>{order.status}</Badge>
+                            </div>
+                            <p className="font-bold text-sm flex items-start gap-2 mb-2 tracking-tight" style={{ color: 'var(--mcms-text)' }}>
+                                <MapPin className="w-4 h-4 mt-0.5 opacity-30 shrink-0" /> 
+                                <span className="line-clamp-2">{order.customer_address}</span>
+                            </p>
+                            <p className="text-[10px] font-medium opacity-60 ml-6" style={{ color: 'var(--mcms-text)' }}>{order.customer_name} · {order.customer_phone}</p>
+                            <div className="mt-6 pt-4 border-t flex items-center justify-between text-[9px] font-black uppercase tracking-widest" style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text-muted)' }}>
+                                <span className="flex items-center gap-1.5 opacity-60"><Truck className="w-3.5 h-3.5" /> Rider</span>
+                                <span className="font-black text-black dark:text-white">{order.rider_name || "Unassigned"}</span>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             </div>
 
             {/* Delivery Zones */}
-            <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: 'var(--mcms-card-border)' }}>
-                <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--mcms-heading)' }}><Navigation className="w-5 h-5" style={{ color: '#10b981' }} /> Delivery Zones Setup</h2>
-                <Button
-                    className="text-white rounded-lg gap-1.5 h-9 px-3 border-none"
-                    style={{ backgroundColor: 'var(--mcms-accent)' }}
-                    onClick={() => { setEditingZone(null); setShowZoneForm(true); }}
-                >
-                    <Plus className="w-4 h-4" /> Add Zone
-                </Button>
-            </div>
+            <div>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-2" style={{ color: 'var(--mcms-text-muted)' }}>
+                        <Navigation className="w-4 h-4" style={{ color: '#10b981' }} /> Zone Configuration
+                    </h2>
+                    <button
+                        className="h-8 text-[9px] font-black uppercase tracking-widest text-black rounded-full px-5 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-amber-500/10"
+                        style={{ backgroundColor: 'var(--mcms-accent)' }}
+                        onClick={() => { setEditingZone(null); setShowZoneForm(true); }}
+                    >
+                        <Plus className="w-3.5 h-3.5 mr-1.5 inline" /> Add Zone
+                    </button>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {zones.map(zone => (
-                    <Card key={zone.id} className="p-4 border relative group" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
-                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button className="hover:bg-transparent h-7 w-7 p-0 bg-transparent border-none" onClick={() => { setEditingZone(zone); setShowZoneForm(true); }}><Edit2 className="w-3 h-3" style={{ color: 'var(--mcms-text-micro)' }} /></Button>
-                            <Button className="hover:bg-transparent h-7 w-7 p-0 bg-transparent border-none" onClick={() => deleteZone(zone.id)}><Trash2 className="w-3 h-3 text-red-500/60 hover:text-red-500" /></Button>
-                        </div>
-                        <h3 className="font-bold mb-1" style={{ color: 'var(--mcms-text)' }}>{zone.name}</h3>
-                        <Badge className="border-none" style={{
-                            backgroundColor: zone.type === "local" ? "rgba(16, 185, 129, 0.1)" : "rgba(59, 130, 246, 0.1)",
-                            color: zone.type === "local" ? "#10b981" : "#3b82f6"
-                        }}>{zone.type}</Badge>
-                        <div className="mt-4 space-y-1.5 text-sm">
-                            <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Base Fee:</span><span className="font-semibold" style={{ color: 'var(--mcms-text)' }}>₦{zone.base_fee.toLocaleString()}</span></div>
-                            {zone.per_km_fee > 0 && <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Per KM:</span><span className="font-semibold" style={{ color: 'var(--mcms-text)' }}>₦{zone.per_km_fee.toLocaleString()}</span></div>}
-                            <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Est. Hours:</span><span className="font-semibold" style={{ color: 'var(--mcms-text)' }}>{zone.estimated_hours}h</span></div>
-                        </div>
-                        {!zone.is_active && <div className="absolute inset-0 bg-black/10 flex items-center justify-center rounded-xl"><Badge className="bg-slate-800 text-white border-none">Inactive</Badge></div>}
-                    </Card>
-                ))}
-                {zones.length === 0 && <p className="text-sm py-4" style={{ color: 'var(--mcms-text-muted)' }}>No delivery zones configured.</p>}
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {zones.map(zone => (
+                        <Card key={zone.id} className="p-5 border relative group shadow-sm hover:shadow-md transition-all duration-300" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => { setEditingZone(zone); setShowZoneForm(true); }} className="hover:scale-110 transition-transform"><Edit2 className="w-3.5 h-3.5 opacity-30 hover:opacity-100" style={{ color: 'var(--mcms-text)' }} /></button>
+                                <button onClick={() => deleteZone(zone.id)} className="hover:scale-110 transition-transform"><Trash2 className="w-3.5 h-3.5 text-red-500/30 hover:text-red-500" /></button>
+                            </div>
+                            <h3 className="font-bold text-sm mb-2 tracking-tight" style={{ color: 'var(--mcms-text)' }}>{zone.name}</h3>
+                            <Badge className="border px-2 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider mb-4" style={{
+                                backgroundColor: zone.type === "local" ? "rgba(16, 185, 129, 0.05)" : "rgba(59, 130, 246, 0.05)",
+                                color: zone.type === "local" ? "#34d399" : "#60a5fa",
+                                borderColor: zone.type === "local" ? "rgba(16, 185, 129, 0.1)" : "rgba(59, 130, 246, 0.1)"
+                            }}>{zone.type}</Badge>
+                            <div className="space-y-2 mt-4 text-[11px] font-medium">
+                                <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Base Fee:</span><span className="font-bold" style={{ color: 'var(--mcms-text)' }}>₦{zone.base_fee.toLocaleString()}</span></div>
+                                {zone.per_km_fee > 0 && <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Per KM:</span><span className="font-bold" style={{ color: 'var(--mcms-text)' }}>₦{zone.per_km_fee.toLocaleString()}</span></div>}
+                                <div className="flex justify-between" style={{ color: 'var(--mcms-text-muted)' }}><span>Lead Time:</span><span className="font-bold" style={{ color: 'var(--mcms-text)' }}>{zone.estimated_hours}h</span></div>
+                            </div>
+                            {!zone.is_active && <div className="absolute inset-0 bg-black/5 backdrop-blur-[2px] flex items-center justify-center rounded-xl"><Badge className="bg-black text-white text-[9px] font-black uppercase tracking-widest border-none">Stopped</Badge></div>}
+                        </Card>
+                    ))}
+                </div>
             </div>
 
             {/* Zone Form Dialog */}

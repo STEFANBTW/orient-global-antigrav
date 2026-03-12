@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockDb } from './lib/mockDb';
 import { useBakeryCms } from './lib/bakeryCmsData';
+import { useGlobalCart } from './context/GlobalCartContext';
 
 // Export the master 49-item menu data so it can be passed in if needed, but it lives here.
 // Note: Categories and items are now augmented by CMS data
@@ -376,7 +376,8 @@ export const MASTER_BAKERY_MENU = [
 ];
 
 export const BakeryMenu: React.FC<{ setCurrentView?: (v: any) => void; currentUser?: any }> = ({ setCurrentView, currentUser }) => {
-  const { data: bakeryData } = useBakeryCms();
+  const { data: bakeryData, loading } = useBakeryCms();
+  const { addToCart } = useGlobalCart();
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -385,7 +386,7 @@ export const BakeryMenu: React.FC<{ setCurrentView?: (v: any) => void; currentUs
 
   // Pull 100% of data from CMS Inventory
   const fullMenu = [
-    ...bakeryData.inventory.map(item => ({
+    ...bakeryData.inventory.map((item: any) => ({
       title: item.name,
       category: item.category,
       price: `₦${item.price.toLocaleString()}`,
@@ -397,12 +398,14 @@ export const BakeryMenu: React.FC<{ setCurrentView?: (v: any) => void; currentUs
   ];
 
   const handleAddToCart = (product: any, qty: number = 1) => {
-    mockDb.addToCart({
+    addToCart({
       id: product.title,
       name: product.title,
       price: parseInt(product.price.replace(/[^0-9]/g, '')),
       quantity: qty,
-      category: product.category
+      category: product.category,
+      image: product.image,
+      division: 'bakery'
     });
   };
 
@@ -423,6 +426,17 @@ export const BakeryMenu: React.FC<{ setCurrentView?: (v: any) => void; currentUs
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     );
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[var(--bakery-bg)]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[var(--bakery-primary)]/20 border-t-[var(--bakery-primary)] rounded-full animate-spin"></div>
+          <p className="text-[var(--bakery-text-muted)] font-serif italic">Warming the oven...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bakery-theme bg-[var(--bakery-bg)] min-h-screen text-[var(--bakery-text)] font-sans sm:pb-24 pt-0">

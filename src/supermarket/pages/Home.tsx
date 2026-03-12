@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '../context/CartContext';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 import { useMarketProducts } from '../hooks/useMarketProducts';
 import { Product } from '../types';
 import { useCMS } from '../../hooks/useCMS';
@@ -74,7 +74,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste, onSearchOutOf
   ];
   const [currentDealSlide, setCurrentDealSlide] = useState(0);
 
-  const { addToCart, cart, updateQuantity } = useCart();
+  const { addToCart, cart, updateQuantity } = useGlobalCart();
   const { products: MARKET_PRODUCTS, loading: productsLoading } = useMarketProducts({ context: 'RETAIL' });
 
   const allCategories = Array.from(new Set(MARKET_PRODUCTS.map(p => p.category)));
@@ -166,16 +166,24 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste, onSearchOutOf
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.stopPropagation();
-    addToCart(product, 1);
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      category: product.category,
+      image: product.image,
+      division: 'market'
+    });
   };
 
   const getProductQtyInCart = (productId: string) => {
-    const item = cart.items.find(i => i.id === productId && i.context === 'RETAIL');
+    const item = cart.find(i => i.id === productId && i.division === 'market');
     return item ? item.quantity : 0;
   };
 
   const getCartItem = (productId: string) => {
-    return cart.items.find(i => i.id === productId && i.context === 'RETAIL');
+    return cart.find(i => i.id === productId && i.division === 'market');
   };
 
   const clearFilters = () => {
@@ -437,7 +445,15 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste, onSearchOutOf
                         <span className="text-sm text-white/30 line-through font-sans">₦{FLASH_DEALS[currentDealSlide].oldPrice.toLocaleString()}</span>
                       </div>
                       <button
-                        onClick={() => addToCart(FLASH_DEALS[currentDealSlide], 1)}
+                        onClick={() => addToCart({
+                          id: FLASH_DEALS[currentDealSlide].id,
+                          name: FLASH_DEALS[currentDealSlide].name,
+                          price: FLASH_DEALS[currentDealSlide].price,
+                          quantity: 1,
+                          category: FLASH_DEALS[currentDealSlide].category,
+                          image: FLASH_DEALS[currentDealSlide].image,
+                          division: 'market'
+                        })}
                         className="group w-full bg-white text-slate-950 py-4 rounded-3xl text-xs font-black uppercase tracking-[0.2em] hover:bg-[var(--color-accent-light)] hover:text-white transition-all shadow-[0_15px_30px_-5px_rgba(0,0,0,0.3)] flex items-center justify-center gap-3"
                       >
                         <span className="material-icons text-sm group-hover:rotate-12 transition-transform">bolt</span> Claim Deal
@@ -644,14 +660,22 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onOpenSmartPaste, onSearchOutOf
                             {qty > 0 ? (
                               <div className="flex items-center bg-slate-950 dark:bg-white rounded-2xl p-1 shadow-xl" onClick={(e) => e.stopPropagation()}>
                                 <button
-                                  onClick={() => updateQuantity(cartItem!.cartId, qty - 1)}
+                                  onClick={() => updateQuantity(cartItem!.id, qty - 1)}
                                   className="w-8 h-8 flex items-center justify-center text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-950 transition-colors"
                                 >
                                   <span className="material-icons text-sm">remove</span>
                                 </button>
                                 <span className="w-8 text-center font-sans text-xs font-black text-white dark:text-slate-950">{qty}</span>
-                                <button
-                                  onClick={() => addToCart(product, 1)}
+                                  <button
+                                  onClick={() => addToCart({
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    quantity: 1,
+                                    category: product.category,
+                                    image: product.image,
+                                    division: 'market'
+                                  })}
                                   className="w-8 h-8 flex items-center justify-center text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-950 transition-colors"
                                 >
                                   <span className="material-icons text-sm">add</span>

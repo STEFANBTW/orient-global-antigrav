@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CartProvider } from './context/CartContext';
+// import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import LuxeStorefront from './pages/LuxeStorefront';
 import Wholesale from './pages/Wholesale';
@@ -290,9 +290,7 @@ export const SupermarketApp: React.FC<{
 
     return (
       <AuthProvider>
-        <CartProvider>
-          {renderContent()}
-        </CartProvider>
+        {renderContent()}
       </AuthProvider>
     );
   };

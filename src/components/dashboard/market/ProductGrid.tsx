@@ -66,16 +66,15 @@ export default function ProductGrid({
     const clearSelection = () => setSelected(new Set());
 
     const statusBadge = (s: string) => {
-        if (s === "active") return <Badge className="bg-green-100 text-green-700 text-[9px]">Active</Badge>;
-        if (s === "draft") return <Badge className="bg-amber-100 text-amber-700 text-[9px]">Draft</Badge>;
-        return <Badge className="bg-red-100 text-red-700 text-[9px]">Archived</Badge>;
+        if (s === "active") return <Badge variant="outline" className="bg-green-500/5 text-green-500 border-green-500/20 text-[9px] font-bold uppercase tracking-wider px-2 py-0">Active</Badge>;
+        if (s === "draft") return <Badge variant="outline" className="bg-amber-500/5 text-amber-500 border-amber-500/20 text-[9px] font-bold uppercase tracking-wider px-2 py-0">Draft</Badge>;
+        return <Badge variant="outline" className="bg-slate-500/5 text-slate-400 border-slate-500/20 text-[9px] font-bold uppercase tracking-wider px-2 py-0">Archived</Badge>;
     };
-
     const stockBadge = (stock: number | null) => {
         if (stock === null) return null;
-        if (stock <= 3) return <Badge className="bg-red-500 text-white text-[9px] animate-pulse">LOW: {stock}</Badge>;
-        if (stock <= 10) return <Badge className="bg-amber-100 text-amber-700 text-[9px]">{stock} left</Badge>;
-        return <span className="text-[10px] text-slate-400">{stock} in stock</span>;
+        if (stock <= 3) return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 text-[9px] font-bold px-2 py-0 animate-pulse">Low: {stock}</Badge>;
+        if (stock <= 10) return <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[9px] font-bold px-2 py-0">{stock} left</Badge>;
+        return <span className="text-[10px] uppercase font-bold tracking-tight opacity-40 px-1" style={{ color: 'var(--mcms-text)' }}>{stock} in stock</span>;
     };
 
     return (
@@ -84,14 +83,14 @@ export default function ProductGrid({
             <div className="sticky top-0 z-20 space-y-4 pt-1 pb-4" style={{ backgroundColor: 'var(--mcms-bg)' }}>
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2">
-                    <div className="relative flex-1 min-w-[180px] w-full sm:w-auto">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: 'var(--mcms-text-muted)' }} />
+                    <div className="relative flex-1 min-w-[200px] w-full sm:w-auto">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: 'var(--mcms-text-micro)' }} />
                         <Input
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                             placeholder="Search products..."
-                            className="pl-8 h-8 text-xs rounded-lg border"
-                            style={{ backgroundColor: 'var(--mcms-input-bg)', color: 'var(--mcms-text)', borderColor: 'var(--mcms-card-border)' }}
+                            className="pl-9 h-9 text-xs rounded-xl border-none shadow-sm focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-[var(--mcms-accent)]"
+                            style={{ backgroundColor: 'var(--mcms-input-bg)', color: 'var(--mcms-text)' }}
                         />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
@@ -127,18 +126,18 @@ export default function ProductGrid({
                         size="sm"
                         variant="outline"
                         onClick={onExportCSV}
-                        className="h-8 text-xs rounded-lg gap-1 border"
-                        style={{ backgroundColor: 'var(--mcms-card)', color: 'var(--mcms-text)', borderColor: 'var(--mcms-card-border)' }}
+                        className="h-9 text-xs rounded-xl gap-2 border-none shadow-sm"
+                        style={{ backgroundColor: 'var(--mcms-card)', color: 'var(--mcms-text)' }}
                     >
-                        <Download className="w-3 h-3" />CSV
+                        <Download className="w-3.5 h-3.5" />Export
                     </Button>
                     <Button
                         size="sm"
                         onClick={() => setShowAddForm(true)}
-                        className="h-8 text-xs rounded-lg text-white gap-1 border-none"
+                        className="h-9 px-5 text-xs rounded-xl text-white gap-2 border-none shadow-md hover:shadow-lg transition-all"
                         style={{ backgroundColor: 'var(--mcms-accent)' }}
                     >
-                        <Plus className="w-3 h-3" />Add
+                        <Plus className="w-3.5 h-3.5" />Add Product
                     </Button>
                 </div>
 
@@ -171,14 +170,13 @@ export default function ProductGrid({
             ) : paged.length === 0 ? (
                 <p className="text-center text-sm py-16" style={{ color: 'var(--mcms-text-muted)' }}>No products found</p>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {paged.map(p => (
                         <Card
                             key={p.id}
-                            className={`group overflow-hidden border transition-all hover:shadow-md ${selected.has(p.id) ? "ring-2 ring-offset-0" : ""}`}
+                            className={`group overflow-hidden border-none transition-all hover:shadow-xl ${selected.has(p.id) ? "ring-2 ring-offset-2" : "shadow-sm"}`}
                             style={{
                                 backgroundColor: 'var(--mcms-card)',
-                                borderColor: selected.has(p.id) ? 'var(--mcms-accent)' : 'var(--mcms-card-border)',
                                 '--tw-ring-color': 'var(--mcms-accent)'
                             } as any}
                         >
@@ -192,17 +190,18 @@ export default function ProductGrid({
                                     {stockBadge(p.stock)}
                                 </div>
                             </div>
-                            <div className="p-2.5">
-                                <p className="text-xs font-semibold truncate" style={{ color: 'var(--mcms-text)' }}>{p.name}</p>
-                                <p className="text-[10px] mb-1" style={{ color: 'var(--mcms-text-muted)' }}>{p.category}{p.brand ? ` · ${p.brand}` : ""}</p>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-sm font-bold" style={{ color: 'var(--mcms-heading)' }}>₦{p.price.toLocaleString()}</span>
-                                    {p.old_price && <span className="text-[10px] line-through" style={{ color: 'var(--mcms-text-micro)' }}>₦{p.old_price.toLocaleString()}</span>}
-                                </div>
-                                <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button size="sm" variant="outline" onClick={() => setEditingProduct(p)} className="h-6 text-[10px] rounded-full flex-1 gap-0.5 border" style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text)' }}><Edit2 className="w-2.5 h-2.5" />Edit</Button>
-                                    <Button size="sm" variant="outline" onClick={() => onDuplicate(p)} className="h-6 text-[10px] rounded-full gap-0.5 px-2 border" style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text)' }}><Copy className="w-2.5 h-2.5" /></Button>
-                                    <Button size="sm" variant="outline" onClick={() => onDelete(p.id)} className="h-6 text-[10px] rounded-full gap-0.5 px-2 text-red-500 hover:bg-red-500/10 border-red-500/20"><Trash2 className="w-2.5 h-2.5" /></Button>
+                            <div className="p-3">
+                                <p className="text-xs font-bold truncate tracking-tight" style={{ color: 'var(--mcms-text)' }}>{p.name}</p>
+                                <p className="text-[10px] mb-2 uppercase font-semibold tracking-wider" style={{ color: 'var(--mcms-text-micro)' }}>{p.category}</p>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-sm font-bold" style={{ color: 'var(--mcms-heading)' }}>₦{p.price.toLocaleString()}</span>
+                                        {p.old_price && <span className="text-[10px] line-through opacity-40" style={{ color: 'var(--mcms-text-micro)' }}>₦{p.old_price.toLocaleString()}</span>}
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-y-1 group-hover:translate-y-0">
+                                        <Button size="icon" variant="ghost" onClick={() => setEditingProduct(p)} className="h-7 w-7 rounded-full" style={{ color: 'var(--mcms-text)' }}><Edit2 className="w-3 h-3" /></Button>
+                                        <Button size="icon" variant="ghost" onClick={() => onDelete(p.id)} className="h-7 w-7 rounded-full text-red-400 hover:text-red-500 hover:bg-red-500/5"><Trash2 className="w-3 h-3" /></Button>
+                                    </div>
                                 </div>
                             </div>
                         </Card>

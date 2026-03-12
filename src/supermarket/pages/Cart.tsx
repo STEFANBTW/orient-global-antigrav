@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '../context/CartContext';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 import { supabase } from '@/lib/supabase';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
-const Cart: React.FC = () => {
-   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+const Cart: React.FC<{ onNavigate?: (target: string) => void }> = ({ onNavigate }) => {
+   const { cart, removeFromCart, updateQuantity, clearCart } = useGlobalCart();
    const { toast } = useToast();
 
    const [showCheckout, setShowCheckout] = useState(false);
@@ -23,51 +23,23 @@ const Cart: React.FC = () => {
       customer_address: ''
    });
 
-   const retailItems = cart.items.filter(i => i.context === 'RETAIL');
-   const wholesaleItems = cart.items.filter(i => i.context === 'WHOLESALE');
+   const retailItems = cart.filter(i => i.division === 'market' && (!i.category || i.category !== 'Wholesale'));
+   const wholesaleItems = cart.filter(i => i.division === 'market' && i.category === 'Wholesale');
 
-   const logisticsFee = cart.wholesaleSubtotal > 0 ? cart.wholesaleSubtotal * 0.05 : 0;
-   const standardDeliveryFee = cart.retailSubtotal > 0 ? 2500 : 0;
-   const grandTotal = cart.total + standardDeliveryFee + logisticsFee;
+   const retailSubtotal = retailItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+   const wholesaleSubtotal = wholesaleItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-   const handleCheckoutSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!customerForm.customer_name || !customerForm.customer_phone || !customerForm.customer_address) {
-         toast({ title: "Validation Error", description: "Please fill required fields (Name, Phone, Address).", variant: "destructive" });
-         return;
-      }
+   const logisticsFee = wholesaleSubtotal > 0 ? wholesaleSubtotal * 0.05 : 0;
+   const standardDeliveryFee = retailSubtotal > 0 ? 2500 : 0;
+   const grandTotal = retailSubtotal + wholesaleSubtotal + standardDeliveryFee + logisticsFee;
 
-      setIsSubmitting(true);
-
-      const orderData = {
-         ...customerForm,
-         items: cart.items,
-         subtotal: cart.total,
-         delivery_fee: standardDeliveryFee + logisticsFee,
-         total: grandTotal,
-         status: 'pending',
-         payment_status: 'pending'
-      };
-
-      const { data, error } = await supabase.from('market_orders').insert(orderData).select().single();
-
-      setIsSubmitting(false);
-
-      if (error) {
-         toast({ title: "Checkout Failed", description: error.message, variant: "destructive" });
-      } else {
-         // Decrement stock for each item
-         for (const item of cart.items) {
-            const { data: currentProduct } = await supabase.from('market_products').select('stock').eq('id', item.id).single();
-            if (currentProduct && currentProduct.stock !== null) {
-               const newStock = Math.max(0, currentProduct.stock - item.quantity);
-               await supabase.from('market_products').update({ stock: newStock }).eq('id', item.id);
-            }
-         }
-
-         toast({ title: "Order Placed Successfully!", description: `Order #${data.id.slice(0, 8)} is processing.` });
-         clearCart();
-         setShowCheckout(false);
+   const handleProceedToCheckout = () => {
+      // Direct user to global checkout view
+      if (onNavigate) {
+         // In App.tsx currentView, we need 'checkout'
+         // SupermarketWrapper might need to bubble this up or we use a global event/state
+         // For now, if we are in SupermarketApp, we might need a way to reach the root setCurrentView
+         window.dispatchEvent(new CustomEvent('switch-view', { detail: 'checkout' }));
       }
    };
 
@@ -97,11 +69,11 @@ const Cart: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                <div className="lg:col-span-8 space-y-6">
                   <div className="flex items-center justify-between mb-2">
-                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Shopping Cart <span className="text-gray-400 text-lg font-normal ml-2">({cart.items.length} Items)</span></h1>
+                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Shopping Cart <span className="text-gray-400 text-lg font-normal ml-2">({cart.length} Items)</span></h1>
                      <button onClick={clearCart} className="text-[var(--color-accent-light)] font-medium text-sm flex items-center gap-1"><span className="material-icons text-sm">delete_outline</span> Clear Cart</button>
                   </div>
 
-                  {cart.items.length === 0 && (
+                  {cart.length === 0 && (
                      <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                         <span className="material-icons text-6xl text-gray-200 dark:text-slate-600 mb-4">production_quantity_limits</span>
                         <p className="text-gray-500 dark:text-gray-400 text-lg">Your cart is empty.</p>
@@ -113,18 +85,18 @@ const Cart: React.FC = () => {
                      <div className="space-y-4">
                         <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2"><span className="material-icons text-base">storefront</span> Retail Items</h3>
                         {retailItems.map((item) => (
-                           <motion.div layout key={item.cartId} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row gap-4 items-center">
+                           <motion.div layout key={item.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row gap-4 items-center">
                               <div className="w-24 h-24 rounded-lg bg-gray-100 dark:bg-slate-700 overflow-hidden flex-shrink-0"><img src={item.image} className="w-full h-full object-cover" alt={item.name} /></div>
                               <div className="flex-grow min-w-0 w-full">
                                  <div className="flex justify-between items-start">
                                     <div><h3 className="font-bold text-lg text-slate-900 dark:text-white">{item.name}</h3></div>
-                                    <button onClick={() => removeFromCart(item.cartId)} className="text-gray-400 hover:text-red-500 p-1"><span className="material-icons text-xl">close</span></button>
+                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500 p-1"><span className="material-icons text-xl">close</span></button>
                                  </div>
                                  <div className="flex justify-between items-end mt-2">
                                     <div className="flex items-center border border-gray-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700">
-                                       <button onClick={() => updateQuantity(item.cartId, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-l-lg text-slate-600 dark:text-slate-300">-</button>
+                                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-l-lg text-slate-600 dark:text-slate-300">-</button>
                                        <span className="w-10 text-center text-sm font-semibold text-slate-900 dark:text-white">{item.quantity}</span>
-                                       <button onClick={() => updateQuantity(item.cartId, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-r-lg text-slate-600 dark:text-slate-300">+</button>
+                                       <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-r-lg text-slate-600 dark:text-slate-300">+</button>
                                     </div>
                                     <div className="text-right">
                                        <span className="block text-xl font-bold text-slate-900 dark:text-white">₦{item.price.toLocaleString()}</span>
@@ -141,21 +113,21 @@ const Cart: React.FC = () => {
                      <div className="space-y-4 mt-8 pt-6 border-t border-gray-200 dark:border-slate-700">
                         <h3 className="text-sm font-bold text-[var(--color-accent-light)] uppercase tracking-wider flex items-center gap-2"><span className="material-icons text-base">inventory_2</span> Wholesale / Bulk Items</h3>
                         {wholesaleItems.map((item) => (
-                           <motion.div layout key={item.cartId} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-4 shadow-sm border border-orange-100 dark:border-orange-900/30 flex flex-col sm:flex-row gap-4 items-center">
+                           <motion.div layout key={item.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="bg-orange-50/50 dark:bg-orange-900/10 rounded-xl p-4 shadow-sm border border-orange-100 dark:border-orange-900/30 flex flex-col sm:flex-row gap-4 items-center">
                               <div className="w-24 h-24 rounded-lg bg-gray-100 dark:bg-slate-700 overflow-hidden flex-shrink-0 relative">
                                  <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
                                  <div className="absolute top-0 left-0 bg-[var(--color-accent-light)] text-white text-[10px] px-1 py-0.5 font-bold">BULK</div>
                               </div>
                               <div className="flex-grow min-w-0 w-full">
                                  <div className="flex justify-between items-start">
-                                    <div><h3 className="font-bold text-lg text-slate-900 dark:text-white">{item.name}</h3><p className="text-sm text-gray-500 dark:text-gray-400">{item.unit} • {item.tierInfo}</p></div>
-                                    <button onClick={() => removeFromCart(item.cartId)} className="text-gray-400 hover:text-red-500 p-1"><span className="material-icons text-xl">close</span></button>
+                                    <div><h3 className="font-bold text-lg text-slate-900 dark:text-white">{item.name}</h3><p className="text-sm text-gray-500 dark:text-gray-400">{item.unit} • {item.category}</p></div>
+                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500 p-1"><span className="material-icons text-xl">close</span></button>
                                  </div>
                                  <div className="flex justify-between items-end mt-2">
                                     <div className="flex items-center border border-orange-200 dark:border-orange-800/50 rounded-lg bg-white dark:bg-slate-800">
-                                       <button onClick={() => updateQuantity(item.cartId, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-l-lg text-slate-600 dark:text-slate-300">-</button>
+                                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-l-lg text-slate-600 dark:text-slate-300">-</button>
                                        <span className="w-12 text-center text-sm font-semibold text-slate-900 dark:text-white">{item.quantity}</span>
-                                       <button onClick={() => updateQuantity(item.cartId, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-r-lg text-slate-600 dark:text-slate-300">+</button>
+                                       <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-r-lg text-slate-600 dark:text-slate-300">+</button>
                                     </div>
                                     <div className="text-right">
                                        <span className="block text-xl font-bold text-slate-900 dark:text-white">₦{(item.price * item.quantity).toLocaleString()}</span>
@@ -173,17 +145,17 @@ const Cart: React.FC = () => {
                   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 p-6 sticky top-24 transition-colors duration-300">
                      <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Checkout Summary</h2>
                      <div className="space-y-3 mb-6">
-                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Retail Subtotal</span><span>₦{cart.retailSubtotal.toLocaleString()}</span></div>
-                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Wholesale Subtotal</span><span>₦{cart.wholesaleSubtotal.toLocaleString()}</span></div>
+                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Retail Subtotal</span><span>₦{retailSubtotal.toLocaleString()}</span></div>
+                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Wholesale Subtotal</span><span>₦{wholesaleSubtotal.toLocaleString()}</span></div>
 
                         {/* Dynamic Logistics Fee */}
-                        {cart.wholesaleSubtotal > 0 && (
+                        {wholesaleSubtotal > 0 && (
                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                               <span>Freight Logistics</span>
-                              <span>₦{(cart.wholesaleSubtotal * 0.05).toLocaleString()}</span>
+                              <span>₦{(wholesaleSubtotal * 0.05).toLocaleString()}</span>
                            </div>
                         )}
-                        {cart.retailSubtotal > 0 && (
+                        {retailSubtotal > 0 && (
                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                               <span>Standard Delivery</span>
                               <span>₦2,500</span>
@@ -193,8 +165,8 @@ const Cart: React.FC = () => {
                         <div className="border-t border-gray-200 dark:border-slate-700 pt-3 flex justify-between items-center"><span className="text-base font-bold text-slate-900 dark:text-white">Grand Total</span><span className="text-2xl font-bold text-slate-900 dark:text-white">₦{grandTotal.toLocaleString()}</span></div>
                      </div>
                      <button
-                        onClick={() => setShowCheckout(true)}
-                        disabled={cart.items.length === 0}
+                        onClick={handleProceedToCheckout}
+                        disabled={cart.length === 0}
                         className="w-full bg-[var(--color-accent-light)] hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg py-3.5 rounded-xl shadow-lg transition-all transform active:scale-[0.98]">
                         Proceed to Checkout
                      </button>
@@ -203,43 +175,6 @@ const Cart: React.FC = () => {
             </div>
          </main>
 
-         {/* Checkout Dialog */}
-         <AnimatePresence>
-            {showCheckout && (
-               <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
-                  <DialogContent className="sm:max-w-[425px]">
-                     <DialogHeader>
-                        <DialogTitle className="text-xl">Checkout Details</DialogTitle>
-                     </DialogHeader>
-                     <form onSubmit={handleCheckoutSubmit} className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                           <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
-                           <Input id="name" required value={customerForm.customer_name} onChange={e => setCustomerForm(prev => ({ ...prev, customer_name: e.target.value }))} placeholder="John Doe" />
-                        </div>
-                        <div className="space-y-2">
-                           <Label htmlFor="email">Email Address <span className="text-slate-400 font-normal">(Optional)</span></Label>
-                           <Input id="email" type="email" value={customerForm.customer_email} onChange={e => setCustomerForm(prev => ({ ...prev, customer_email: e.target.value }))} placeholder="john@example.com" />
-                        </div>
-                        <div className="space-y-2">
-                           <Label htmlFor="phone">Phone Number <span className="text-red-500">*</span></Label>
-                           <Input id="phone" required value={customerForm.customer_phone} onChange={e => setCustomerForm(prev => ({ ...prev, customer_phone: e.target.value }))} placeholder="08012345678" />
-                        </div>
-                        <div className="space-y-2">
-                           <Label htmlFor="address">Delivery Address <span className="text-red-500">*</span></Label>
-                           <Input id="address" required value={customerForm.customer_address} onChange={e => setCustomerForm(prev => ({ ...prev, customer_address: e.target.value }))} placeholder="123 Main St, Lagos" />
-                        </div>
-                        <DialogFooter className="pt-4 flex gap-2">
-                           <Button type="button" className="border border-slate-200 bg-white text-slate-900 hover:bg-slate-100" onClick={() => setShowCheckout(false)} disabled={isSubmitting}>Cancel</Button>
-                           <Button type="submit" disabled={isSubmitting} className="bg-[var(--color-accent-light)] hover:bg-orange-600 text-white min-w-[120px]">
-                              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                              {isSubmitting ? "Processing..." : `Pay ₦${grandTotal.toLocaleString()}`}
-                           </Button>
-                        </DialogFooter>
-                     </form>
-                  </DialogContent>
-               </Dialog>
-            )}
-         </AnimatePresence>
       </div>
    );
 };

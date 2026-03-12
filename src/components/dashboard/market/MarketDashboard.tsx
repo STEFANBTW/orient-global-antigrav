@@ -9,22 +9,22 @@ import {
 function StatCard({ icon: Icon, title, value, sub, trend, color }: any) {
     const up = trend > 0;
     return (
-        <Card className="overflow-hidden border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
-            <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
+        <Card className="overflow-hidden border-none shadow-sm transition-all hover:shadow-md" style={{ backgroundColor: 'var(--mcms-card)' }}>
+            <div className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center opacity-80 ${color}`}>
                         <Icon className="w-4 h-4 text-white" />
                     </div>
                     {trend !== undefined && (
-                        <Badge className={`text-[9px] gap-0.5 border-none ${up ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
+                        <Badge variant="outline" className={`text-[9px] font-bold gap-0.5 border ${up ? "bg-green-500/5 text-green-500 border-green-500/10" : "bg-red-500/5 text-red-500 border-red-500/10"}`}>
                             {up ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
                             {Math.abs(trend)}%
                         </Badge>
                     )}
                 </div>
-                <p className="text-xl font-bold" style={{ color: 'var(--mcms-text)' }}>{value}</p>
-                <p className="text-[10px] font-medium uppercase tracking-wider mt-0.5" style={{ color: 'var(--mcms-text-muted)' }}>{title}</p>
-                {sub && <p className="text-[10px] mt-1" style={{ color: 'var(--mcms-text-micro)' }}>{sub}</p>}
+                <p className="text-2xl font-bold tracking-tight" style={{ color: 'var(--mcms-text)' }}>{value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] mt-1" style={{ color: 'var(--mcms-text-micro)' }}>{title}</p>
+                {sub && <p className="text-[10px] mt-2 font-medium" style={{ color: 'var(--mcms-text-micro)', opacity: 0.6 }}>{sub}</p>}
             </div>
         </Card>
     );
@@ -39,9 +39,9 @@ export default function MarketDashboard({ cms }: { cms: any }) {
 
     return (
         <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto px-2 sm:px-0">
-            <div>
-                <h1 className="text-lg font-bold uppercase italic tracking-tight" style={{ color: 'var(--mcms-heading)' }}>Market Operations Summary</h1>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--mcms-text-micro)' }}>Real-time logistics & inventory metrics</p>
+            <div className="mb-2">
+                <h1 className="text-xl font-bold italic tracking-tight" style={{ color: 'var(--mcms-heading)' }}>Market Operations Summary</h1>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mt-1" style={{ color: 'var(--mcms-text-micro)', opacity: 0.5 }}>Real-time logistics & inventory metrics</p>
             </div>
 
             {/* Stats row */}
@@ -54,10 +54,10 @@ export default function MarketDashboard({ cms }: { cms: any }) {
 
             {/* Low stock alerts */}
             {inventoryAlerts.critical.length > 0 && (
-                <Card className="border-red-500/30 bg-red-500/5">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-bold text-red-500 flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 animate-pulse" /> Critical Stock — Needs Immediate Restock
+                <Card className="border-none bg-red-500/[0.03] shadow-sm">
+                    <CardHeader className="pb-3 px-6 pt-6">
+                        <CardTitle className="text-[11px] font-bold text-red-500 flex items-center gap-2 uppercase tracking-widest">
+                            <AlertTriangle className="w-3.5 h-3.5 animate-pulse" /> Critical Stock — Needs Immediate Restock
                         </CardTitle>
                     </CardHeader>
                     <div className="px-4 sm:px-6 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">

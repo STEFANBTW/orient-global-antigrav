@@ -1,6 +1,8 @@
 import React from 'react';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 const DeliveryScreen: React.FC = () => {
+    const { addToCart } = useGlobalCart();
     return (
         <div className="bg-slate-50 dark:bg-background-dark min-h-screen text-gray-800 dark:text-gray-100 font-sans pb-24">
              {/* Map Hero */}
@@ -202,7 +204,9 @@ const TimelineItem = ({ icon, title, time, text, subText, active, completed }: a
     </div>
 );
 
-const BundleCard = ({ title, price, desc, image, badge, badgeColor, people, time, icon }: any) => (
+const BundleCard = ({ title, price, desc, image, badge, badgeColor, people, time, icon }: any) => {
+    const { addToCart } = useGlobalCart();
+    return (
     <div className="group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 cursor-pointer">
         <div className="relative h-56 overflow-hidden">
             <img src={image} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" alt={title} />
@@ -223,13 +227,28 @@ const BundleCard = ({ title, price, desc, image, badge, badgeColor, people, time
                     <span className="flex items-center"><span className="material-icons text-xs mr-1">{icon || 'group'}</span> {people}</span>
                     <span className="flex items-center"><span className="material-icons text-xs mr-1">schedule</span> {time}</span>
                 </div>
-                <button className="bg-primary/10 hover:bg-primary hover:text-white text-primary font-semibold py-1.5 px-3.5 rounded-lg transition-colors text-xs">
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart({
+                            id: `bundle-${title.toLowerCase().replace(/\s+/g, '-')}`,
+                            name: title,
+                            price: parseInt(price.replace(/[^0-9]/g, '')),
+                            image: image,
+                            quantity: 1,
+                            category: 'Bundles',
+                            division: 'dining'
+                        });
+                    }}
+                    className="bg-primary/10 hover:bg-primary hover:text-white text-primary font-semibold py-1.5 px-3.5 rounded-lg transition-colors text-xs"
+                >
                     Add to Cart
                 </button>
             </div>
         </div>
     </div>
-);
+    );
+};
 
 const ZoneCard = ({ name, badge, badgeColor, fee, time, freeOver, popular }: any) => (
     <div className={`bg-white dark:bg-gray-900 rounded-lg p-5 border transition-colors relative overflow-hidden ${popular ? 'border-primary dark:border-primary/50 shadow-md' : 'border-gray-100 dark:border-gray-800 hover:border-primary/50'}`}>

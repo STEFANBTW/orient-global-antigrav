@@ -22,6 +22,7 @@ import { mockDb } from './src/lib/mockDb';
 import { LoginForm } from './src/components/auth/LoginForm';
 import { SignupForm } from './src/components/auth/SignupForm';
 import { CheckoutPage } from './src/components/checkout/CheckoutPage';
+import { GlobalCartProvider } from './src/context/GlobalCartContext';
 
 // --- Utility: Magnetic Tilt Hook ---
 function useMagneticTilt() {
@@ -2163,10 +2164,9 @@ const MainLayout: React.FC<{
             {currentView === 'water' && (
               <WaterProvider>
                 <div className={`water-theme ${divisionThemes['water'] === 'dark' ? 'dark' : ''} min-h-screen relative`}>
-                  <Navbar theme={globalTheme} toggleTheme={toggleGlobalTheme} setCurrentView={setCurrentView} scrolled={scrolled} navHidden={navHidden} isSubpage isAppNavHovered={isNavHovered} onHoverChange={setIsNavHovered} />
+                  <Navbar theme={globalTheme} toggleTheme={toggleGlobalTheme} setCurrentView={setCurrentView} scrolled={scrolled} navHidden={navHidden} isSubpage isAppNavHovered={isNavHovered} onHoverChange={setIsNavHovered} heroOutOfView={heroOutOfView} />
                   <WaterNav navHidden={navHidden} currentPage={waterPage} onNavigate={setWaterPage} scrolled={scrolled} isAppNavHovered={isNavHovered} onHoverChange={setIsNavHovered} heroOutOfView={heroOutOfView} />
                   <WaterApp currentPage={waterPage} onNavigate={setWaterPage} />
-                  <Footer setCurrentView={setCurrentView} />
                 </div>
               </WaterProvider>
             )}
@@ -2267,6 +2267,17 @@ const App: React.FC = () => {
   const [smSearchTerm, setSmSearchTerm] = useState('');
 
   useEffect(() => {
+    const handleSwitchView = (e: any) => {
+      if (e.detail) {
+        setCurrentView(e.detail);
+        document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('switch-view', handleSwitchView);
+    return () => window.removeEventListener('switch-view', handleSwitchView);
+  }, []);
+
+  useEffect(() => {
     if (currentView !== 'home' && currentView !== 'login' && currentView !== 'admin') {
       setNavHidden(true);
     } else {
@@ -2321,51 +2332,53 @@ const App: React.FC = () => {
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {isLoading ? (
-        <Preloader onComplete={() => setIsLoading(false)} key="preloader" />
-      ) : (
-        <MainLayout
-          key="main-layout"
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          bakeryView={bakeryView}
-          setBakeryView={setBakeryView}
-          supermarketPage={supermarketPage}
-          setSupermarketPage={setSupermarketPage}
-          diningView={diningView}
-          setDiningView={setDiningView}
-          gamesPage={gamesPage}
-          setGamesPage={setGamesPage}
-          waterPage={waterPage}
-          setWaterPage={setWaterPage}
-          loungePage={loungePage}
-          setLoungePage={setLoungePage}
-          globalTheme={globalTheme}
-          divisionThemes={divisionThemes}
-          toggleGlobalTheme={toggleGlobalTheme}
-          scrolled={scrolled}
-          setScrolled={setScrolled}
-          navHidden={navHidden}
-          setNavHidden={setNavHidden}
-          activeSectionId={activeSectionId}
-          setActiveSectionId={setActiveSectionId}
-          isLoading={isLoading}
-          isSmartPasteOpen={isSmartPasteOpen}
-          setIsSmartPasteOpen={setIsSmartPasteOpen}
-          currentUser={currentUser}
-          handleLogin={handleLogin}
-          isNavHovered={isNavHovered}
-          setIsNavHovered={setIsNavHovered}
-          heroOutOfView={heroOutOfView}
-          setHeroOutOfView={setHeroOutOfView}
-          smSearchOutOfView={smSearchOutOfView}
-          setSmSearchOutOfView={setSmSearchOutOfView}
-          smSearchTerm={smSearchTerm}
-          setSmSearchTerm={setSmSearchTerm}
-        />
-      )}
-    </AnimatePresence>
+    <GlobalCartProvider>
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <Preloader onComplete={() => setIsLoading(false)} key="preloader" />
+        ) : (
+          <MainLayout
+            key="main-layout"
+            currentView={currentView}
+            setCurrentView={setCurrentView}
+            bakeryView={bakeryView}
+            setBakeryView={setBakeryView}
+            supermarketPage={supermarketPage}
+            setSupermarketPage={setSupermarketPage}
+            diningView={diningView}
+            setDiningView={setDiningView}
+            gamesPage={gamesPage}
+            setGamesPage={setGamesPage}
+            waterPage={waterPage}
+            setWaterPage={setWaterPage}
+            loungePage={loungePage}
+            setLoungePage={setLoungePage}
+            globalTheme={globalTheme}
+            divisionThemes={divisionThemes}
+            toggleGlobalTheme={toggleGlobalTheme}
+            scrolled={scrolled}
+            setScrolled={setScrolled}
+            navHidden={navHidden}
+            setNavHidden={setNavHidden}
+            activeSectionId={activeSectionId}
+            setActiveSectionId={setActiveSectionId}
+            isLoading={isLoading}
+            isSmartPasteOpen={isSmartPasteOpen}
+            setIsSmartPasteOpen={setIsSmartPasteOpen}
+            currentUser={currentUser}
+            handleLogin={handleLogin}
+            isNavHovered={isNavHovered}
+            setIsNavHovered={setIsNavHovered}
+            heroOutOfView={heroOutOfView}
+            setHeroOutOfView={setHeroOutOfView}
+            smSearchOutOfView={smSearchOutOfView}
+            setSmSearchOutOfView={setSmSearchOutOfView}
+            smSearchTerm={smSearchTerm}
+            setSmSearchTerm={setSmSearchTerm}
+          />
+        )}
+      </AnimatePresence>
+    </GlobalCartProvider>
   );
 };
 

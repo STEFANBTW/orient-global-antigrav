@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useCMS } from '@/hooks/useCMS';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 const MenuScreen: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const { content: cmsData, loading } = useCMS('dining');
+    const { addToCart } = useGlobalCart();
 
     if (loading) {
         return (
@@ -126,7 +128,18 @@ const MenuScreen: React.FC = () => {
                                 <h3 className="text-xl text-white font-bold font-sans">{localMenu[1].title}</h3>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-primary font-bold">{localMenu[1].price}</span>
-                                    <button className="w-7 h-7 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center text-white transition-colors">
+                                    <button 
+                                        onClick={() => addToCart({
+                                            id: 'dining-local-1',
+                                            name: localMenu[1].title,
+                                            price: parseInt(localMenu[1].price.replace(/[^0-9]/g, '')),
+                                            image: localMenu[1].image,
+                                            quantity: 1,
+                                            category: 'Local Soul',
+                                            division: 'dining'
+                                        })}
+                                        className="w-7 h-7 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center text-white transition-colors"
+                                    >
                                         <span className="material-icons text-xs">add</span>
                                     </button>
                                 </div>
@@ -141,7 +154,18 @@ const MenuScreen: React.FC = () => {
                                 <h3 className="text-xl text-white font-bold font-sans">{localMenu[2].title}</h3>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-primary font-bold">{localMenu[2].price}</span>
-                                    <button className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center text-white transition-colors">
+                                    <button 
+                                        onClick={() => addToCart({
+                                            id: 'dining-local-2',
+                                            name: localMenu[2].title,
+                                            price: parseInt(localMenu[2].price.replace(/[^0-9]/g, '')),
+                                            image: localMenu[2].image,
+                                            quantity: 1,
+                                            category: 'Local Soul',
+                                            division: 'dining'
+                                        })}
+                                        className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center text-white transition-colors"
+                                    >
                                         <span className="material-icons text-sm">add</span>
                                     </button>
                                 </div>
@@ -159,7 +183,20 @@ const MenuScreen: React.FC = () => {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <span className="text-primary font-bold text-xl">₦15,000</span>
-                                    <button className="px-5 py-1.5 bg-primary hover:bg-red-700 text-white rounded-full transition-colors text-sm font-medium">Add to Order</button>
+                                    <button 
+                                        onClick={() => addToCart({
+                                            id: 'dining-catfish',
+                                            name: 'Whole Grilled Catfish',
+                                            price: 15000,
+                                            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDWzM7d0VlahOQ5ysiJiJjCwOySlZX6Qu3P8KdB1HH63tSWU_E5N_oaFBv6rT4JuHLbMl_9HDZqxGaZ2xzyGkO-gwUkZtF0KE67Nibx8bkLX2KqjAM7BvYkdSCzGFP5_M16q2LiYwmY-Q7bz_fqK2oU1zCF4CHR2y5Ing20fcf2YU4KLwtS0sM6KJIVSrt6eZ3m7eo2Hk64kiAoPLnAw1oC43eYDgMFinuA9ApVJ0mc6s02YamuMcAmSuomqq2PaNCI6AO6vTKeMggW',
+                                            quantity: 1,
+                                            category: 'The Grill',
+                                            division: 'dining'
+                                        })}
+                                        className="px-5 py-1.5 bg-primary hover:bg-red-700 text-white rounded-full transition-colors text-sm font-medium"
+                                    >
+                                        Add to Order
+                                    </button>
                                 </div>
                             </div>
                         </div>

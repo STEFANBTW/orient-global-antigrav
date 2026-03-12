@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "../context/CartContext";
+import { useGlobalCart } from "../../context/GlobalCartContext";
 import Hub from "../luxe/views/Hub";
 import Smartphones from "../luxe/views/Smartphones";
 import Laptops from "../luxe/views/Laptops";
@@ -92,7 +92,7 @@ export default function LuxeStorefront({ onNavigate, onOpenSmartPaste, onSearchO
   const [cartCount, setCartCount] = useState(0);
   const [currentView, setCurrentView] = useState("home"); // "home" or "groceries"
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { addToCart: cartAdd } = useCart();
+  const { addToCart: cartAdd } = useGlobalCart();
   const { theme, setTheme } = useTheme();
 
   const [internalSearchTerm, setInternalSearchTerm] = useState('');
@@ -220,7 +220,15 @@ export default function LuxeStorefront({ onNavigate, onOpenSmartPaste, onSearchO
   };
 
   const addToCart = (product: Product) => {
-    cartAdd(product as any, 1);
+    cartAdd({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      category: product.category,
+      image: product.image,
+      division: 'market'
+    });
     setCartCount((prev) => prev + 1);
   };
 

@@ -84,72 +84,76 @@ export default function BakeryCms({
         {/* Subtle background glow based on holiday preset */}
         <div 
           className="fixed top-0 right-0 w-[800px] h-[800px] rounded-full blur-[150px] opacity-10 pointer-events-none transition-all duration-1000"
-          style={{ backgroundColor: accentColor, opacity: isDarkMode ? 0.1 : 0.05 }}
+          style={{ backgroundColor: accentColor, opacity: isDarkMode ? 0.08 : 0.03 }}
         />
 
         <div className="max-w-4xl mx-auto p-12 pb-32">
           
-          <div className="mb-10">
-            <h1 className={`text-3xl font-black font-serif ${isDarkMode ? 'text-white' : 'text-slate-900'} flex items-center gap-3 tracking-tight`}>
-              {activeTab === "home" && "Home Page Editor"}
-              {activeTab === "inventory" && "Inventory Heatmap"}
-              {activeTab === "orders" && "Live Order Monitor"}
-              {activeTab === "menu" && "Menu Management"}
-              {activeTab === "wholesale" && "Wholesale Portal"}
-              {activeTab === "story" && "Our Story Editor"}
-              {activeTab === "settings" && "SEO & Preferences"}
-              <span className="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse" />
+          <div className="mb-14">
+            <h1 className={`text-[10px] font-black uppercase tracking-[0.3em] mb-3 flex items-center gap-2 ${isDarkMode ? 'text-[#d4af37]/80' : 'text-[#d4af37]'}`}>
+               Artisanal Content Operations <span className="w-8 h-[1px] bg-current opacity-20" />
             </h1>
-            <p className={`${isDarkMode ? 'text-white/40' : 'text-slate-500'} text-sm mt-2`}>Manage your artisanal content and operations.</p>
+            <h2 className={`text-4xl font-serif font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} tracking-tight`}>
+              {activeTab === "home" && "Interface Control"}
+              {activeTab === "inventory" && "Stock Matrix"}
+              {activeTab === "orders" && "Active Logistics"}
+              {activeTab === "menu" && "Catalog Curation"}
+              {activeTab === "wholesale" && "B2B Infrastructure"}
+              {activeTab === "story" && "Brand Narrative"}
+              {activeTab === "settings" && "Global Params"}
+            </h2>
           </div>
 
           {/* Framer Motion Content Area */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               
               {/* --- HOME TAB --- */}
               {activeTab === "home" && (
                 <div className="space-y-8">
-                  <SectionCard title="Hero Section" isDarkMode={isDarkMode}>
+                  <SectionCard title="Hero Configuration" isDarkMode={isDarkMode}>
                     <FormInput 
-                      label="Hero Title" icon={<Type size={16} />} 
+                      label="Main Headline" icon={<Type size={14} />} 
                       value={cmsData.home.heroTitle} 
                       onChange={(e: any) => updateNestedState('home', 'heroTitle', e.target.value)} 
                       isDarkMode={isDarkMode}
                     />
                     <FormTextarea 
-                      label="Hero Subtext" icon={<AlignLeft size={16} />} 
+                      label="Secondary Narrative" icon={<AlignLeft size={14} />} 
                       value={cmsData.home.heroSubtext} 
                       onChange={(e: any) => updateNestedState('home', 'heroSubtext', e.target.value)} 
                       isDarkMode={isDarkMode}
                     />
                     <div className="grid grid-cols-2 gap-4">
-                      <FormInput label="Primary Button Text" icon={<Edit3 size={16} />} value={cmsData.home.btn1Text} onChange={(e: any) => updateNestedState('home', 'btn1Text', e.target.value)} isDarkMode={isDarkMode} />
-                      <FormInput label="Button Link" icon={<LinkIcon size={16} />} value={cmsData.home.btn1Link} onChange={(e: any) => updateNestedState('home', 'btn1Link', e.target.value)} isDarkMode={isDarkMode} />
+                      <FormInput label="Call to Action" value={cmsData.home.btn1Text} onChange={(e: any) => updateNestedState('home', 'btn1Text', e.target.value)} isDarkMode={isDarkMode} />
+                      <FormInput label="Destination Path" value={cmsData.home.btn1Link} onChange={(e: any) => updateNestedState('home', 'btn1Link', e.target.value)} isDarkMode={isDarkMode} />
                     </div>
-                    <ImagePreviewInput label="Hero Image URL" url={cmsData.home.heroImage} onChange={(val: string) => updateNestedState('home', 'heroImage', val)} isDarkMode={isDarkMode} />
+                    <ImagePreviewInput label="Background Asset URL" url={cmsData.home.heroImage} onChange={(val: string) => updateNestedState('home', 'heroImage', val)} isDarkMode={isDarkMode} />
                   </SectionCard>
 
-                  <SectionCard title="Rolling Ticker" isDarkMode={isDarkMode}>
-                    <FormInput label="News Headline" icon={<Zap size={16} className="text-yellow-500" />} value={cmsData.home.newsHeadline} onChange={(e: any) => updateNestedState('home', 'newsHeadline', e.target.value)} isDarkMode={isDarkMode} />
+                  <SectionCard title="Ticker Stream" isDarkMode={isDarkMode}>
+                    <FormInput label="Global Announcement" icon={<Zap size={14} className="text-amber-500" />} value={cmsData.home.newsHeadline} onChange={(e: any) => updateNestedState('home', 'newsHeadline', e.target.value)} isDarkMode={isDarkMode} />
                   </SectionCard>
 
-                  <SectionCard title="Cake of the Week" isDarkMode={isDarkMode}>
-                    <div className={`flex items-center justify-between mb-4 p-3 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'} border rounded-lg`}>
-                      <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Show Section on Website</span>
+                  <SectionCard title="Curated Highlight" isDarkMode={isDarkMode}>
+                    <div className={`flex items-center justify-between mb-6 p-4 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-slate-200'}`}>
+                      <div>
+                        <span className={`text-[9px] font-black uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>Active Status</span>
+                        <p className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Display 'Cake of the Week'</p>
+                      </div>
                       <Switch isOn={cmsData.home.cakeOfWeek.show} onToggle={() => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, show: !cmsData.home.cakeOfWeek.show}}})} isDarkMode={isDarkMode} />
                     </div>
                     {cmsData.home.cakeOfWeek.show && (
-                      <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="space-y-4">
-                        <FormInput label="Cake Name" icon={<Croissant size={16} />} value={cmsData.home.cakeOfWeek.name} onChange={(e: any) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, name: e.target.value}}})} isDarkMode={isDarkMode} />
-                        <FormTextarea label="Tasting Notes & Description" icon={<AlignLeft size={16} />} value={cmsData.home.cakeOfWeek.desc} onChange={(e: any) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, desc: e.target.value}}})} isDarkMode={isDarkMode} />
-                        <ImagePreviewInput label="Product Image URL" url={cmsData.home.cakeOfWeek.image} onChange={(val: string) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, image: val}}})} isDarkMode={isDarkMode} />
+                      <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="space-y-4">
+                        <FormInput label="Selection Name" value={cmsData.home.cakeOfWeek.name} onChange={(e: any) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, name: e.target.value}}})} isDarkMode={isDarkMode} />
+                        <FormTextarea label="Sensory Description" value={cmsData.home.cakeOfWeek.desc} onChange={(e: any) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, desc: e.target.value}}})} isDarkMode={isDarkMode} />
+                        <ImagePreviewInput label="Visual Asset URL" url={cmsData.home.cakeOfWeek.image} onChange={(val: string) => setCmsData({...cmsData, home: {...cmsData.home, cakeOfWeek: {...cmsData.home.cakeOfWeek, image: val}}})} isDarkMode={isDarkMode} />
                       </motion.div>
                     )}
                   </SectionCard>
@@ -160,17 +164,17 @@ export default function BakeryCms({
               {activeTab === "inventory" && (
                 <SectionCard title="Stock Status" isDarkMode={isDarkMode}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl flex items-center justify-between">
+                    <div className="bg-green-500/5 border border-green-500/10 p-5 rounded-xl flex items-center justify-between">
                       <span className="text-green-500 text-[10px] font-bold uppercase tracking-widest">In Stock (&gt;20)</span>
-                      <span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock >= 20).length}</span>
+                      <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock >= 20).length}</span>
                     </div>
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex items-center justify-between">
+                    <div className="bg-yellow-500/5 border border-yellow-500/10 p-5 rounded-xl flex items-center justify-between">
                       <span className="text-yellow-500 text-[10px] font-bold uppercase tracking-widest">Low Stock (&lt;10)</span>
-                      <span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock > 0 && i.stock < 10).length}</span>
+                      <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock > 0 && i.stock < 10).length}</span>
                     </div>
-                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-center justify-between">
+                    <div className="bg-red-500/5 border border-red-500/10 p-5 rounded-xl flex items-center justify-between">
                       <span className="text-red-500 text-[10px] font-bold uppercase tracking-widest">Sold Out</span>
-                      <span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock === 0).length}</span>
+                      <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cmsData.inventory.filter((i: any) => i.stock === 0).length}</span>
                     </div>
                   </div>
 
@@ -242,7 +246,7 @@ export default function BakeryCms({
                               const newOrders = cmsData.orders.map((o: any) => o.id === order.id ? {...o, status: e.target.value} : o);
                               setCmsData({...cmsData, orders: newOrders});
                             }}
-                            className={`${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'} border text-sm rounded-lg p-2.5 outline-none focus:border-[#d4af37] transition-colors duration-300`}
+                            className={`${isDarkMode ? 'bg-black/20 border-white/[0.05] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'} border text-xs rounded-xl p-3 outline-none focus:border-[#d4af37]/40 transition-all duration-300 font-medium`}
                           >
                             <option value="Pending">🕒 Pending</option>
                             <option value="Preparing">👨🍳 Preparing</option>
@@ -345,7 +349,7 @@ export default function BakeryCms({
                               placeholder="Search products..."
                               value={menuSearch}
                               onChange={(e) => setMenuSearch(e.target.value)}
-                              className={`mr-2 ${isDarkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200'} border rounded-full py-2.5 px-5 text-sm outline-none focus:border-[#d4af37] shadow-inner`}
+                              className={`mr-2 ${isDarkMode ? 'bg-black/20 border-white/[0.05] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} border rounded-full py-2.5 px-6 text-xs outline-none focus:border-[#d4af37]/40 shadow-sm transition-all`}
                               autoFocus
                             />
                           )}
@@ -425,7 +429,7 @@ export default function BakeryCms({
                             <div 
                               key={item.id} 
                               onClick={() => setEditingItem(item)}
-                              className={`group relative overflow-hidden rounded-2xl border transition-all cursor-pointer ${isDarkMode ? 'bg-[#121212]/80 border-white/5 hover:border-[#d4af37]/30' : 'bg-white border-gray-100 hover:border-gray-300'} shadow-sm hover:shadow-md`}
+                              className={`group relative overflow-hidden rounded-2xl border transition-all cursor-pointer ${isDarkMode ? 'bg-[#0c0c0c]/60 border-white/5 hover:border-[#d4af37]/20 shadow-sm' : 'bg-white border-slate-100 hover:border-slate-300 shadow-sm'} hover:shadow-xl`}
                             >
                                <div className="aspect-square overflow-hidden relative">
                                   <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -599,12 +603,11 @@ export default function BakeryCms({
 
 function SectionCard({ title, children, isDarkMode }: any) {
   return (
-    <div className={`${isDarkMode ? 'bg-[#121212]/80' : 'bg-white/90'} backdrop-blur-md border ${isDarkMode ? 'border-white/5' : 'border-gray-200'} p-8 rounded-2xl shadow-xl transition-colors duration-300`}>
-      <h3 className={`text-lg font-serif font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-6 flex items-center gap-2`}>
-        <span className="w-1.5 h-6 bg-[#d4af37] rounded-full inline-block"></span>
-        {title}
+    <div className={`${isDarkMode ? 'bg-[#0c0c0c]/40' : 'bg-white'} border ${isDarkMode ? 'border-white/[0.03]' : 'border-slate-200'} p-8 rounded-3xl transition-all duration-300`}>
+      <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDarkMode ? 'text-white/30' : 'text-slate-400'} mb-6 flex items-center gap-3`}>
+        {title} <span className="flex-1 h-[1px] bg-current opacity-10" />
       </h3>
-      <div className="space-y-5">
+      <div className="space-y-6">
         {children}
       </div>
     </div>
@@ -613,15 +616,15 @@ function SectionCard({ title, children, isDarkMode }: any) {
 
 function FormInput({ label, icon, value, onChange, isDarkMode }: any) {
   return (
-    <div className="space-y-1.5 w-full">
-      <label className={`text-[10px] font-bold ${isDarkMode ? 'text-white/50' : 'text-slate-500'} uppercase tracking-widest px-1`}>{label}</label>
+    <div className="space-y-2 w-full">
+      {label && <label className={`text-[10px] font-bold ${isDarkMode ? 'text-white/20' : 'text-slate-400'} uppercase tracking-widest px-1`}>{label}</label>}
       <div className="relative flex items-center">
-        {icon && <div className={`absolute left-4 ${isDarkMode ? 'text-white/30' : 'text-slate-400'}`}>{icon}</div>}
+        {icon && <div className={`absolute left-4 ${isDarkMode ? 'text-white/10' : 'text-slate-300'}`}>{icon}</div>}
         <input 
           type="text" 
           value={value} 
           onChange={onChange}
-          className={`w-full ${isDarkMode ? 'bg-[#050505] border-white/10 text-white' : 'bg-white border-gray-200 text-slate-900'} border text-sm rounded-xl py-3 ${icon ? 'pl-11' : 'px-4'} pr-4 outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/50 transition-all placeholder:text-white/20`}
+          className={`w-full ${isDarkMode ? 'bg-black/20 border-white/5 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} border text-xs rounded-xl py-3.5 ${icon ? 'pl-11' : 'px-4'} pr-4 outline-none focus:border-[#d4af37]/40 focus:ring-4 focus:ring-[#d4af37]/5 transition-all font-medium`}
         />
       </div>
     </div>
@@ -630,15 +633,15 @@ function FormInput({ label, icon, value, onChange, isDarkMode }: any) {
 
 function FormTextarea({ label, icon, value, onChange, isDarkMode }: any) {
   return (
-    <div className="space-y-1.5 w-full">
-      <label className={`text-[10px] font-bold ${isDarkMode ? 'text-white/50' : 'text-slate-500'} uppercase tracking-widest px-1`}>{label}</label>
+    <div className="space-y-2 w-full">
+      {label && <label className={`text-[10px] font-bold ${isDarkMode ? 'text-white/20' : 'text-slate-400'} uppercase tracking-widest px-1`}>{label}</label>}
       <div className="relative flex">
-        {icon && <div className={`absolute left-4 top-3.5 ${isDarkMode ? 'text-white/30' : 'text-slate-400'}`}>{icon}</div>}
+        {icon && <div className={`absolute left-4 top-3.5 ${isDarkMode ? 'text-white/10' : 'text-slate-300'}`}>{icon}</div>}
         <textarea 
           value={value} 
           onChange={onChange}
           rows={3}
-          className={`w-full ${isDarkMode ? 'bg-[#050505] border-white/10 text-white' : 'bg-white border-gray-200 text-slate-900'} border text-sm rounded-xl py-3 ${icon ? 'pl-11' : 'px-4'} pr-4 outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/50 transition-all placeholder:text-white/20 resize-none`}
+          className={`w-full ${isDarkMode ? 'bg-black/20 border-white/5 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} border text-xs rounded-xl py-3.5 ${icon ? 'pl-11' : 'px-4'} pr-4 outline-none focus:border-[#d4af37]/40 focus:ring-4 focus:ring-[#d4af37]/5 transition-all font-medium resize-none`}
         />
       </div>
     </div>

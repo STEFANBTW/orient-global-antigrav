@@ -2,9 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, Monitor, HardDrive, Zap, Crosshair, Activity, Server, Shield, Terminal } from 'lucide-react';
 import { useCMS } from '@/hooks/useCMS';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 const Hardware: React.FC = () => {
     const { content: cmsData } = useCMS('games');
+    const { addToCart } = useGlobalCart();
     const hardwareBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'hardware')?.content_payload || {
         hero: {
             title1: "ZERO",
@@ -212,6 +214,24 @@ const Hardware: React.FC = () => {
                                 <p className="text-gray-400 text-xs tracking-widest uppercase leading-relaxed max-w-md">
                                     {hardwareBlock.rigs.desc}
                                 </p>
+                                <button 
+                                    onClick={() => {
+                                        addToCart({
+                                            id: `games-rig-${hardwareBlock.rigs.subtitle.toLowerCase().replace(/\s+/g, '-')}`,
+                                            name: hardwareBlock.rigs.subtitle,
+                                            price: 2500, // Hourly rate placeholder
+                                            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBclQ8Im1ImDIEwPdTuKMespLQVxjvhT9YhpStwrlbtEA30iZXG21L1xwpzYiRv6E_zHU5l90Fm1aBDLPdylYh1qhW7vwT19Eu8NCBFTW5wRWDaIER6DP5zgkMIsZnQ61w4tWfJ6s8Idxfq8tSnnGPFNn6fP8bt55oiL3CKiiGSiX0dlbaeNRHwh6wvULzayKqOgTjY0cUmXj6cqVghnWO_5dqfXQp0QS_OlB3-aehJxghk3ZfmNPe1q1rJJhrwb3OWaWBcRdFF9Ys2",
+                                            quantity: 1,
+                                            category: 'Rentals',
+                                            division: 'games'
+                                        });
+                                        window.dispatchEvent(new CustomEvent('switch-view', { detail: 'checkout' }));
+                                    }}
+                                    className="mt-8 px-8 py-3 bg-[#0df2f2] text-black font-bold text-[10px] tracking-[0.3em] uppercase hover:bg-white transition-all"
+                                    style={{ clipPath: 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)' }}
+                                >
+                                    Initialize Order
+                                </button>
                             </div>
 
                             <div className="space-y-4">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
+import { useGlobalCart } from "../context/GlobalCartContext";
 import {
   Droplets, Truck, ShoppingCart, ShieldCheck, MapPin,
   Minus, Plus, RefreshCw, PackageSearch, Clock, ArrowRight,
@@ -8,47 +9,18 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import WaterHome from "./components/WaterHome";
-import Process from "./components/Process";
-import Logistics from "./components/Logistics";
-import Quality from "./components/Quality";
-import Impact from "./components/Impact";
 import {
+  PurityHubView,
   DirectStoreView,
   B2BView,
+  ProcessView,
   CartView,
   TrackDeliveryView
-} from "./backup/OriginalWaterViews";
+} from "./components/WaterSubViews";
 
-export type WaterPage = 'home' | 'd2c' | 'b2b' | 'process' | 'logistics' | 'quality' | 'impact' | 'cart' | 'track';
+export type WaterPage = 'home' | 'd2c' | 'b2b' | 'process' | 'cart' | 'track' | 'logistics' | 'quality' | 'impact';
 
-interface WaterContextType {
-  cartCount: number;
-  setCartCount: React.Dispatch<React.SetStateAction<number>>;
-  addToCart: () => void;
-}
-
-const WaterContext = createContext<WaterContextType | undefined>(undefined);
-
-export const useWater = () => {
-  const context = useContext(WaterContext);
-  if (!context) throw new Error("useWater must be used within a WaterProvider");
-  return context;
-};
-
-// ============================================================================
-// PROVIDER
-// ============================================================================
-
-export const WaterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cartCount, setCartCount] = useState(0);
-  const addToCart = () => setCartCount(prev => prev + 1);
-
-  return (
-    <WaterContext.Provider value={{ cartCount, setCartCount, addToCart }}>
-      {children}
-    </WaterContext.Provider>
-  );
-};
+// Local context removed in favor of GlobalCartContext
 
 // ============================================================================
 // COMPONENTS
@@ -61,28 +33,19 @@ export const WaterNav: React.FC<{
   onHoverChange?: (hovered: boolean) => void,
   heroOutOfView?: boolean
 }> = ({ currentPage, onNavigate, isAppNavHovered = false, onHoverChange, heroOutOfView = false }) => {
-  const { cartCount } = useWater();
+  const { cart } = useGlobalCart();
+  const cartCount = cart.filter(item => item.division === 'water').length;
 
   const navItems = [
-    { id: "home", label: "Home" },
-    { id: "process", label: "Process" },
-    { id: "logistics", label: "Logistics" },
-    { id: "quality", label: "Quality Control" },
-    { id: "impact", label: "Impact" },
-    { id: "d2c", label: "Store" },
+    { id: "home", label: "The Purity Hub" },
+    { id: "d2c", label: "Direct Store" },
+    { id: "b2b", label: "Wholesale & B2B" },
+    { id: "process", label: "Our Process" },
   ];
 
   return (
     <nav
-      className={`transition-all duration-500 sticky top-0 w-full z-40 h-[68px] theme-transition`}
-      style={{
-        backgroundColor: heroOutOfView
-          ? 'var(--water-nav-opaque)'
-          : ((isAppNavHovered) ? 'var(--water-nav-blur)' : 'transparent'),
-        backdropFilter: (heroOutOfView || isAppNavHovered) ? 'blur(20px)' : 'none',
-        borderBottom: heroOutOfView ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid transparent',
-        color: heroOutOfView ? '#fff' : 'inherit'
-      }}
+      className={`transition-all duration-500 sticky top-0 w-full z-40 h-16 theme-transition bg-white/95 backdrop-blur-md border-b border-slate-200/60`}
       onMouseEnter={() => onHoverChange?.(true)}
       onMouseLeave={() => onHoverChange?.(false)}
     >
@@ -99,8 +62,8 @@ export const WaterNav: React.FC<{
 
         <nav className="hidden lg:flex items-center gap-10">
           {navItems.map((item) => (
-            <button
-              key={item.id}
+            <button 
+              key={item.id} 
               onClick={() => onNavigate(item.id as WaterPage)}
               className={`text-sm transition-colors ${currentPage === item.id ? "text-cyan-600 font-medium" : "text-slate-500 hover:text-blue-900"}`}
             >
@@ -109,10 +72,11 @@ export const WaterNav: React.FC<{
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <button onClick={() => onNavigate('track')} className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-full bg-sky-500 hover:bg-sky-400 transition-colors text-white font-bold text-[10px] sm:text-xs tracking-wider uppercase shadow-[0_0_15px_rgba(14,165,233,0.3)]">
-            Subscribe
+        <div className="flex items-center gap-6">
+          <button onClick={() => onNavigate('track')} className="hidden sm:flex items-center gap-2 text-sm text-slate-600 hover:text-cyan-600 transition-colors">
+            <Truck size={16} /> Track Delivery
           </button>
+          <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
           <button onClick={() => onNavigate('cart')} className="relative p-1.5 text-slate-600 hover:text-blue-950 transition-colors">
             <ShoppingCart size={20} />
             {cartCount > 0 && (
@@ -128,27 +92,31 @@ export const WaterNav: React.FC<{
 };
 
 export const WaterApp: React.FC<{ currentPage: WaterPage, onNavigate: (p: WaterPage) => void }> = ({ currentPage, onNavigate }) => {
-  const { addToCart } = useWater();
+  const { addToCart } = useGlobalCart();
+
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      ...product,
+      quantity: 1,
+      division: 'water'
+    });
+  };
 
   const renderView = () => {
     switch (currentPage) {
       case "home": return <WaterHome onNavigate={onNavigate} />;
-      case "d2c": return <DirectStoreView addToCart={addToCart} />;
+      case "d2c": return <DirectStoreView />;
       case "b2b": return <B2BView />;
-      case "process": return <Process />;
-      case "logistics": return <Logistics />;
-      case "quality": return <Quality />;
-      case "impact": return <Impact />;
+      case "process": return <ProcessView />;
       case "cart": return <CartView onNavigate={onNavigate} />;
-      case "track": return <TrackDeliveryView />;
+      case "track": return <TrackDeliveryView navigateTo={onNavigate} />;
       default: return <WaterHome onNavigate={onNavigate} />;
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen pt-16 lg:pt-[72px]">
-      <style dangerouslySetInnerHTML={{
-        __html: `
+    <div className="flex flex-col min-h-screen">
+      <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
         .water-theme { font-family: 'Plus Jakarta Sans', sans-serif; }
         .fade-in { animation: fadeIn 0.6s ease-in-out; }
@@ -170,31 +138,10 @@ export const WaterApp: React.FC<{ currentPage: WaterPage, onNavigate: (p: WaterP
           </motion.div>
         </AnimatePresence>
       </main>
-      <WaterFooter />
     </div>
   );
 };
 
-// ============================================================================
-// SHARED COMPONENTS
-// ============================================================================
-
-function WaterFooter() {
-  return (
-    <footer className="bg-blue-950 text-slate-300 py-20 border-t-2 border-cyan-500">
-      <div className="max-w-[1440px] mx-auto px-8 flex flex-col md:flex-row justify-between gap-12">
-        <div>
-          <h2 className="text-white font-medium text-xl mb-4">Orient Water</h2>
-          <p className="max-w-xs text-sm text-blue-200/60 font-light">Sourced from Plateau State. Purified for Nigeria.</p>
-        </div>
-        <div className="flex gap-16 text-xs uppercase tracking-widest text-blue-200/40">
-          <span>© 2026 Orient Global</span>
-          <div className="flex gap-4"><Instagram size={14} /><Twitter size={14} /></div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // NOTE: Original views moved to backup/OriginalWaterViews.tsx as per user request.
 

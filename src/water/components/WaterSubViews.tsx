@@ -3,18 +3,31 @@ import {
   Droplets, Truck, ShoppingCart, ShieldCheck, MapPin, 
   Minus, Plus, RefreshCw, PackageSearch, Clock, ArrowRight, 
   CheckCircle2, Beaker, Zap, GlassWater, Factory, 
-  Instagram, Twitter, Trash2, Check, User,
+  ChevronRight, Phone, Mail, Instagram, Twitter, Trash2, Check, User,
   Building2, Home as HomeIcon, CalendarDays, CreditCard
 } from "lucide-react";
-import { useGlobalCart } from "../../context/GlobalCartContext";
-
-export type WaterPage = 'home' | 'd2c' | 'b2b' | 'process' | 'logistics' | 'quality' | 'impact' | 'cart' | 'track';
 
 // ============================================================================
-// ORIGINAL VIEWS (BACKUP)
+// HELPER COMPONENTS
 // ============================================================================
 
-export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => void }) {
+export function MapNode({ top, left, label, main, pulse }: { top: string; left: string; label: string; main?: boolean; pulse?: boolean }) {
+  return (
+    <div className="absolute group" style={{ top, left, transform: 'translate(-50%, -50%)' }}>
+      {pulse && <div className="absolute inset-0 rounded-full bg-cyan-400 animate-ping opacity-50"></div>}
+      <div className={`relative flex items-center justify-center rounded-sm shadow-lg cursor-pointer transition-transform hover:scale-110 ${main ? 'size-4 bg-cyan-400 z-20' : 'size-2.5 bg-blue-500/80 z-10'}`}></div>
+      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-md text-[9px] font-medium text-white tracking-widest uppercase whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-white/10">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// VIEW 1: THE PURITY HUB (LANDING)
+// ============================================================================
+
+export function PurityHubView({ navigateTo }: { navigateTo: (v: any) => void }) {
   const products = [
     { name: "Sachet Premium", size: "50cl", pack: "Bag of 20", icon: <PackageSearch size={28} strokeWidth={1.5} /> },
     { name: "Personal Hydration", size: "50cl", pack: "Pack of 12", icon: <GlassWater size={28} strokeWidth={1.5} /> },
@@ -25,6 +38,7 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
 
   return (
     <div className="fade-in bg-white">
+      {/* Refined Hero */}
       <section className="relative w-full h-[85vh] bg-blue-950 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-blue-950">
           <img 
@@ -47,26 +61,27 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
             Engineered through a 7-step reverse osmosis process. Delivering uncompromising quality to homes, offices, and distributors across Nigeria.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-            <button onClick={() => onNavigate('d2c')} className="w-full sm:w-auto px-10 py-3.5 bg-white text-blue-900 rounded-lg text-sm font-medium hover:bg-cyan-50 transition-all shadow-sm">
-              Direct Store
+            <button onClick={() => navigateTo('d2c')} className="w-full sm:w-auto px-10 py-3.5 bg-white text-blue-900 rounded-lg text-sm font-medium hover:bg-cyan-50 transition-all shadow-sm">
+              Order for Home
             </button>
-            <button onClick={() => onNavigate('b2b')} className="w-full sm:w-auto px-10 py-3.5 border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/5 transition-all">
+            <button onClick={() => navigateTo('b2b')} className="w-full sm:w-auto px-10 py-3.5 border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/5 transition-all">
               Become a Distributor
             </button>
           </div>
         </div>
       </section>
 
+      {/* Floating Product Ribbon */}
       <section className="relative z-20 max-w-[1440px] mx-auto px-8 -mt-24 mb-40">
         <div className="glass-panel bg-blue-950/40 rounded-xl p-4 shadow-2xl overflow-x-auto hide-scrollbar">
           <div className="flex min-w-max">
             {products.map((prod, idx) => (
-              <div key={idx} className="flex-1 min-w-[220px] p-8 text-center group cursor-pointer border-r border-blue-950/10 last:border-0 hover:bg-white/10 transition-colors rounded-lg">
+              <div key={idx} className="flex-1 min-w-[220px] p-8 text-center group cursor-pointer border-r border-white/5 last:border-0 hover:bg-white/5 transition-colors rounded-lg">
                 <div className="h-20 flex items-center justify-center text-cyan-200/80 group-hover:text-cyan-400 transition-colors duration-500 mb-6">
                   {prod.icon}
                 </div>
                 <h3 className="text-white font-medium text-base tracking-wide">{prod.size}</h3>
-                <p className="text-cyan-400 text-[10px] font-medium uppercase tracking-widest mt-2 mb-1.5">{prod.name}</p>
+                <p className="text-cyan-200/60 text-[10px] font-medium uppercase tracking-widest mt-2 mb-1.5">{prod.name}</p>
                 <p className="text-white/40 text-[9px] uppercase tracking-wider">{prod.pack}</p>
               </div>
             ))}
@@ -74,6 +89,7 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
         </div>
       </section>
 
+      {/* Logistics Map Section */}
       <section className="py-32 bg-slate-50">
         <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div>
@@ -94,7 +110,7 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
                 </li>
               ))}
             </ul>
-            <button onClick={() => onNavigate('b2b')} className="flex items-center gap-2 text-blue-600 text-sm font-medium hover:text-cyan-600 transition-colors">
+            <button onClick={() => navigateTo('b2b')} className="flex items-center gap-2 text-blue-600 text-sm font-medium hover:text-cyan-600 transition-colors">
               Explore Wholesale Logistics <ArrowRight size={16} />
             </button>
           </div>
@@ -115,6 +131,7 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
                <path d="M50% 30% L60% 20%" stroke="#22d3ee" strokeWidth="1" strokeDasharray="4 4" className="animate-[dash_30s_linear_infinite]" />
                <path d="M50% 30% L65% 70%" stroke="#22d3ee" strokeWidth="1" strokeDasharray="4 4" className="animate-[dash_30s_linear_infinite]" />
              </svg>
+             <style>{`@keyframes dash { to { stroke-dashoffset: -1000; } }`}</style>
           </div>
         </div>
       </section>
@@ -122,9 +139,12 @@ export function PurityHubView({ onNavigate }: { onNavigate: (p: WaterPage) => vo
   );
 }
 
-export function DirectStoreView() {
-  const { addToCart } = useGlobalCart();
-  const [shopContext, setShopContext] = useState("home"); 
+// ============================================================================
+// VIEW 2: DIRECT STORE
+// ============================================================================
+
+export function DirectStoreView({ addToCart }: { addToCart: () => void }) {
+  const [shopContext, setShopContext] = useState("home"); // 'home' or 'corporate'
   const [activeProductId, setActiveProductId] = useState("1.5l");
 
   useEffect(() => {
@@ -182,7 +202,7 @@ export function DirectStoreView() {
                key={activeProduct.id}
                src={activeProduct.image} 
                alt={activeProduct.title} 
-               className="w-full h-full object-contain mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105" 
+               className="w-full h-full object-contain mix-blend-multiply opacity-90 fade-in transition-transform duration-700 group-hover:scale-105" 
             />
           </div>
 
@@ -195,18 +215,7 @@ export function DirectStoreView() {
               <span className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">{activeProduct.unit}</span>
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-medium text-blue-950">₦{activeProduct.price.toLocaleString()}</span>
-                <button 
-                  onClick={() => addToCart({
-                    id: activeProduct.id,
-                    name: activeProduct.title,
-                    price: activeProduct.price,
-                    image: activeProduct.image,
-                    quantity: 1,
-                    category: 'Water',
-                    division: 'water'
-                  })} 
-                  className="size-12 bg-blue-950 text-white rounded-xl flex items-center justify-center hover:bg-cyan-600 transition-colors shadow-sm"
-                >
+                <button onClick={addToCart} className="size-12 bg-blue-950 text-white rounded-xl flex items-center justify-center hover:bg-cyan-600 transition-colors shadow-sm">
                   <Plus size={20} strokeWidth={1.5} />
                 </button>
               </div>
@@ -243,6 +252,7 @@ export function DirectStoreView() {
       <section className="max-w-[1200px] mx-auto px-8 mt-10">
         <div className="bg-blue-950 rounded-[2rem] p-10 md:p-16 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/10 to-transparent pointer-events-none"></div>
+          
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 relative z-10 border-b border-blue-900 pb-10">
             <div>
               <div className="flex items-center gap-3 text-cyan-400 mb-4">
@@ -253,6 +263,9 @@ export function DirectStoreView() {
                 Set up a recurring delivery schedule. Enjoy a permanent <span className="text-cyan-400 font-medium">10% discount</span>, priority routing, and zero empty-bottle anxiety.
               </p>
             </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-blue-200/50 uppercase tracking-widest">
+              <ShieldCheck size={16} className="text-cyan-400" /> Cancel Anytime
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
@@ -262,11 +275,14 @@ export function DirectStoreView() {
                 <h4 className="text-white font-medium">Select Your Mix</h4>
               </div>
               <div className="space-y-4">
-                <select className="w-full bg-blue-900/40 border border-blue-800/50 text-white text-sm rounded-lg p-3 outline-none focus:border-cyan-400">
-                  <option>4x 19L Dispenser Refills</option>
-                  <option>2x 19L Dispenser Refills</option>
-                  <option>6x 1.5L Family Packs</option>
-                </select>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-widest text-blue-300/50">Primary Item</label>
+                  <select className="w-full bg-blue-900/40 border border-blue-800/50 text-white text-sm rounded-lg p-3 outline-none focus:border-cyan-400">
+                    <option>4x 19L Dispenser Refills</option>
+                    <option>2x 19L Dispenser Refills</option>
+                    <option>6x 1.5L Family Packs</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -276,11 +292,13 @@ export function DirectStoreView() {
                 <h4 className="text-white font-medium">Delivery Cadence</h4>
               </div>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg border border-cyan-500 bg-cyan-500/10 cursor-pointer">
-                  <div className="flex items-center gap-3 text-white text-sm">
-                    <CalendarDays size={18} /> Every 2 Weeks
+                <label className="flex items-center justify-between p-3 rounded-lg border border-cyan-500 bg-cyan-500/10 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <CalendarDays size={18} className="text-cyan-400" />
+                    <span className="text-sm font-medium text-white">Every 2 Weeks</span>
                   </div>
-                </div>
+                  <div className="size-4 rounded-full border-2 border-cyan-400 flex items-center justify-center"><div className="size-2 bg-cyan-400 rounded-full"></div></div>
+                </label>
               </div>
             </div>
 
@@ -290,8 +308,11 @@ export function DirectStoreView() {
                   <div className="size-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-bold">3</div>
                   <h4 className="text-white font-medium">Activation</h4>
                 </div>
+                <p className="text-cyan-50 text-sm font-light leading-relaxed mb-4">
+                  You are setting up automated delivery.
+                </p>
               </div>
-              <button className="w-full bg-white text-blue-950 py-3.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2">
+              <button className="w-full bg-white text-blue-950 py-3.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 mt-auto">
                 <CreditCard size={16} /> Activate Auto-Fill
               </button>
             </div>
@@ -301,6 +322,10 @@ export function DirectStoreView() {
     </div>
   );
 }
+
+// ============================================================================
+// VIEW 3: B2B & WHOLESALE
+// ============================================================================
 
 export function B2BView() {
   const nigerianStates = [
@@ -325,137 +350,172 @@ export function B2BView() {
       </section>
 
       <section className="max-w-[1200px] mx-auto px-8 -mt-12 relative z-20 mb-24">
-        <div className="bg-white rounded-xl shadow-lg border border-slate-100 p-10 md:p-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="bg-white rounded-xl shadow-lg shadow-blue-900/5 border border-slate-100 p-10 md:p-16 grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-slate-100">
           <div className="flex flex-col items-center text-center">
             <div className="size-12 bg-slate-50 text-slate-400 rounded-lg border border-slate-100 flex items-center justify-center mb-6"><Truck size={20} /></div>
             <h3 className="font-medium text-blue-950 text-base mb-3">Fleet of 500+ Trucks</h3>
-            <p className="text-sm text-slate-500 font-light">Unmatched logistical capacity ensuring continuous supply lines.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="size-12 bg-slate-50 text-slate-400 rounded-lg border border-slate-100 flex items-center justify-center mb-6"><PackageSearch size={20} /></div>
-            <h3 className="font-medium text-blue-950 text-base mb-3">Automated Palletizing</h3>
-            <p className="text-sm text-slate-500 font-light">Rapid warehouse unloading with standardized units.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="size-12 bg-slate-50 text-slate-400 rounded-lg border border-slate-100 flex items-center justify-center mb-6"><Clock size={20} /></div>
-            <h3 className="font-medium text-blue-950 text-base mb-3">99.9% On-Time Delivery</h3>
-            <p className="text-sm text-slate-500 font-light">Stock is replenished precisely when you need it.</p>
           </div>
         </div>
       </section>
 
       <div className="max-w-[1200px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-20">
-        <div>
+         <div>
           <h2 className="text-2xl font-medium text-blue-950 mb-3">Bulk Pricing Tiers</h2>
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <div className="overflow-x-auto rounded-xl border border-slate-200 mt-8">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
                 <tr>
                   <th className="p-5 font-medium text-xs uppercase tracking-wider">Product</th>
-                  <th className="p-5 font-medium text-xs uppercase tracking-wider">Discount</th>
+                  <th className="p-5 font-medium text-xs uppercase tracking-wider">10-50 Units</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-light text-slate-500">
-                <tr><td className="p-5 text-blue-900 font-medium">50cl Carton</td><td className="p-5">Tiered Pricing Apply</td></tr>
-                <tr><td className="p-5 text-blue-900 font-medium">1.5L Carton</td><td className="p-5">Tiered Pricing Apply</td></tr>
+              <tbody className="divide-y divide-slate-100 font-light">
+                <tr>
+                  <td className="p-5 font-medium text-blue-900">50cl Carton (12 pcs)</td>
+                  <td className="p-5 text-slate-500">₦1,350</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="bg-slate-50 border border-slate-200 p-10 rounded-xl">
-          <h3 className="text-xl font-medium text-blue-950 mb-8">Apply for Wholesale</h3>
-          <form className="space-y-5">
-            <input className="w-full bg-white border border-slate-200 rounded-md p-3 text-sm focus:border-cyan-500 outline-none" placeholder="Business Name" />
-            <input className="w-full bg-white border border-slate-200 rounded-md p-3 text-sm focus:border-cyan-500 outline-none" placeholder="Email" />
-            <select className="w-full bg-white border border-slate-200 rounded-md p-3 text-sm outline-none">
-              <option>Select State</option>
-              {nigerianStates.map(s => <option key={s}>{s}</option>)}
-            </select>
-            <button type="button" className="w-full bg-blue-950 text-white font-medium py-3.5 rounded-md hover:bg-cyan-600 transition-colors">Request Quote</button>
-          </form>
+        <div>
+          <div className="bg-slate-50 border border-slate-200 p-10 rounded-xl">
+            <h3 className="text-xl font-medium text-blue-950 mb-3">Apply for Wholesale</h3>
+            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+              <input required type="text" className="w-full bg-white border border-slate-200 rounded-md p-3 text-sm" placeholder="Business Name" />
+              <button className="w-full bg-blue-950 text-white font-medium py-3.5 rounded-md hover:bg-cyan-600 transition-colors text-sm">
+                Request Custom Quote
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export function CartView({ onNavigate }: { onNavigate: (p: WaterPage) => void }) {
-  const { cart, removeFromCart, updateQuantity } = useGlobalCart();
-  const items = cart.filter(item => item.division === 'water');
+// ============================================================================
+// VIEW 4: THE SOURCE & PROCESS
+// ============================================================================
 
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+export function ProcessView() {
+  const steps = [
+    { num: "01", title: "Deep Aquifer Extraction", desc: "Sourced from pristine aquifers." },
+    { num: "02", title: "Reverse Osmosis (RO)", desc: "Molecular filtration." },
+  ];
+
+  return (
+    <div className="fade-in bg-slate-50 pb-32">
+      <section className="bg-blue-950 py-28 px-8 text-center relative overflow-hidden">
+        <h1 className="text-3xl md:text-5xl font-medium text-white mb-6">7 Steps to Absolute Purity.</h1>
+      </section>
+
+      <div className="max-w-[1200px] mx-auto px-8 mt-24 grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="lg:col-span-7">
+          <h2 className="text-2xl font-medium text-blue-950 mb-12">The Purification Journey</h2>
+          <div className="relative border-l border-slate-200 ml-4 space-y-14">
+            {steps.map((step, i) => (
+              <div key={i} className="relative pl-12 group">
+                <div className="absolute left-[-17px] top-0 w-8 h-8 bg-slate-50 border border-slate-300 rounded-md flex items-center justify-center">
+                  <span className="text-[10px] font-medium text-slate-500">{step.num}</span>
+                </div>
+                <h3 className="text-base font-medium text-blue-950 mb-3">{step.title}</h3>
+                <p className="text-slate-500 text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// VIEW 5: CART
+// ============================================================================
+
+export function CartView({ navigateTo }: { navigateTo: (v: any) => void }) {
+  const [cartItems, setCartItems] = useState([
+    { id: 1, title: "19L Dispenser Refill", price: 1200, qty: 2, image: "https://images.unsplash.com/photo-1559523161-0fc0d8b38a7a?q=80&w=800&auto=format&fit=crop" },
+  ]);
+
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const total = subtotal + 500;
 
   return (
     <div className="fade-in bg-slate-50 min-h-[80vh] pb-32">
       <div className="bg-blue-950 py-20 px-8">
-        <h1 className="text-2xl font-medium text-white max-w-[1200px] mx-auto">Your Cart</h1>
+         <h1 className="text-2xl md:text-3xl font-medium text-white">Your Cart</h1>
       </div>
-      <div className="max-w-[1200px] mx-auto px-8 -mt-10">
-        <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-200">
-           {items.length === 0 ? (
-             <div className="text-center py-10">
-               <p className="text-slate-500 mb-6">Your water cart is empty.</p>
-               <button onClick={() => onNavigate('d2c')} className="text-cyan-600 font-medium hover:underline">Go to Store</button>
-             </div>
-           ) : (
-             <>
-               {items.map(item => (
-                 <div key={item.id} className="flex items-center gap-8 py-4 border-b last:border-0">
-                   <img src={item.image} className="w-20 h-20 object-cover rounded" />
+      <div className="max-w-[1200px] mx-auto px-8 -mt-10 relative z-20">
+        <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex-1 bg-white rounded-xl p-10 shadow-sm border border-slate-200">
+             {cartItems.map(item => (
+                <div key={item.id} className="flex items-center gap-8 py-4 border-b">
+                   <img src={item.image} className="w-16 h-16 rounded" />
                    <div className="flex-1">
-                     <h4 className="font-medium text-blue-950">{item.name}</h4>
-                     <p className="text-cyan-600">₦{item.price.toLocaleString()}</p>
+                      <h4 className="font-medium">{item.title}</h4>
+                      <p className="text-cyan-600">₦{item.price.toLocaleString()}</p>
                    </div>
                    <div className="flex items-center gap-4">
-                     <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-2 py-1">
-                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:text-cyan-600 transition-colors"><Minus size={14} /></button>
-                       <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                       <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:text-cyan-600 transition-colors"><Plus size={14} /></button>
-                     </div>
-                     <button onClick={() => removeFromCart(item.id)} className="text-slate-400 hover:text-red-500 transition-colors">
-                       <Trash2 size={18} />
-                     </button>
+                      <span>{item.qty}</span>
                    </div>
-                 </div>
-               ))}
-               <div className="mt-8 pt-8 border-t flex justify-between items-center">
-                 <span className="text-blue-950 font-medium">Subtotal</span>
-                 <span className="text-2xl font-bold text-cyan-600">₦{subtotal.toLocaleString()}</span>
-               </div>
-               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('switch-view', { detail: 'checkout' }))}
-                className="w-full mt-8 py-4 bg-blue-950 text-white rounded-lg hover:bg-blue-900 transition-colors font-bold tracking-wider"
-               >
-                 Proceed to Checkout
-               </button>
-             </>
-           )}
+                </div>
+             ))}
+          </div>
+          <div className="w-full lg:w-80 bg-white rounded-xl p-8 shadow-sm border border-slate-200 h-fit">
+             <h3 className="text-lg font-medium mb-8">Order Summary</h3>
+             <div className="flex justify-between mb-4"><span>Total</span><span className="text-xl font-bold text-cyan-600">₦{total.toLocaleString()}</span></div>
+             <button className="w-full bg-blue-950 text-white py-3.5 rounded-lg text-sm font-medium hover:bg-cyan-600 transition-colors">Checkout</button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export function TrackDeliveryView() {
-  return (
-    <div className="fade-in bg-slate-50 min-h-[80vh] flex flex-col items-center justify-center px-8">
-      <div className="max-w-md w-full text-center">
-        <Truck size={48} className="text-cyan-600 mx-auto mb-8" />
-        <h1 className="text-3xl font-medium text-blue-950 mb-4">Track Delivery</h1>
-        <input className="w-full p-4 border rounded-lg focus:border-cyan-500 outline-none mb-4" placeholder="Enter Order ID (e.g. ORD-123)" />
-        <button className="w-full py-4 bg-blue-950 text-white rounded-lg">Search Order</button>
-      </div>
-    </div>
-  );
-}
+// ============================================================================
+// VIEW 6: TRACK DELIVERY
+// ============================================================================
 
-export function MapNode({ top, left, label, main, pulse }: any) {
+export function TrackDeliveryView({ navigateTo }: { navigateTo: (v: any) => void }) {
+  const [trackingId, setTrackingId] = useState("");
+  const [isTracking, setIsTracking] = useState(false);
+
   return (
-    <div className="absolute group" style={{ top, left, transform: 'translate(-50%, -50%)' }}>
-      {pulse && <div className="absolute inset-0 rounded-full bg-cyan-400 animate-ping opacity-50"></div>}
-      <div className={`relative rounded-sm shadow-lg ${main ? 'size-4 bg-cyan-400' : 'size-2 bg-blue-500'}`}></div>
-       <div className="absolute top-full mt-2 text-[8px] text-white opacity-0 group-hover:opacity-100 uppercase tracking-widest whitespace-nowrap">{label}</div>
+    <div className="fade-in bg-slate-50 min-h-[80vh] pb-32">
+      <div className="bg-blue-950 py-24 px-8 text-center">
+         <h1 className="text-2xl md:text-4xl font-medium text-white mb-6">Track Your Delivery</h1>
+         <div className="flex max-w-md mx-auto gap-4 mt-8">
+            <input 
+               type="text" 
+               value={trackingId}
+               onChange={(e) => setTrackingId(e.target.value)}
+               placeholder="Order ID" 
+               className="flex-1 bg-white/10 border border-white/20 rounded-lg py-3 px-4 text-white"
+            />
+            <button onClick={() => setIsTracking(true)} className="bg-cyan-600 text-white px-8 py-3 rounded-lg">Track</button>
+         </div>
+      </div>
+
+      {isTracking && (
+        <div className="max-w-[800px] mx-auto px-8 -mt-10 relative z-20">
+          <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-200">
+             <h3 className="text-lg font-medium mb-8">Status: Out for Delivery</h3>
+             <div className="space-y-8">
+                <div className="flex gap-4">
+                   <div className="size-8 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center"><Check size={16}/></div>
+                   <p className="text-slate-700">Order Confirmed</p>
+                </div>
+                <div className="flex gap-4">
+                   <div className="size-8 bg-cyan-600 text-white rounded-full flex items-center justify-center animate-pulse"><Truck size={16}/></div>
+                   <p className="font-medium text-blue-950">In Transit</p>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

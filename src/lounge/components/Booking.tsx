@@ -1,8 +1,10 @@
 import React from 'react';
 import { useCMS } from '@/hooks/useCMS';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 const Booking: React.FC = () => {
   const { content: cmsData } = useCMS('lounge');
+  const { addToCart } = useGlobalCart();
   const bookingBlock = cmsData?.blocks?.find((b: any) => b.block_type === 'booking')?.content_payload || {
     hero: {
       title1: "Sanctuary",
@@ -96,7 +98,23 @@ const Booking: React.FC = () => {
                       <span className="text-[10px] text-gray-500 uppercase">Starting At</span>
                       <div className="text-xl font-bold">{pkg.price}</div>
                     </div>
-                    <button className="text-primary text-xs uppercase font-bold">Select</button>
+                    <button 
+                      onClick={() => {
+                        addToCart({
+                          id: `lounge-pkg-${i}`,
+                          name: pkg.title,
+                          price: parseInt(pkg.price.replace(/[^0-9]/g, '')),
+                          image: pkg.img,
+                          quantity: 1,
+                          category: 'Packages',
+                          division: 'lounge'
+                        });
+                        window.dispatchEvent(new CustomEvent('switch-view', { detail: 'checkout' }));
+                      }}
+                      className="text-primary text-xs uppercase font-bold"
+                    >
+                      Select
+                    </button>
                   </div>
                 </div>
               </div>

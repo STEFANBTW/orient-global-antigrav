@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 interface ProduceProps {
    onNavigate: (page: any) => void;
 }
 
 const Produce: React.FC<ProduceProps> = ({ onNavigate }) => {
+   const { addToCart, cart } = useGlobalCart();
    const [searchTerm, setSearchTerm] = useState('');
 
    // Extracted items for filtering capability
@@ -57,7 +59,12 @@ const Produce: React.FC<ProduceProps> = ({ onNavigate }) => {
                <div className="flex items-center gap-6 flex-shrink-0">
                   <button onClick={() => onNavigate('Favorites')} className="flex items-center gap-2 text-sm font-medium hover:text-[var(--color-accent-light)]"><span className="material-icons-outlined">favorite_border</span></button>
                   <button onClick={() => onNavigate('Dashboard')} className="flex items-center gap-2 text-sm font-medium hover:text-[var(--color-accent-light)]"><span className="material-icons-outlined">person_outline</span></button>
-                  <button onClick={() => onNavigate('Cart')} className="flex items-center gap-3 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800"><span className="material-icons-outlined text-xl">shopping_basket</span><span className="font-semibold">$42.50</span></button>
+                  <button onClick={() => onNavigate('Cart')} className="flex items-center gap-3 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800">
+                     <span className="material-icons-outlined text-xl">shopping_basket</span>
+                     <span className="font-semibold">
+                        ₦{cart.filter(i => i.division === 'market').reduce((sum, i) => sum + i.price * i.quantity, 0).toLocaleString()}
+                     </span>
+                  </button>
                </div>
             </div>
          </header>
@@ -87,7 +94,20 @@ const Produce: React.FC<ProduceProps> = ({ onNavigate }) => {
                               <div key={i} className="flex items-center gap-3 group cursor-pointer">
                                  <div className="w-12 h-12 rounded bg-slate-100 overflow-hidden flex-shrink-0"><img src={item.img} className="w-full h-full object-cover" alt={item.name} /></div>
                                  <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate group-hover:text-[var(--color-accent-light)]">{item.name}</p><p className="text-xs text-slate-500">{item.price}</p></div>
-                                 <button className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-[var(--color-accent-light)] transition-colors"><span className="material-icons text-sm">add</span></button>
+                                 <button 
+                                    onClick={() => addToCart({
+                                       id: item.name.toLowerCase().replace(/\s+/g, '-'),
+                                       name: item.name,
+                                       price: parseFloat(item.price.replace(/[^0-9.]/g, '')),
+                                       quantity: 1,
+                                       category: 'Produce',
+                                       image: item.img,
+                                       division: 'market'
+                                    })}
+                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-[var(--color-accent-light)] transition-colors"
+                                 >
+                                    <span className="material-icons text-sm">add</span>
+                                 </button>
                               </div>
                            ))
                         ) : (
@@ -114,7 +134,20 @@ const Produce: React.FC<ProduceProps> = ({ onNavigate }) => {
                                        <h3 className="font-medium mb-2">{item.name}</h3>
                                        <div className="flex items-center justify-between">
                                           <div><span className="text-lg font-bold">${item.price}<span className="text-xs font-normal text-slate-400">{item.unit}</span></span>{item.oldPrice && <span className="text-xs text-slate-400 line-through ml-1">${item.oldPrice}</span>}</div>
-                                          <button className="w-8 h-8 rounded-full bg-[var(--color-accent-light)] flex items-center justify-center hover:bg-[#e65e00]"><span className="material-icons text-sm font-bold text-white">add</span></button>
+                                          <button 
+                                             onClick={() => addToCart({
+                                                id: item.name.toLowerCase().replace(/\s+/g, '-'),
+                                                name: item.name,
+                                                price: parseFloat(item.price),
+                                                quantity: 1,
+                                                category: 'Produce',
+                                                image: item.img,
+                                                division: 'market'
+                                             })}
+                                             className="w-8 h-8 rounded-full bg-[var(--color-accent-light)] flex items-center justify-center hover:bg-[#e65e00]"
+                                          >
+                                             <span className="material-icons text-sm font-bold text-white">add</span>
+                                          </button>
                                        </div>
                                     </div>
                                  </motion.div>
@@ -151,7 +184,20 @@ const Produce: React.FC<ProduceProps> = ({ onNavigate }) => {
                                  <div><h4 className="font-bold">{item.name}</h4><div className="text-xs text-slate-500 mt-1">Mixed Colors</div></div>
                                  <div className="flex items-center justify-between">
                                     <div className="flex flex-col"><span className="text-xs text-slate-400 line-through">${item.oldPrice}</span><span className="text-lg font-bold text-[var(--color-accent-light)]">${item.price}</span></div>
-                                    <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-[var(--color-accent-light)] flex items-center justify-center transition-colors"><span className="material-icons text-sm">add</span></button>
+                                    <button 
+                                       onClick={() => addToCart({
+                                          id: item.name.toLowerCase().replace(/\s+/g, '-'),
+                                          name: item.name,
+                                          price: parseFloat(item.price),
+                                          quantity: 1,
+                                          category: 'Produce',
+                                          image: item.img,
+                                          division: 'market'
+                                       })}
+                                       className="w-8 h-8 rounded-full bg-slate-100 hover:bg-[var(--color-accent-light)] flex items-center justify-center transition-colors"
+                                    >
+                                       <span className="material-icons text-sm">add</span>
+                                    </button>
                                  </div>
                               </div>
                            </motion.div>

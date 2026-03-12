@@ -29,7 +29,7 @@ export default function MarketCms({
                 color: 'var(--mcms-text)'
             }}
         >
-            <div className="flex-1 overflow-y-auto relative p-4 sm:p-6 md:p-8 lg:p-12 pb-24 sm:pb-28 md:pb-32" data-lenis-prevent>
+            <div className="flex-1 overflow-y-auto relative p-4 sm:p-6 md:p-8 lg:p-10 pb-24 sm:pb-32" data-lenis-prevent>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
@@ -38,11 +38,11 @@ export default function MarketCms({
                         exit={{ opacity: 0, y: -15 }}
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     >
-                        {activeTab === "dashboard" && <MarketDashboard cms={cms} />}
+                        {activeTab === "dashboard" && <MarketDashboard cms={cms} isDarkMode={isDarkMode} />}
 
-                        {activeTab === "orders" && <OrdersManager />}
+                        {activeTab === "orders" && <OrdersManager isDarkMode={isDarkMode} />}
 
-                        {activeTab === "deliveries" && <DeliveriesManager />}
+                        {activeTab === "deliveries" && <DeliveriesManager isDarkMode={isDarkMode} />}
 
                         {activeTab === "inventory" && (
                             <ProductGrid
@@ -56,6 +56,7 @@ export default function MarketCms({
                                 onBulkDelete={cms.bulkDelete}
                                 onBulkStatus={cms.bulkUpdateStatus}
                                 onExportCSV={cms.exportCSV}
+                                isDarkMode={isDarkMode}
                             />
                         )}
 
@@ -72,20 +73,21 @@ export default function MarketCms({
                                 onBulkStatus={cms.bulkUpdateStatus}
                                 onExportCSV={cms.exportCSV}
                                 categoryFilter={["Flash Sale", "Deals"]}
+                                isDarkMode={isDarkMode}
                             />
                         )}
 
                         {activeTab === "crm" && (
                             <div className="space-y-8">
-                                <ComplaintsManager />
+                                <ComplaintsManager isDarkMode={isDarkMode} />
                                 <div className="pt-8 border-t" style={{ borderColor: 'var(--mcms-card-border)' }}>
                                     <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--mcms-heading)' }}>Customer Reviews</h3>
-                                    <ReviewsManager />
+                                    <ReviewsManager isDarkMode={isDarkMode} />
                                 </div>
                             </div>
                         )}
 
-                        {activeTab === "categories" && <CategoryManager products={products} onRefresh={cms.fetchProducts} />}
+                        {activeTab === "categories" && <CategoryManager products={products} onRefresh={cms.fetchProducts} isDarkMode={isDarkMode} />}
                     </motion.div>
                 </AnimatePresence>
             </div>

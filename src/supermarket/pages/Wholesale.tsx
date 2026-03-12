@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '../context/CartContext';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 import { MOCK_PRODUCTS } from '../data/mockDb';
 import { Product } from '../types';
 
 const Wholesale: React.FC = () => {
-  const { addToCart, cart } = useCart();
+  const { addToCart, cart } = useGlobalCart();
 
   // Local state for filters
   const [skuSearch, setSkuSearch] = useState('');
@@ -43,7 +43,15 @@ const Wholesale: React.FC = () => {
   const getQty = (id: string) => quantities[id] ?? 1;
 
   const handleAddToOrder = (item: Product) => {
-    addToCart(item, getQty(item.id));
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: getQty(item.id),
+      category: item.category,
+      image: item.image,
+      division: 'market'
+    });
   };
 
   const handleExport = () => {
@@ -231,18 +239,17 @@ const Wholesale: React.FC = () => {
           </div>
 
           <div className="flex-1 p-6 overflow-y-auto space-y-3">
-            {cart.items.filter(i => i.context === 'WHOLESALE').length === 0 ? (
+            {cart.filter(i => i.division === 'market').length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-10">No wholesale items in cart.</p>
             ) : (
-              cart.items.filter(i => i.context === 'WHOLESALE').map(item => (
-                <div key={item.cartId} className="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border border-gray-200 dark:border-slate-700">
+              cart.filter(i => i.division === 'market').map(item => (
+                <div key={item.id} className="bg-white dark:bg-slate-800 p-3 rounded shadow-sm border border-gray-200 dark:border-slate-700">
                   <div className="flex justify-between items-start mb-1">
                     <span className="font-semibold text-sm line-clamp-1 text-slate-900 dark:text-white">{item.name}</span>
-                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">₦{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                    <span>{item.quantity} x {item.unit}</span>
-                    <span className="bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{item.tierInfo || 'Standard'}</span>
+                    <span>{item.quantity} units</span>
                   </div>
                 </div>
               ))
@@ -250,19 +257,18 @@ const Wholesale: React.FC = () => {
           </div>
 
           <div className="p-6 space-y-4 border-t border-gray-200 dark:border-slate-800">
-            <div className="bg-slate-200 dark:bg-slate-800 rounded p-4 border border-slate-300 dark:border-slate-700">
-              <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-3 flex items-center gap-1"><span className="material-icons text-sm">local_shipping</span> Logistics Estimation</div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div><div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Total Weight</div><div className="text-lg font-bold text-slate-900 dark:text-white">{(cart.items.filter(i => i.context === 'WHOLESALE').length * 20 + 50).toFixed(0)} kg</div></div>
-                <div><div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Est. Pallets</div><div className="text-lg font-bold text-slate-900 dark:text-white">{Math.ceil(cart.items.filter(i => i.context === 'WHOLESALE').length / 10)}</div></div>
-              </div>
-            </div>
-
             <div className="flex justify-between items-end">
               <span className="text-base font-bold text-slate-900 dark:text-white">Wholesale Total</span>
-              <span className="text-2xl font-bold text-[var(--color-accent-light)]">${cart.wholesaleSubtotal.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-[var(--color-accent-light)]">₦{cart.filter(i => i.division === 'market').reduce((sum, i) => sum + i.price * i.quantity, 0).toLocaleString()}</span>
             </div>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full bg-[var(--color-accent-light)] hover:bg-orange-600 text-white font-bold py-3 rounded shadow-lg flex items-center justify-center gap-2 transition-colors">
+            <motion.button 
+              whileHover={{ scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }} 
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('switch-view', { detail: 'checkout' }));
+              }}
+              className="w-full bg-[var(--color-accent-light)] hover:bg-orange-600 text-white font-bold py-3 rounded shadow-lg flex items-center justify-center gap-2 transition-colors"
+            >
               Proceed to Logistics <span className="material-icons text-sm">arrow_forward</span>
             </motion.button>
           </div>

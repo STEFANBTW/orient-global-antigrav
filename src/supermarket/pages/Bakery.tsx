@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cmsApi } from '@/services/cmsApi';
+import { useGlobalCart } from '../../context/GlobalCartContext';
 
 interface BakeryProps {
   onNavigate: (page: any) => void;
 }
 
 const Bakery: React.FC<BakeryProps> = ({ onNavigate }) => {
+  const { addToCart, cart } = useGlobalCart();
   const [cmsData, setCmsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,9 +54,11 @@ const Bakery: React.FC<BakeryProps> = ({ onNavigate }) => {
             <span className="text-sm font-sans uppercase tracking-widest text-[#5A5A40]">Back to Market</span>
           </button>
           <h1 className="text-3xl font-serif italic text-[#5A5A40]">The Bakery</h1>
-          <button className="relative p-2">
+          <button onClick={() => onNavigate('Cart')} className="relative p-2">
             <span className="material-icons text-[#5A5A40]">shopping_bag</span>
-            <span className="absolute top-0 right-0 w-2 h-2 bg-[#5A5A40] rounded-full"></span>
+            {cart.length > 0 && (
+              <span className="absolute top-0 right-0 w-2 h-2 bg-[#5A5A40] rounded-full"></span>
+            )}
           </button>
         </div>
       </header>
@@ -112,7 +116,18 @@ const Bakery: React.FC<BakeryProps> = ({ onNavigate }) => {
                 <div className="bg-white rounded-[32px] p-4 mb-5 shadow-[0_4px_20px_rgba(90,90,64,0.05)] transition-shadow group-hover:shadow-[0_8px_30px_rgba(90,90,64,0.1)]">
                   <div className="h-64 rounded-[24px] overflow-hidden relative">
                     <img src={product.img} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <button className="absolute bottom-4 right-4 w-10 h-10 bg-[#f5f5f0] rounded-full flex items-center justify-center text-[#5A5A40] opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                    <button 
+                      onClick={() => addToCart({
+                        id: product.name.toLowerCase().replace(/\s+/g, '-'),
+                        name: product.name,
+                        price: parseFloat(product.price.replace(/[^0-9.]/g, '')),
+                        quantity: 1,
+                        category: 'Bakery',
+                        image: product.img,
+                        division: 'bakery'
+                      })}
+                      className="absolute bottom-4 right-4 w-10 h-10 bg-[#f5f5f0] rounded-full flex items-center justify-center text-[#5A5A40] opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
+                    >
                       <span className="material-icons text-sm">add</span>
                     </button>
                   </div>

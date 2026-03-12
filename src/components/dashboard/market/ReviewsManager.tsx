@@ -22,7 +22,7 @@ interface Review {
     product_name?: string;
 }
 
-export default function ReviewsManager() {
+export default function ReviewsManager({ isDarkMode = true }: { isDarkMode?: boolean }) {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
@@ -70,163 +70,132 @@ export default function ReviewsManager() {
     const ratingDist = [5, 4, 3, 2, 1].map(n => ({ stars: n, count: reviews.filter(r => r.rating === n).length }));
 
     return (
-        <div className="space-y-6 mcms">
+        <div className="space-y-8 mcms">
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-4">
-                <Card className="border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'rgba(245, 158, 11, 0.2)' }}>
-                    <CardHeader className="p-4">
-                        <div className="flex items-center gap-2">
-                            <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
-                            <div>
-                                <p className="text-2xl font-bold" style={{ color: 'var(--mcms-text)' }}>{avgRating}</p>
-                                <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--mcms-text-muted)' }}>Avg Rating</p>
-                            </div>
-                        </div>
-                    </CardHeader>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="p-5 border shadow-sm" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                    <div className="flex items-center gap-2 mb-1" style={{ color: 'var(--mcms-text-muted)' }}><Star className="w-4 h-4 text-amber-500 fill-amber-500" /> <span className="text-[10px] font-black uppercase tracking-widest">Average Score</span></div>
+                    <span className="text-3xl font-bold tracking-tight" style={{ color: 'var(--mcms-text)' }}>{avgRating}</span>
                 </Card>
-                <Card className="border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'rgba(99, 102, 241, 0.2)' }}>
-                    <CardHeader className="p-4">
-                        <div className="flex items-center gap-2">
-                            <MessageSquare className="w-6 h-6 text-indigo-500" />
-                            <div>
-                                <p className="text-2xl font-bold" style={{ color: 'var(--mcms-text)' }}>{reviews.length}</p>
-                                <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--mcms-text-muted)' }}>Total Reviews</p>
-                            </div>
-                        </div>
-                    </CardHeader>
+                <Card className="p-5 border shadow-sm" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                    <div className="flex items-center gap-2 mb-1" style={{ color: 'var(--mcms-text-muted)' }}><MessageSquare className="w-4 h-4 text-indigo-500" /> <span className="text-[10px] font-black uppercase tracking-widest">Feedback Count</span></div>
+                    <span className="text-3xl font-bold tracking-tight" style={{ color: 'var(--mcms-text)' }}>{reviews.length}</span>
                 </Card>
-                <Card className="border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                    <CardHeader className="p-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">{pendingCount}</div>
-                            <div>
-                                <p className="text-2xl font-bold" style={{ color: 'var(--mcms-text)' }}>{pendingCount}</p>
-                                <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--mcms-text-muted)' }}>Pending</p>
-                            </div>
-                        </div>
-                    </CardHeader>
+                <Card className="p-5 border shadow-sm" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                    <div className="flex items-center gap-2 mb-1 text-amber-500"><div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" /> <span className="text-[10px] font-black uppercase tracking-widest">Awaiting Approval</span></div>
+                    <span className="text-3xl font-bold tracking-tight" style={{ color: 'var(--mcms-text)' }}>{pendingCount}</span>
                 </Card>
             </div>
 
-            {/* Rating distribution */}
-            <Card className="border" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
-                <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--mcms-text-muted)' }}>Rating Distribution</CardTitle>
-                </CardHeader>
-                <div className="px-4 pb-4 space-y-1.5">
-                    {ratingDist.map(d => (
-                        <div key={d.stars} className="flex items-center gap-2 text-xs">
-                            <span className="w-6 font-medium" style={{ color: 'var(--mcms-text-muted)' }}>{d.stars}★</span>
-                            <div className="flex-1 rounded-full h-2 overflow-hidden" style={{ backgroundColor: 'var(--mcms-kanban-bg)' }}>
-                                <div className="bg-amber-400 h-full rounded-full" style={{ width: `${reviews.length ? (d.count / reviews.length) * 100 : 0}%` }} />
-                            </div>
-                            <span className="w-6 text-right" style={{ color: 'var(--mcms-text-micro)' }}>{d.count}</span>
-                        </div>
-                    ))}
-                </div>
-            </Card>
-
-            {/* Filter tabs */}
-            <div className="flex gap-1.5">
-                {(["all", "pending", "approved"] as const).map(f => (
-                    <Button
-                        key={f}
-                        size="sm"
-                        variant={filter === f ? "default" : "outline"}
-                        onClick={() => setFilter(f)}
-                        className="rounded-full text-xs capitalize transition-all"
-                        style={{
-                            backgroundColor: filter === f ? 'var(--mcms-accent)' : 'transparent',
-                            borderColor: filter === f ? 'var(--mcms-accent)' : 'var(--mcms-card-border)',
-                            color: filter === f ? '#fff' : 'var(--mcms-text)'
-                        }}
-                    >
-                        {f}{f === "pending" && pendingCount > 0 ? ` (${pendingCount})` : ""}
-                    </Button>
-                ))}
-            </div>
-
-            {/* Reviews list */}
-            {loading ? (
-                <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--mcms-text-micro)' }} /></div>
-            ) : filtered.length === 0 ? (
-                <p className="text-center text-sm py-12" style={{ color: 'var(--mcms-text-micro)' }}>No reviews yet</p>
-            ) : (
-                <div className="space-y-3">
-                    {filtered.map(r => (
-                        <Card key={r.id} className="border" style={{
-                            backgroundColor: 'var(--mcms-card)',
-                            borderColor: r.is_approved ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                            boxShadow: 'none'
-                        }}>
-                            <div className="p-4">
-                                <div className="flex items-start justify-between mb-2">
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-semibold text-sm" style={{ color: 'var(--mcms-text)' }}>{r.customer_name}</span>
-                                            {r.is_verified_purchase && <Badge className="border-none" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>Verified Purchase</Badge>}
-                                            {!r.is_approved && <Badge className="border-none" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>Pending</Badge>}
-                                        </div>
-                                        <p className="text-[10px]" style={{ color: 'var(--mcms-text-micro)' }}>{r.product_name} · {new Date(r.created_at).toLocaleDateString()}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 space-y-6">
+                    {/* Rating distribution */}
+                    <Card className="p-5 border shadow-sm" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest mb-4 opacity-40" style={{ color: 'var(--mcms-text)' }}>Rating Breakdown</h3>
+                        <div className="space-y-3">
+                            {ratingDist.map(d => (
+                                <div key={d.stars} className="flex items-center gap-3 text-xs">
+                                    <span className="w-6 font-bold" style={{ color: 'var(--mcms-text-muted)' }}>{d.stars}★</span>
+                                    <div className="flex-1 rounded-full h-1.5 overflow-hidden" style={{ backgroundColor: 'var(--mcms-kanban-bg)' }}>
+                                        <div className="bg-amber-400 h-full rounded-full transition-all duration-500" style={{ width: `${reviews.length ? (d.count / reviews.length) * 100 : 0}%` }} />
                                     </div>
-                                    <div className="flex">
-                                        {Array.from({ length: 5 }).map((_, i) => (
-                                            <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? "text-amber-400 fill-amber-400" : ""}`} style={{ color: i >= r.rating ? 'var(--mcms-kanban-bg)' : undefined }} />
-                                        ))}
-                                    </div>
+                                    <span className="text-[9px] font-bold opacity-30" style={{ color: 'var(--mcms-text)' }}>{d.count}</span>
                                 </div>
-                                {r.title && <p className="font-medium text-sm mb-1" style={{ color: 'var(--mcms-text)' }}>{r.title}</p>}
-                                <p className="text-sm mb-3" style={{ color: 'var(--mcms-text-muted)' }}>{r.review_text}</p>
-                                {r.admin_response && (
-                                    <div className="rounded-lg p-3 mt-2 border" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#3b82f6' }}>Admin Response</p>
-                                        <p className="text-xs" style={{ color: 'var(--mcms-text)' }}>{r.admin_response}</p>
-                                    </div>
-                                )}
-                                {respondingTo === r.id && (
-                                    <div className="mt-3 space-y-2">
-                                        <Textarea
-                                            value={responseText}
-                                            onChange={(e) => setResponseText(e.target.value)}
-                                            placeholder="Write your public response..."
-                                            className="text-sm border"
-                                            style={{ backgroundColor: 'var(--mcms-input-bg)', color: 'var(--mcms-text)', borderColor: 'var(--mcms-card-border)' }}
-                                        />
-                                        <div className="flex gap-2 justify-end">
-                                            <Button size="sm" variant="outline" onClick={() => setRespondingTo(null)} className="text-xs rounded-lg" style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text)' }}>Cancel</Button>
-                                            <Button size="sm" onClick={() => submitResponse(r.id)} className="text-xs rounded-lg text-white border-none" style={{ backgroundColor: 'var(--mcms-accent)' }}>Submit</Button>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Filter tabs */}
+                    <div className="flex flex-col gap-2">
+                        {(["all", "pending", "approved"] as const).map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setFilter(f)}
+                                className={`h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between transition-all ${filter === f ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg shadow-black/10' : 'bg-white/5 hover:bg-white/10 opacity-60'}`}
+                                style={{ color: filter === f ? undefined : 'var(--mcms-text)' }}
+                            >
+                                {f}
+                                <span className="px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/10 text-[9px]">{f === "all" ? reviews.length : f === "pending" ? pendingCount : reviews.length - pendingCount}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="lg:col-span-2">
+                    {/* Reviews list */}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin opacity-20" /></div>
+                    ) : filtered.length === 0 ? (
+                        <div className="flex items-center justify-center py-20 border-2 border-dashed rounded-3xl opacity-20" style={{ borderColor: 'var(--mcms-card-border)' }}>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">No matching feedback found</span>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {filtered.map(r => (
+                                <Card key={r.id} className="p-5 border shadow-sm group hover:shadow-md transition-all duration-300" style={{ backgroundColor: 'var(--mcms-card)', borderColor: 'var(--mcms-card-border)' }}>
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-sm font-bold opacity-80" style={{ color: 'var(--mcms-text)' }}>
+                                                {r.customer_name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-0.5">
+                                                    <span className="font-bold text-sm tracking-tight" style={{ color: 'var(--mcms-text)' }}>{r.customer_name}</span>
+                                                    {r.is_verified_purchase && <Badge className="bg-green-500/5 text-green-500 border-green-500/10 border text-[8px] font-black uppercase px-1.5 py-0">Verified</Badge>}
+                                                </div>
+                                                <p className="text-[10px] font-medium opacity-40 uppercase tracking-wider" style={{ color: 'var(--mcms-text)' }}>{r.product_name} · {new Date(r.created_at).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-0.5">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <Star key={i} className={`w-3 h-3 ${i < r.rating ? "text-amber-400 fill-amber-400" : "opacity-10"}`} style={{ color: i >= r.rating ? 'var(--mcms-text)' : undefined }} />
+                                            ))}
                                         </div>
                                     </div>
-                                )}
-                                <div className="flex gap-2 mt-2">
-                                    {!r.is_approved && (
-                                        <Button size="sm" onClick={() => approveReview(r.id)} className="text-[10px] text-white rounded-full h-7 gap-1 border-none bg-green-600 hover:bg-green-700">
-                                            <Check className="w-3 h-3" /> Approve
-                                        </Button>
+                                    
+                                    {r.title && <p className="font-bold text-sm mb-1 tracking-tight" style={{ color: 'var(--mcms-text)' }}>{r.title}</p>}
+                                    <p className="text-[11px] font-medium opacity-60 leading-relaxed mb-6" style={{ color: 'var(--mcms-text)' }}>{r.review_text}</p>
+                                    
+                                    {r.admin_response && (
+                                        <div className="rounded-2xl p-4 mb-6 border-l-4 border-blue-500/20" style={{ backgroundColor: 'rgba(59, 130, 246, 0.03)' }}>
+                                            <p className="text-[9px] font-black uppercase tracking-widest mb-1.5 text-blue-500">Merchant Response</p>
+                                            <p className="text-[11px] font-medium opacity-70" style={{ color: 'var(--mcms-text)' }}>{r.admin_response}</p>
+                                        </div>
                                     )}
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => { setRespondingTo(r.id); setResponseText(r.admin_response || ""); }}
-                                        className="text-[10px] rounded-full h-7 gap-1 border"
-                                        style={{ borderColor: 'var(--mcms-card-border)', color: 'var(--mcms-text)' }}
-                                    >
-                                        <MessageSquare className="w-3 h-3" /> Respond
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => rejectReview(r.id)}
-                                        className="text-[10px] rounded-full h-7 gap-1 text-red-500 hover:bg-red-50 border-red-500/20"
-                                    >
-                                        <X className="w-3 h-3" /> Remove
-                                    </Button>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
+
+                                    {respondingTo === r.id && (
+                                        <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <Textarea
+                                                value={responseText}
+                                                onChange={(e) => setResponseText(e.target.value)}
+                                                placeholder="Type your public response here..."
+                                                className="text-[11px] min-h-[100px] border-none bg-black/5 dark:bg-white/5 rounded-xl resize-none"
+                                            />
+                                            <div className="flex gap-2 justify-end">
+                                                <button onClick={() => setRespondingTo(null)} className="h-8 px-4 text-[9px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">Discard</button>
+                                                <button onClick={() => submitResponse(r.id)} className="h-8 px-5 rounded-lg text-[9px] font-black uppercase tracking-widest text-white border-none" style={{ backgroundColor: 'var(--mcms-accent)' }}>Post Response</button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-2 pt-2">
+                                        {!r.is_approved && (
+                                            <button onClick={() => approveReview(r.id)} className="h-7 px-4 text-[9px] font-black uppercase tracking-widest bg-green-500 text-white rounded-full hover:scale-105 active:scale-95 transition-all">Publish</button>
+                                        )}
+                                        <button 
+                                            onClick={() => { setRespondingTo(r.id); setResponseText(r.admin_response || ""); }} 
+                                            className={`h-7 px-4 text-[9px] font-black uppercase tracking-widest rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-900'}`}
+                                        >
+                                            Reply
+                                        </button>
+                                        <button onClick={() => rejectReview(r.id)} className="ml-auto h-7 px-4 text-[9px] font-black uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors">Delete</button>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

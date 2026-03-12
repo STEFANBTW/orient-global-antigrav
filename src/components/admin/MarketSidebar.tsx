@@ -53,10 +53,10 @@ export default function MarketSidebar({
                         <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
                     </div>
                 </div>
-                <div className={`w-full h-32 rounded-lg ${bgInput} border ${isDarkMode ? 'border-white/10' : 'border-gray-200'} overflow-hidden relative group cursor-pointer bg-orange-500/10 flex items-center justify-center`}>
+                <div className={`w-full h-28 rounded-xl ${bgInput} border ${isDarkMode ? 'border-white/[0.05]' : 'border-slate-100'} overflow-hidden relative group cursor-pointer bg-orange-500/[0.03] flex items-center justify-center transition-all hover:bg-orange-500/[0.06]`}>
                     <div className="text-center">
-                        <ShoppingCart size={24} className="text-orange-500/30 mx-auto mb-2" />
-                        <p className="text-[10px] font-black uppercase tracking-tighter text-orange-500/50">Market Suite Live</p>
+                        <ShoppingCart size={20} className="text-orange-500/20 mx-auto mb-2" />
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-orange-500/40">Market Suite Live</p>
                     </div>
                 </div>
             </div>
@@ -78,14 +78,14 @@ export default function MarketSidebar({
             </div>
 
             {/* Sticky Action Footer */}
-            <div className={`p-5 ${bgFooter} border-t ${borderCol} space-y-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] transition-colors duration-300`}>
+            <div className={`p-6 ${bgFooter} border-t ${borderCol} space-y-4 transition-colors duration-300`}>
                 {/* Global Save */}
                 <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="w-full flex items-center justify-center gap-2 p-3.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-sm transition-all shadow-[0_4px_14px_rgba(249,115,22,0.3)] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2.5 p-3.5 bg-orange-500 hover:bg-orange-400 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                     {isSaving ? "Syncing Modules..." : "Commit Site Updates"}
                 </button>
             </div>

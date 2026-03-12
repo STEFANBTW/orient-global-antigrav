@@ -15,7 +15,7 @@ import BakeryCms from "./BakeryCms";
 import BakerySidebar from "./BakerySidebar";
 import MarketCms from "./MarketCms";
 import MarketSidebar from "./MarketSidebar";
-import { cmsData as cmsApi } from "../../lib/bakeryCmsData";
+import { cmsApi, DEFAULT_BAKERY_CMS } from "../../lib/bakeryCmsData";
 
 export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
   // --- GLOBAL DASHBOARD STATE ---
@@ -26,12 +26,27 @@ export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   // --- BAKERY CMS LIFTED STATE ---
-  const [cmsData, setCmsData] = useState(cmsApi.getBakeryData());
+  const [cmsData, setCmsData] = useState<any>(DEFAULT_BAKERY_CMS);
   const [isSaving, setIsSaving] = useState(false);
-  const [goldenHour, setGoldenHour] = useState(cmsData.settings?.goldenHour || false);
-  const [holidayPreset, setHolidayPreset] = useState(cmsData.settings?.holidayPreset || "default");
+  const [goldenHour, setGoldenHour] = useState(false);
+  const [holidayPreset, setHolidayPreset] = useState("default");
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const handleBakerySave = () => {
+  // Initialize data on mount
+  React.useEffect(() => {
+    const initData = async () => {
+      const data = await cmsApi.getBakeryData();
+      if (data) {
+        setCmsData(data);
+        setGoldenHour(data.settings?.goldenHour || false);
+        setHolidayPreset(data.settings?.holidayPreset || "default");
+      }
+      setInitialFetchDone(true);
+    };
+    initData();
+  }, []);
+
+  const handleBakerySave = async () => {
     setIsSaving(true);
     const updatedData = {
       ...cmsData,
@@ -41,10 +56,17 @@ export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
         holidayPreset
       }
     };
-    setTimeout(() => {
-      cmsApi.saveBakeryData(updatedData);
+    
+    try {
+      const success = await cmsApi.saveBakeryData(updatedData);
+      if (success) {
+        // Option: show toast or success message
+      }
+    } catch (error) {
+      console.error("Failed to save bakery data:", error);
+    } finally {
       setIsSaving(false);
-    }, 1500);
+    }
   };
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
@@ -146,11 +168,11 @@ export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
       {/* 1. MASTER SHELL: PRIMARY LEFT SIDEBAR */}
       <div className={`fixed top-0 left-0 h-full ${bgMain} flex flex-col py-8 z-50 border-r ${borderCol} justify-between transition-all duration-300 ease-in-out ${sidebarWidth}`}>
         <div className="flex flex-col gap-8 w-full">
-          <div className={`flex items-center gap-3 px-6 cursor-pointer`} onClick={onCancel}>
-            <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center font-black text-white text-lg shadow-xl shadow-orange-500/20">
+          <div className={`flex items-center gap-3 px-6 cursor-pointer group`} onClick={onCancel}>
+            <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center font-bold text-white text-lg shadow-lg group-hover:scale-105 transition-transform">
               OG
             </div>
-            {isSidebarExpanded && <span className={`font-black tracking-tight text-lg whitespace-nowrap ${textMain}`}>Orient Global</span>}
+            {isSidebarExpanded && <span className={`font-bold tracking-tight text-lg whitespace-nowrap ${textMain}`}>Orient Global</span>}
           </div>
 
           <div className="flex flex-col gap-2 w-full px-4">
@@ -163,7 +185,7 @@ export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
 
         <div className="flex flex-col w-full px-3 gap-6">
           <div className="space-y-2">
-            {isSidebarExpanded && <span className={`text-[11px] uppercase font-black ${textMuted} tracking-widest px-6 mb-5 block`}>Divisions</span>}
+            {isSidebarExpanded && <span className={`text-[10px] uppercase font-bold ${textMuted} tracking-[0.2em] px-6 mb-4 block opacity-50`}>Divisions</span>}
             <div className="flex flex-col gap-2 w-full px-4">
               {Object.keys(divisionData).map(key => (
                 <SidebarIcon
@@ -308,17 +330,17 @@ export default function AdminDashboard({ onCancel }: { onCancel: () => void }) {
 // SHARED BUTTON COMPONENT
 function SidebarIcon({ icon, label, active, isExpanded, isDarkMode, onClick }: any) {
   const activeClass = active
-    ? (isDarkMode ? "bg-slate-800 text-white shadow-xl shadow-black/40 ring-1 ring-white/10" : "bg-white text-orange-600 shadow-xl border border-gray-100")
-    : (isDarkMode ? "text-slate-500 hover:bg-slate-800/40 hover:text-slate-200" : "text-slate-500 hover:bg-gray-100 hover:text-slate-800");
+    ? (isDarkMode ? "bg-white/[0.03] text-white shadow-sm ring-1 ring-white/10" : "bg-white text-orange-600 shadow-sm border border-slate-100")
+    : (isDarkMode ? "text-slate-500 hover:bg-white/[0.02] hover:text-slate-200" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800");
 
   return (
-    <div className="group relative w-full flex justify-center">
-      <button onClick={onClick} className={`p-4 rounded-xl transition-all w-full flex items-center gap-5 ${isExpanded ? "px-5" : "justify-center"} ${activeClass}`}>
-        <div className="shrink-0">{icon}</div>
+    <div className="group relative w-full flex justify-center px-1">
+      <button onClick={onClick} className={`p-3.5 rounded-xl transition-all w-full flex items-center gap-4 ${isExpanded ? "px-5" : "justify-center"} ${activeClass}`}>
+        <div className={`shrink-0 ${active ? (isDarkMode ? 'text-orange-400' : 'text-orange-500') : 'opacity-40 group-hover:opacity-100'} transition-all`}>{icon}</div>
         {isExpanded && <span className="text-sm font-bold tracking-tight whitespace-nowrap">{label}</span>}
       </button>
       {!isExpanded && (
-        <div className={`absolute left-20 top-1/2 -translate-y-1/2 px-4 py-2.5 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-900'} text-white text-xs font-black tracking-widest uppercase rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-2xl ring-1 ring-white/10`}>
+        <div className={`absolute left-20 top-1/2 -translate-y-1/2 px-4 py-2 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-900'} text-white text-[10px] font-bold tracking-widest uppercase rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl ring-1 ring-white/10`}>
           {label}
         </div>
       )}
@@ -343,10 +365,10 @@ function HealthView({ isDarkMode }: any) { return <PlaceholderView isDarkMode={i
 
 function PlaceholderView({ title, icon, isDarkMode }: any) {
   return (
-    <div className={`w-full border ${isDarkMode ? 'bg-[#1e232b] border-slate-800 text-slate-500' : 'bg-white border-gray-200 text-slate-400'} rounded-2xl p-24 flex flex-col items-center justify-center text-center fade-in`}>
-      <div className={`p-6 rounded-full mb-6 ${isDarkMode ? 'bg-slate-800' : 'bg-gray-100'}`}>{icon}</div>
-      <h3 className={`text-2xl font-black mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{title} Module</h3>
-      <p className="max-w-sm leading-relaxed text-sm font-medium">This module is part of the unified Orient Global command center.</p>
+    <div className={`w-full border-none ${isDarkMode ? 'bg-white/[0.02] text-slate-500' : 'bg-slate-50 text-slate-400'} rounded-3xl p-24 flex flex-col items-center justify-center text-center fade-in`}>
+      <div className={`p-6 rounded-2xl mb-8 ${isDarkMode ? 'bg-white/[0.01]' : 'bg-white shadow-sm'}`}>{icon}</div>
+      <h3 className={`text-xl font-bold mb-3 tracking-tight ${isDarkMode ? 'text-white/80' : 'text-slate-800'}`}>{title} Module</h3>
+      <p className="max-w-xs leading-relaxed text-xs font-medium opacity-60 uppercase tracking-widest">Unified Orient Global architecture</p>
     </div>
   );
 }
